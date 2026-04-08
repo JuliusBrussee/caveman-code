@@ -508,7 +508,7 @@ Every acceptance criterion from every kit requirement is listed below with its a
 ### T-018: RTK Integration Settings
 **Cavekit Requirement:** rtk-integration/R3
 **Acceptance Criteria Mapped:**
-- R3/AC-1: A boolean setting `rtk.enabled` exists in the settings manager, defaulting to `false`
+- R3/AC-1: A boolean setting `rtk.enabled` exists in the settings manager, defaulting to `true`
 - R3/AC-2: When `rtk.enabled` is `true` and RTK is available, bash command rewriting is active
 - R3/AC-3: When `rtk.enabled` is `false`, no RTK rewriting occurs regardless of binary availability
 - R3/AC-4: The setting is readable and writable through the existing settings manager API (`getRtkEnabled()` / `setRtkEnabled()`)
@@ -517,14 +517,14 @@ Every acceptance criterion from every kit requirement is listed below with its a
 **Effort:** M
 **Description:**
 1. Open `packages/coding-agent/src/core/settings-manager.ts`.
-2. Add `RtkSettings` interface: `{ enabled?: boolean }` (default `false`).
+2. Add `RtkSettings` interface: `{ enabled?: boolean }` (default `true`).
 3. Add `rtk?: RtkSettings` field to the `Settings` interface.
-4. Add getter `getRtkEnabled(): boolean` returning `this.settings.rtk?.enabled ?? false`.
+4. Add getter `getRtkEnabled(): boolean` returning `this.settings.rtk?.enabled ?? true`.
 5. Add setter `setRtkEnabled(enabled: boolean): void` following the `setCaveModeEnabled` pattern: ensure `this.globalSettings.rtk` exists, set `.enabled`, call `markModified("rtk", "enabled")`, call `save()`.
-6. Note: AC-2 and AC-3 are validated at the integration level in T-020/T-021, but the setting must default to `false` and persist correctly.
+6. Note: AC-2 and AC-3 are validated at the integration level in T-020/T-021, but the setting must default to `true` and persist correctly.
 **Files:**
 - `packages/coding-agent/src/core/settings-manager.ts`
-**Test Strategy:** Unit test: create SettingsManager with temp dir, verify `getRtkEnabled()` returns `false` by default. Call `setRtkEnabled(true)`, verify it returns `true`. Reload settings from disk, verify persistence.
+**Test Strategy:** Unit test: create SettingsManager with temp dir, verify `getRtkEnabled()` returns `true` by default. Call `setRtkEnabled(false)`, verify it returns `false`. Reload settings from disk, verify persistence.
 
 ---
 
@@ -684,7 +684,7 @@ Every acceptance criterion from cavekit-rtk-integration is listed below with its
 | rtk-integration | R2 | AC-6 | Compound commands passed as-is to rtk rewrite | T-019, T-022 |
 | rtk-integration | R2 | AC-7 | Rewrite adds <50ms latency | T-019, T-022 |
 | rtk-integration | R2 | AC-8 | Rewriting skipped when disabled or unavailable | T-019, T-020, T-021, T-022 |
-| rtk-integration | R3 | AC-1 | `rtk.enabled` setting exists, defaults to `false` | T-018, T-022 |
+| rtk-integration | R3 | AC-1 | `rtk.enabled` setting exists, defaults to `true` | T-018, T-022 |
 | rtk-integration | R3 | AC-2 | When enabled + available, rewriting is active | T-021, T-022 |
 | rtk-integration | R3 | AC-3 | When disabled, no rewriting regardless of availability | T-021, T-022 |
 | rtk-integration | R3 | AC-4 | Readable/writable via `getRtkEnabled()`/`setRtkEnabled()` | T-018, T-022 |

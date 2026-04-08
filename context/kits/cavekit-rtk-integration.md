@@ -40,7 +40,7 @@ Integration of [RTK (Rust Token Killer)](https://github.com/rtk-ai/rtk) into the
 **Description:** Users must be able to enable or disable RTK integration through the settings system, and the setting must persist across sessions.
 
 **Acceptance Criteria:**
-- [ ] A boolean setting `rtk.enabled` exists in the settings manager, defaulting to `false`
+- [ ] A boolean setting `rtk.enabled` exists in the settings manager, defaulting to `true`
 - [ ] When `rtk.enabled` is `true` and RTK is available (R1), bash command rewriting (R2) is active
 - [ ] When `rtk.enabled` is `false`, no RTK rewriting occurs regardless of binary availability
 - [ ] The setting is readable and writable through the existing settings manager API (`getRtkEnabled()` / `setRtkEnabled()`)
@@ -78,3 +78,10 @@ Integration of [RTK (Rust Token Killer)](https://github.com/rtk-ai/rtk) into the
 - `settings-manager.ts` — settings persistence layer
 - `agent-session.ts` — tool initialization in `_initToolsAndExtensions`
 - `tools/index.ts` — tool factory functions accepting `ToolsOptions`
+
+## Changelog
+
+### 2026-04-09 — Revision
+- **Affected:** R3/AC-1
+- **Summary:** Changed `rtk.enabled` default from `false` to `true`. RTK is now opt-out: users with rtk on PATH get compression automatically; users without rtk are unaffected (detection fails gracefully, no hook wired).
+- **Commits:** c87c6303
