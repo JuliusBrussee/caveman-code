@@ -71,6 +71,7 @@ import { copyToClipboard } from "../../utils/clipboard.js";
 import { extensionForImageMimeType, readClipboardImage } from "../../utils/clipboard-image.js";
 import { parseGitUrl } from "../../utils/git.js";
 import { ensureTool } from "../../utils/tools-manager.js";
+import { ActionBarComponent } from "./components/action-bar.js";
 import { ArminComponent } from "./components/armin.js";
 import { AssistantMessageComponent } from "./components/assistant-message.js";
 import { BashExecutionComponent } from "./components/bash-execution.js";
@@ -158,6 +159,7 @@ export class InteractiveMode {
 	private fdPath: string | undefined;
 	private editorContainer: Container;
 	private footer: FooterComponent;
+	private actionBar: ActionBarComponent;
 	private footerDataProvider: FooterDataProvider;
 	// Stored so the same manager can be injected into custom editors, selectors, and extension UI.
 	private keybindings: KeybindingsManager;
@@ -287,6 +289,7 @@ export class InteractiveMode {
 		this.footerDataProvider = new FooterDataProvider(this.sessionManager.getCwd());
 		this.footer = new FooterComponent(this.session, this.footerDataProvider);
 		this.footer.setAutoCompactEnabled(this.session.autoCompactionEnabled);
+		this.actionBar = new ActionBarComponent(() => this.getActionBarState());
 
 		// Load hide thinking block setting
 		this.hideThinkingBlock = this.settingsManager.getHideThinkingBlock();
@@ -535,6 +538,7 @@ export class InteractiveMode {
 		this.ui.addChild(this.widgetContainerAbove);
 		this.ui.addChild(this.editorContainer);
 		this.ui.addChild(this.widgetContainerBelow);
+		this.ui.addChild(this.actionBar);
 		this.ui.addChild(this.footer);
 		this.ui.setFocus(this.editor);
 
@@ -2952,6 +2956,28 @@ export class InteractiveMode {
 		} else {
 			this.showStatus(`Restored ${restored} queued message${restored > 1 ? "s" : ""} to editor`);
 		}
+	}
+
+	private getActionBarState() {
+		const caveState = this.session.getCaveModeSessionState();
+		return {
+			isStreaming: this.session.isStreaming,
+			thinkingLevel: this.session.thinkingLevel || "off",
+			modelName: this.session.state.model?.name || this.session.state.model?.id || "no-model",
+			toolsExpanded: this.toolOutputExpanded,
+			caveModeEnabled: caveState.enabled,
+			caveModeIntensity: caveState.intensity,
+			queuedMessageCount: this.compactionQueuedMessages.length,
+			isBashMode: this.isBashMode,
+			cavekitActive: this.detectCavekitActive(),
+		};
+	}
+
+	private detectCavekitActive(): boolean {
+		for (const key of this.skillCommands.keys()) {
+			if (key.startsWith("ck:")) return true;
+		}
+		return false;
 	}
 
 	private updateEditorBorderColor(): void {
