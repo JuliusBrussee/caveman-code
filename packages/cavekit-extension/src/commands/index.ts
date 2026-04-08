@@ -7,6 +7,7 @@ import type { CaveKitConfig } from "../config/index.js";
 import { registerArchitectCommand } from "./architect.js";
 import { registerBuildCommand } from "./build.js";
 import { registerConfigCommand } from "./config.js";
+import { registerConvergenceCommand } from "./convergence.js";
 import { registerDesignCommand } from "./design.js";
 import { registerDraftCommand } from "./draft.js";
 import { registerHelpCommand } from "./help.js";
@@ -24,4 +25,5 @@ export function registerCommands(pi: ExtensionAPI, config: CaveKitConfig): void 
 	registerConfigCommand(pi, config);
 	registerHelpCommand(pi, config);
 	registerProgressCommand(pi, config);
+	registerConvergenceCommand(pi, config);
 }
