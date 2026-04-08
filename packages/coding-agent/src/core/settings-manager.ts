@@ -1017,7 +1017,7 @@ export class SettingsManager {
 	}
 
 	getRtkEnabled(): boolean {
-		return this.settings.rtk?.enabled ?? false;
+		return this.settings.rtk?.enabled ?? true;
 	}
 
 	setRtkEnabled(enabled: boolean): void {
