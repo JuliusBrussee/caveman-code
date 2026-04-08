@@ -59,10 +59,14 @@ async function handleDesignCreate(pi: ExtensionAPI, ctx: ExtensionCommandContext
 	ctx.ui.notify("Starting guided DESIGN.md creation…", "info");
 	await ctx.waitForIdle();
 
+	// AC-3: Read existing blueprints for context
+	const cwd = path.dirname(designPath);
+	const blueprintContext = readBlueprintContext(cwd);
+
 	pi.sendUserMessage([
 		{
 			type: "text",
-			text: buildDesignCreatePrompt(designPath),
+			text: buildDesignCreatePrompt(designPath, blueprintContext),
 		},
 	]);
 }
@@ -100,7 +104,33 @@ async function handleDesignImport(
 	]);
 }
 
-function buildDesignCreatePrompt(designPath: string): string {
+/** Read blueprint files from context/blueprints/ to inform DESIGN.md creation. */
+function readBlueprintContext(cwd: string): string {
+	const blueprintsDir = path.join(cwd, "context", "blueprints");
+	if (!fs.existsSync(blueprintsDir)) return "";
+
+	const blueprintFiles = fs.readdirSync(blueprintsDir).filter((f) => f.endsWith(".md"));
+	if (blueprintFiles.length === 0) return "";
+
+	const sections: string[] = [];
+	for (const file of blueprintFiles.slice(0, 5)) {
+		// Limit to first 5 to avoid overwhelming context
+		try {
+			const content = fs.readFileSync(path.join(blueprintsDir, file), "utf8");
+			// Extract just the first 50 lines to get the header and scope
+			const excerpt = content.split("\n").slice(0, 50).join("\n");
+			sections.push(`### ${file}\n${excerpt}`);
+		} catch {
+			// ignore unreadable files
+		}
+	}
+
+	return sections.length > 0
+		? `\n\n## Existing Blueprint Context\nThe following blueprints are present in the project. Use them to pre-populate relevant sections of DESIGN.md:\n\n${sections.join("\n\n---\n\n")}`
+		: "";
+}
+
+function buildDesignCreatePrompt(designPath: string, blueprintContext: string): string {
 	return `You are helping create a DESIGN.md — the cross-cutting constraints document that will be injected into every build subagent during the CaveKit build phase.
 
 Ask the user questions one at a time to gather the following, then write the DESIGN.md:
@@ -114,6 +144,7 @@ Ask the user questions one at a time to gather the following, then write the DES
 7. **Performance constraints** — Any SLOs or resource limits
 8. **Data model principles** — DB patterns, schema conventions
 9. **Forbidden patterns** — What should never be done (anti-patterns to avoid)
+${blueprintContext}
 
 Write the final DESIGN.md to: ${designPath}
 

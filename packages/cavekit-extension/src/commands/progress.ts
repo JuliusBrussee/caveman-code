@@ -39,15 +39,25 @@ export function registerProgressCommand(pi: ExtensionAPI, _config: CaveKitConfig
 
 			const tiers = [...new Set(tasks.map((t) => t.tier))].sort((a, b) => a - b);
 
+			// AC-3: overall completion percentage
+			const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+			const barLen = 20;
+			const filled = Math.round((pct / 100) * barLen);
+			const bar = "█".repeat(filled) + "░".repeat(barLen - filled);
+
 			const lines = [
 				`Build Site: ${path.basename(siteFile)}`,
-				`Progress: ${done}/${total} tasks complete`,
+				`Progress: ${done}/${total} tasks complete (${pct}%)`,
+				`  [${bar}] ${pct}%`,
 				`  ✓ Done: ${done}  ● Active: ${inProgress}  ○ Pending: ${pending}  ✗ Blocked: ${blocked}`,
 				"",
+				"Per-tier breakdown:",
+				// AC-2: per-tier breakdown
 				...tiers.map((tier) => {
 					const tierTasks = tasks.filter((t) => t.tier === tier);
 					const tierDone = tierTasks.filter((t) => t.status === "done").length;
-					return `  Tier ${tier}: ${tierDone}/${tierTasks.length}  ${tierTasks.map((t) => statusIcon(t)).join(" ")}`;
+					const tierPct = tierTasks.length > 0 ? Math.round((tierDone / tierTasks.length) * 100) : 0;
+					return `  Tier ${tier}: ${tierDone}/${tierTasks.length} (${tierPct}%)  ${tierTasks.map((t) => statusIcon(t)).join(" ")}`;
 				}),
 			];
 

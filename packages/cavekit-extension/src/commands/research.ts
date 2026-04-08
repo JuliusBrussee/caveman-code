@@ -47,7 +47,12 @@ function buildResearchPrompt(topic: string, refsDir: string): string {
 ${topic}
 
 ## Instructions
-Research this topic thoroughly using the following parallel approach:
+Research this topic thoroughly using the following approach:
+
+**Web search (AC-3 — use when available):**
+- Search the web for current best practices, official docs, and community guidance on the topic
+- Use the WebSearch or WebFetch tool if available; otherwise note in the brief that web search was unavailable
+- Prioritize authoritative sources (official docs, RFC/spec documents, well-known engineering blogs)
 
 **Codebase exploration:**
 - Search the current codebase for existing implementations, patterns, or related code
@@ -60,7 +65,7 @@ Research this topic thoroughly using the following parallel approach:
 - Identify relevant libraries, tools, or patterns
 
 **Synthesis:**
-- Cross-validate findings from codebase and research
+- Cross-validate findings from codebase and web/research sources
 - Identify gaps between current state and best practices
 - Produce actionable recommendations
 
