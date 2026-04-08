@@ -92,3 +92,18 @@
 - ~ T-004: File Parsers (Kit & Build Site) → **pending**
 
 ---
+### Iteration 2
+
+**Wave:** 2  
+**Date:** 2026-04-08T14:05:05.343Z  
+**Status:** IN-PROGRESS  
+**Acceptance 0/24**  
+**Blocked:** 0  **Failed:** 0  **Active:** 0
+
+**Tasks this wave:**
+- ~ T-001: Fork Identity & Branding Setup → **pending**
+- ~ T-002: Extension Framework Core → **pending**
+- ~ T-003: Type System & Configuration Foundation → **pending**
+- ~ T-004: File Parsers (Kit & Build Site) → **pending**
+
+---
