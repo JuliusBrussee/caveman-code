@@ -1,28 +1,28 @@
 #!/usr/bin/env npx tsx
 /**
  * Migrate log.jsonl timestamps from milliseconds to Slack format (seconds.microseconds)
- * 
+ *
  * Usage: npx tsx scripts/migrate-timestamps.ts <data-dir>
  * Example: npx tsx scripts/migrate-timestamps.ts ./data
  */
 
-import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from "fs";
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "fs";
 import { join } from "path";
 
 function isMillisecondTimestamp(ts: string): boolean {
 	// Slack timestamps are seconds.microseconds, like "1764279530.533489"
 	// Millisecond timestamps are just big numbers, like "1764279320398"
-	// 
-	// Key insight: 
+	//
+	// Key insight:
 	// - Slack ts from 2025: ~1.7 billion (10 digits before decimal)
 	// - Millisecond ts from 2025: ~1.7 trillion (13 digits)
-	
+
 	// If it has a decimal and the integer part is < 10^12, it's Slack format
 	if (ts.includes(".")) {
 		const intPart = parseInt(ts.split(".")[0], 10);
 		return intPart > 1e12; // Unlikely to have decimal AND be millis, but check anyway
 	}
-	
+
 	// No decimal - check if it's too big to be seconds
 	const num = parseInt(ts, 10);
 	return num > 1e12; // If > 1 trillion, it's milliseconds
@@ -38,10 +38,10 @@ function convertToSlackTs(msTs: string): string {
 function migrateFile(filePath: string): { total: number; migrated: number } {
 	const content = readFileSync(filePath, "utf-8");
 	const lines = content.split("\n").filter(Boolean);
-	
+
 	let migrated = 0;
 	const newLines: string[] = [];
-	
+
 	for (const line of lines) {
 		try {
 			const msg = JSON.parse(line);
@@ -58,27 +58,27 @@ function migrateFile(filePath: string): { total: number; migrated: number } {
 			newLines.push(line);
 		}
 	}
-	
+
 	if (migrated > 0) {
 		writeFileSync(filePath, newLines.join("\n") + "\n", "utf-8");
 	}
-	
+
 	return { total: lines.length, migrated };
 }
 
 function findLogFiles(dir: string): string[] {
 	const logFiles: string[] = [];
-	
+
 	if (!existsSync(dir)) {
 		console.error(`Directory not found: ${dir}`);
 		return [];
 	}
-	
+
 	const entries = readdirSync(dir);
 	for (const entry of entries) {
 		const fullPath = join(dir, entry);
 		const stat = statSync(fullPath);
-		
+
 		if (stat.isDirectory()) {
 			// Check for log.jsonl in subdirectory
 			const logPath = join(fullPath, "log.jsonl");
@@ -87,7 +87,7 @@ function findLogFiles(dir: string): string[] {
 			}
 		}
 	}
-	
+
 	return logFiles;
 }
 

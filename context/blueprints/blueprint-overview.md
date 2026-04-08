@@ -42,9 +42,9 @@ fork-identity
 | fork-identity | 6 | 17 |
 | cave-mode | 6 | 23 |
 | extension-core | 8 | 29 |
-| extension-commands | 14 | 57 |
-| extension-ui | 5 | 18 |
-| **Total** | **39** | **144** |
+| extension-commands | 22 | 82 |
+| extension-ui | 6 | 20 |
+| **Total** | **48** | **172** |
 
 ## Key Cross-Cutting Concerns
 

@@ -2,7 +2,7 @@
 
 import { createCanvas } from "canvas";
 import { writeFileSync } from "fs";
-import { join, dirname } from "path";
+import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -28,6 +28,7 @@ const outputPath = join(__dirname, "..", "test", "data", "red-circle.png");
 
 // Ensure the directory exists
 import { mkdirSync } from "fs";
+
 mkdirSync(join(__dirname, "..", "test", "data"), { recursive: true });
 
 writeFileSync(outputPath, buffer);

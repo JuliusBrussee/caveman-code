@@ -1,6 +1,6 @@
 ---
 created: 2026-04-08
-last_edited: 2026-04-08
+last_edited: 2026-04-08-inspect
 status: draft
 ---
 
@@ -81,6 +81,24 @@ status: draft
 - T-037: Tier gate overlay (blockedBy: T-033) --> extension-ui/R3
 - T-038: Dependency graph visualization (blockedBy: T-030) --> extension-ui/R4
 - T-039: Keyboard shortcuts (blockedBy: T-035) --> extension-ui/R5
+
+## Tier 8 -- Inspect Findings (P0/P1 Fixes)
+
+- T-040: Fix kit parser / draft format mismatch (R-001 vs R1) --> extension-commands/R18
+- T-041: Fix build site path inconsistency (context/sites/ vs context/plans/) --> extension-commands/R19
+- T-042: Implement failed task retry in wave executor --> extension-commands/R17
+- T-043: Fix subagent binary name (hardcoded `pi` -> dynamic) --> extension-commands/R20
+- T-044: Fix stderr deadlock in subagent dispatch --> extension-commands/R22
+- T-045: Replace `git add -A` with safe staging --> extension-commands/R21
+
+## Tier 9 -- Inspect Findings (P2 Fixes + New Features)
+
+- T-046: Fix scoped context injection domain prefix mismatch --> extension-commands/R19
+- T-047: Wire kit reviewer overlay into draft workflow --> extension-ui/R6
+- T-048: Wire keyboard shortcut to dashboard toggle instance --> extension-ui/R1
+- T-049: Add convergence metrics to progress command --> extension-commands/R10
+- T-050: Formalize /ck:convergence command in blueprint --> extension-commands/R15
+- T-051: Formalize LLM-callable tools in blueprint --> extension-commands/R16
 
 ---
 
