@@ -14,6 +14,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
 import type { CaveKitConfig } from "../config/index.js";
+import { getBuildSiteDir } from "../paths.js";
 import { parseBuildSite } from "../wave/executor.js";
 
 /** Return true when a CaveKit SDD workflow is initialised in `cwd`. */
@@ -32,7 +33,7 @@ export function registerCompactionHook(pi: ExtensionAPI, _config: CaveKitConfig)
 
 		// --- Phase: infer from active build site or kit presence ---
 		const kitsDir = path.join(cwd, "context", "kits");
-		const sitesDir = path.join(cwd, "context", "sites");
+		const sitesDir = getBuildSiteDir(cwd);
 		const hasKits = fs.existsSync(kitsDir) && fs.readdirSync(kitsDir).some((f) => f.endsWith(".md"));
 		const hasSites = fs.existsSync(sitesDir) && fs.readdirSync(sitesDir).some((f) => f.endsWith(".md"));
 

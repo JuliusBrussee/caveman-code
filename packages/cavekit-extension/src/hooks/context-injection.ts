@@ -14,6 +14,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
 import type { CaveKitConfig } from "../config/index.js";
+import { getBuildSiteDir } from "../paths.js";
 import { parseBuildSite } from "../wave/executor.js";
 
 /** Return true when a CaveKit SDD workflow is initialised in `cwd`. */
@@ -26,7 +27,7 @@ function isSddActive(cwd: string): boolean {
  * Used to scope context injection to only the relevant requirements.
  */
 function getActiveKitRefs(cwd: string): Set<string> {
-	const sitesDir = path.join(cwd, "context", "sites");
+	const sitesDir = getBuildSiteDir(cwd);
 	if (!fs.existsSync(sitesDir)) return new Set();
 
 	const siteFiles = fs.readdirSync(sitesDir).filter((f) => f.endsWith(".md"));

@@ -112,7 +112,7 @@ ${refContext}
 
 ## Requirements
 
-### R-001: {Requirement Title}
+### R1: {Requirement Title}
 {1–2 sentence description of what must be true — implementation-agnostic}
 
 **Acceptance Criteria:**

@@ -207,8 +207,12 @@ export class WaveExecutor {
 					task.status = "blocked";
 					blocked++;
 					this.ctx.ui.notify(`BLOCKED: ${task.id} (${task.name}) — reached max iterations`, "error");
+				} else if (task.iterations >= this.config.maxRetries) {
+					task.status = "blocked";
+					blocked++;
+					this.ctx.ui.notify(`BLOCKED: ${task.id} (${task.name}) — exhausted ${this.config.maxRetries} retries`, "error");
 				} else {
-					task.status = "failed";
+					task.status = "pending"; // Reset for retry on next wave
 				}
 			}
 
@@ -260,7 +264,10 @@ export class WaveExecutor {
 			const prompt = this.buildTaskPrompt(task);
 			const piArgs = ["-p", prompt, "--no-interactive"];
 
-			const child = spawn("pi", piArgs, {
+			// T-043: Resolve binary dynamically — prefer basename of current process entry
+			const binary = process.argv[1] ? path.basename(process.argv[1]) : "cave";
+
+			const child = spawn(binary, piArgs, {
 				cwd: this.ctx.cwd,
 				stdio: ["ignore", "pipe", "pipe"],
 				signal: this.ctx.signal,
@@ -271,6 +278,9 @@ export class WaveExecutor {
 				stdout += d.toString();
 				this.dashboard.updateTaskOutput(task.id, stdout.slice(-200));
 			});
+
+			// T-044: Drain stderr to prevent pipe buffer deadlock on >64KB output
+			child.stderr?.resume();
 
 			child.on("close", (code) => {
 				resolve(code === 0);

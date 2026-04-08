@@ -95,7 +95,7 @@ function commitWave(cwd: string, waveNum: number, results: Array<[ExecutorTask, 
 	try {
 		const taskIds = results.map(([t]) => t.id).join(", ");
 		const msg = `chore(build): wave ${waveNum} — ${taskIds}`;
-		execSync("git add -A", { cwd, stdio: "ignore" });
+		execSync("git add -u context/ packages/", { cwd, stdio: "ignore" });
 		execSync(`git commit -m ${JSON.stringify(msg)} --allow-empty`, { cwd, stdio: "ignore" });
 	} catch {
 		// Non-fatal — skip commit if git is not available or nothing to commit
