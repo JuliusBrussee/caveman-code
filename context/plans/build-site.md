@@ -11,7 +11,7 @@
 **Kit Refs:** fork-identity/R1 (AC-1, AC-2, AC-3), fork-identity/R2 (AC-1, AC-2, AC-3), fork-identity/R6 (AC-1, AC-2)
 **Dependencies:** none
 **Complexity:** M
-**Status:** pending
+**Status:** blocked
 
 Establish the fork's unique identity by renaming CLI binary from 'pi' to 'caveman', updating package scope to @caveman-cli/*, and preserving MIT license compliance. This foundational task creates the project's distinct branding while maintaining proper attribution to upstream sources.
 
@@ -19,7 +19,7 @@ Establish the fork's unique identity by renaming CLI binary from 'pi' to 'cavema
 **Kit Refs:** extension-core/R1 (AC-1, AC-2, AC-3, AC-4), extension-core/R8 (AC-1, AC-2, AC-3)
 **Dependencies:** none
 **Complexity:** L
-**Status:** pending
+**Status:** blocked
 
 Create the extension entry point that integrates seamlessly with Pi's extension system. Implement proper extension registration, lifecycle management, and ensure backward compatibility with vanilla Pi installations. This provides the foundation for all CaveKit functionality to plug into the host system.
 
@@ -27,7 +27,7 @@ Create the extension entry point that integrates seamlessly with Pi's extension 
 **Kit Refs:** extension-core/R3 (AC-1, AC-2, AC-3, AC-4, AC-5, AC-6), fork-identity/R3 (AC-1, AC-2, AC-3)
 **Dependencies:** none
 **Complexity:** M
-**Status:** pending
+**Status:** blocked
 
 Define comprehensive TypeScript interfaces for kit specifications, build sites, task definitions, and tier structures. Establish configuration directory structure at ~/.caveman/ with proper file organization for settings, kits, build sites, and logs. This creates the type safety and configuration foundation for all subsequent development.
 
@@ -35,7 +35,7 @@ Define comprehensive TypeScript interfaces for kit specifications, build sites, 
 **Kit Refs:** extension-commands/R12 (AC-1, AC-2, AC-3), extension-commands/R13 (AC-1, AC-2, AC-3)
 **Dependencies:** none
 **Complexity:** M
-**Status:** pending
+**Status:** blocked
 
 Implement robust parsers for kit markdown files and build site specifications. Handle requirement extraction, acceptance criteria parsing, dependency analysis, and validation of file formats. These parsers form the critical input/output layer for the entire CaveKit workflow system.
 

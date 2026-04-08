@@ -107,3 +107,18 @@
 - ~ T-004: File Parsers (Kit & Build Site) → **pending**
 
 ---
+### Iteration 3
+
+**Wave:** 3  
+**Date:** 2026-04-08T14:05:09.259Z  
+**Status:** BLOCKED  
+**Acceptance 0/24**  
+**Blocked:** 4  **Failed:** 0  **Active:** 0
+
+**Tasks this wave:**
+- ✗ T-001: Fork Identity & Branding Setup → **blocked**
+- ✗ T-002: Extension Framework Core → **blocked**
+- ✗ T-003: Type System & Configuration Foundation → **blocked**
+- ✗ T-004: File Parsers (Kit & Build Site) → **blocked**
+
+---
