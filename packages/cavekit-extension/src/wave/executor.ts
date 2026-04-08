@@ -11,6 +11,7 @@ import * as path from "node:path";
 import type { CaveKitConfig } from "../config/index.js";
 import type { TaskStatus } from "../types.js";
 import type { BuildDashboardWidget } from "../widgets/build-dashboard.js";
+import { runTierGateReview } from "./tier-gate.js";
 
 export type { TaskStatus };
 
@@ -230,8 +231,9 @@ export class WaveExecutor {
 				if (!resume) break;
 			}
 
-			// Tier gate: check if we just completed a full tier
-			await this.checkTierGate(workable);
+			// Tier gate: check if we just completed a full tier (AC-1/AC-4)
+			const tierGateBlocked = await this.checkTierGate(workable);
+			if (tierGateBlocked) break;
 		}
 
 		const done = this.tasks.filter((t) => t.status === "done").length;
@@ -338,18 +340,39 @@ export class WaveExecutor {
 		fs.writeFileSync(this.siteFile, updated, "utf8");
 	}
 
-	private async checkTierGate(completedTasks: ExecutorTask[]): Promise<void> {
-		if (this.config.tierGateMode === "off") return;
+	private async checkTierGate(completedTasks: ExecutorTask[]): Promise<boolean> {
+		if (this.config.tierGateMode === "off") return false;
 
 		const completedTiers = [...new Set(completedTasks.map((t) => t.tier))];
+		let blocked = false;
+
 		for (const tier of completedTiers) {
 			const tierTasks = this.tasks.filter((t) => t.tier === tier);
 			const allDone = tierTasks.every((t) => t.status === "done" || t.status === "blocked");
-			if (allDone) {
-				this.ctx.ui.notify(`Tier ${tier} complete — tier gate check`, "info");
-				// TODO Phase 2: dispatch Codex adversarial review of tier diff
-				// For now just notify
+			if (!allDone) continue;
+
+			// AC-1: Run after each tier completes — dispatches tier gate review
+			const result = await runTierGateReview(tier, this.config, this.ctx.cwd, this.ctx);
+
+			// AC-4: Block next tier on P0/P1 findings (when mode is "severity" or "strict")
+			if (result.blocked) {
+				blocked = true;
+				const shouldContinue = await this.ctx.ui.confirm(
+					`Tier ${tier} Gate: BLOCKED`,
+					`${result.summary}\n\nP0/P1 findings were found. Proceeding to the next tier may build on broken foundations.\n\nContinue anyway?`,
+				);
+				if (!shouldContinue) {
+					// Mark all pending tasks as blocked
+					for (const task of this.tasks) {
+						if (task.status === "pending") {
+							task.status = "blocked";
+						}
+					}
+					return true;
+				}
 			}
 		}
+
+		return blocked;
 	}
 }
