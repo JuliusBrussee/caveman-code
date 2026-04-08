@@ -5,7 +5,7 @@
  * Updates are triggered by WaveExecutor as task states change.
  */
 
-import type { BuildTask } from "../wave/executor.js";
+import type { ExecutorTask } from "../wave/executor.js";
 
 const WIDGET_KEY = "ck-build-dashboard";
 
@@ -35,7 +35,7 @@ export class BuildDashboardWidget {
 		this.ctx.ui.setWidget(WIDGET_KEY, []);
 	}
 
-	updateWave(waveNum: number, tasks: BuildTask[]): void {
+	updateWave(waveNum: number, tasks: ExecutorTask[]): void {
 		this.waveName = `Wave ${waveNum}`;
 		this.totalTasks = tasks.length;
 	}
@@ -44,7 +44,7 @@ export class BuildDashboardWidget {
 		this.taskOutputs.set(taskId, snippet);
 	}
 
-	render(tasks: BuildTask[]): void {
+	render(tasks: ExecutorTask[]): void {
 		if (!this.mounted) return;
 
 		const total = tasks.length || this.totalTasks;

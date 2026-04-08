@@ -9,11 +9,12 @@ import { spawn } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import type { CaveKitConfig } from "../config/index.js";
+import type { TaskStatus } from "../types.js";
 import type { BuildDashboardWidget } from "../widgets/build-dashboard.js";
 
-export type TaskStatus = "pending" | "in-progress" | "done" | "blocked" | "failed";
+export type { TaskStatus };
 
-export interface BuildTask {
+export interface ExecutorTask {
 	id: string;
 	name: string;
 	description: string;
@@ -26,10 +27,10 @@ export interface BuildTask {
 }
 
 /** Parse build-site markdown into structured task list. */
-export function parseBuildSite(content: string): BuildTask[] {
-	const tasks: BuildTask[] = [];
+export function parseBuildSite(content: string): ExecutorTask[] {
+	const tasks: ExecutorTask[] = [];
 	let currentTier = 0;
-	let currentTask: Partial<BuildTask> | null = null;
+	let currentTask: Partial<ExecutorTask> | null = null;
 
 	for (const line of content.split("\n")) {
 		// Tier heading: ## Tier N
@@ -98,7 +99,7 @@ export function parseBuildSite(content: string): BuildTask[] {
 	return tasks;
 }
 
-function finishTask(partial: Partial<BuildTask>): BuildTask {
+function finishTask(partial: Partial<ExecutorTask>): ExecutorTask {
 	return {
 		id: partial.id!,
 		name: partial.name || "",
@@ -113,7 +114,7 @@ function finishTask(partial: Partial<BuildTask>): BuildTask {
 }
 
 /** Compute the next wave: tasks whose dependencies are all done. */
-export function computeFrontier(tasks: BuildTask[]): BuildTask[] {
+export function computeFrontier(tasks: ExecutorTask[]): ExecutorTask[] {
 	const doneIds = new Set(tasks.filter((t) => t.status === "done").map((t) => t.id));
 	return tasks.filter((t) => t.status === "pending" && t.dependencies.every((dep) => doneIds.has(dep)));
 }
@@ -128,7 +129,7 @@ export interface WaveExecutorContext {
 }
 
 export class WaveExecutor {
-	private tasks: BuildTask[];
+	private tasks: ExecutorTask[];
 	private siteFile: string;
 
 	constructor(
@@ -199,21 +200,21 @@ export class WaveExecutor {
 		this.ctx.ui.notify(`Build complete: ${done}/${total} tasks done`, done === total ? "info" : "warning");
 	}
 
-	private async dispatchWave(tasks: BuildTask[]): Promise<Array<[BuildTask, boolean]>> {
-		const batches: BuildTask[][] = [];
+	private async dispatchWave(tasks: ExecutorTask[]): Promise<Array<[ExecutorTask, boolean]>> {
+		const batches: ExecutorTask[][] = [];
 		for (let i = 0; i < tasks.length; i += this.config.maxParallel) {
 			batches.push(tasks.slice(i, i + this.config.maxParallel));
 		}
 
-		const results: Array<[BuildTask, boolean]> = [];
+		const results: Array<[ExecutorTask, boolean]> = [];
 		for (const batch of batches) {
 			const batchResults = await Promise.all(batch.map((task) => this.dispatchTask(task)));
-			results.push(...batchResults.map((ok, i): [BuildTask, boolean] => [batch[i], ok]));
+			results.push(...batchResults.map((ok, i): [ExecutorTask, boolean] => [batch[i], ok]));
 		}
 		return results;
 	}
 
-	private async dispatchTask(task: BuildTask): Promise<boolean> {
+	private async dispatchTask(task: ExecutorTask): Promise<boolean> {
 		return new Promise((resolve) => {
 			const prompt = this.buildTaskPrompt(task);
 			const piArgs = ["-p", prompt, "--no-interactive"];
@@ -246,7 +247,7 @@ export class WaveExecutor {
 		});
 	}
 
-	private buildTaskPrompt(task: BuildTask): string {
+	private buildTaskPrompt(task: ExecutorTask): string {
 		const kitContext = this.buildKitContext(task);
 		const designContext = this.loadDesignContext();
 
@@ -267,7 +268,7 @@ export class WaveExecutor {
 			.join("\n");
 	}
 
-	private buildKitContext(task: BuildTask): string {
+	private buildKitContext(task: ExecutorTask): string {
 		if (task.kitRefs.length === 0) return "";
 		// TODO: load and compress relevant kit sections (Phase 4: caveman compression)
 		return `Kit references: ${task.kitRefs.join(", ")}`;
@@ -291,7 +292,7 @@ export class WaveExecutor {
 		fs.writeFileSync(this.siteFile, updated, "utf8");
 	}
 
-	private async checkTierGate(completedTasks: BuildTask[]): Promise<void> {
+	private async checkTierGate(completedTasks: ExecutorTask[]): Promise<void> {
 		if (this.config.tierGateMode === "off") return;
 
 		const completedTiers = [...new Set(completedTasks.map((t) => t.tier))];

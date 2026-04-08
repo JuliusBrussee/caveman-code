@@ -14,6 +14,17 @@ import { registerHooks } from "./hooks/index.js";
 import { registerTools } from "./tools/index.js";
 import { registerWidgets } from "./widgets/index.js";
 
+export type {
+	AcceptanceCriterion,
+	BuildSite,
+	BuildTask,
+	Finding,
+	FindingSeverity,
+	Kit,
+	Requirement,
+	TaskStatus,
+} from "./types.js";
+
 export default function cavekit(pi: ExtensionAPI) {
 	// Phase 1: Load config (.cavekit/config or defaults)
 	const config = loadConfig(pi);

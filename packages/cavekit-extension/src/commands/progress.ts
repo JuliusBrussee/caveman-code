@@ -6,7 +6,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
 import type { CaveKitConfig } from "../config/index.js";
-import { type BuildTask, parseBuildSite } from "../wave/executor.js";
+import { type ExecutorTask, parseBuildSite } from "../wave/executor.js";
 
 export function registerProgressCommand(pi: ExtensionAPI, _config: CaveKitConfig): void {
 	pi.registerCommand("ck:progress", {
@@ -56,7 +56,7 @@ export function registerProgressCommand(pi: ExtensionAPI, _config: CaveKitConfig
 	});
 }
 
-function statusIcon(task: BuildTask): string {
+function statusIcon(task: ExecutorTask): string {
 	switch (task.status) {
 		case "done":
 			return "✓";
