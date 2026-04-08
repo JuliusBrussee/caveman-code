@@ -92,7 +92,9 @@ function buildKitContent(cwd: string, scopedRefs: Set<string> | null): string {
 			const idMatch = block.match(/^###\s+(R\d+):/);
 			if (!idMatch) continue;
 			const reqId = idMatch[1];
-			if (scopedRefs.has(reqId)) {
+			// scopedRefs may contain "domain/R5" or bare "R5" — match either form
+			const matches = scopedRefs.has(reqId) || [...scopedRefs].some((ref) => ref.endsWith(`/${reqId}`));
+			if (matches) {
 				matchedBlocks.push(block.trim());
 			}
 		}

@@ -15,6 +15,14 @@ import type { ExecutorTask } from "../wave/executor.js";
 
 const WIDGET_KEY = "ck-build-dashboard";
 
+/** Module-level singleton: the currently active dashboard instance (if any). */
+let activeDashboard: BuildDashboardWidget | null = null;
+
+/** Get the active dashboard instance for shortcut toggling. */
+export function getActiveDashboard(): BuildDashboardWidget | null {
+	return activeDashboard;
+}
+
 export interface DashboardContext {
 	ui: {
 		setWidget: (
@@ -41,11 +49,13 @@ export class BuildDashboardWidget {
 	mount(): void {
 		this.mounted = true;
 		this.visible = true;
+		activeDashboard = this;
 		this.render([]);
 	}
 
 	unmount(): void {
 		this.mounted = false;
+		if (activeDashboard === this) activeDashboard = null;
 		// Clear widget by passing undefined
 		this.ctx.ui.setWidget(WIDGET_KEY, undefined);
 	}

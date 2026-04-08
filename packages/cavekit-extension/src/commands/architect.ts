@@ -12,6 +12,7 @@ import * as path from "node:path";
 import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
 import type { CaveKitConfig } from "../config/index.js";
 import { parseKitDirectory } from "../parsers/kit-parser.js";
+import { reviewKits } from "../widgets/kit-reviewer.js";
 
 export function registerArchitectCommand(pi: ExtensionAPI, _config: CaveKitConfig): void {
 	pi.registerCommand("ck:architect", {
@@ -48,6 +49,16 @@ export function registerArchitectCommand(pi: ExtensionAPI, _config: CaveKitConfi
 				return;
 			}
 
+			// T-047 / extension-ui R6: Review kits before architecting
+			const { approvedKits, rejectedKits } = await reviewKits(kits, { ui: ctx.ui });
+			if (approvedKits.length === 0) {
+				ctx.ui.notify("All kits were rejected. Aborting architect.", "warning");
+				return;
+			}
+			if (rejectedKits.length > 0) {
+				ctx.ui.notify(`${rejectedKits.length} kit(s) rejected, proceeding with ${approvedKits.length} approved kit(s).`, "info");
+			}
+
 			// AC-3: Output path is context/plans/build-site.md
 			const plansDir = path.join(cwd, "context", "plans");
 			fs.mkdirSync(plansDir, { recursive: true });
@@ -56,13 +67,13 @@ export function registerArchitectCommand(pi: ExtensionAPI, _config: CaveKitConfi
 			const outputPath = path.join(plansDir, `${siteName}.md`);
 
 			ctx.ui.notify(
-				`Architecting build site from ${kits.length} kit(s) in ${path.relative(cwd, sourceDir)}…`,
+				`Architecting build site from ${approvedKits.length} kit(s) in ${path.relative(cwd, sourceDir)}…`,
 				"info",
 			);
 			await ctx.waitForIdle();
 
-			// AC-2 + AC-4: Build prompt with parsed kit data, requiring domain/RN refs
-			const prompt = buildArchitectPrompt(kits, outputPath, sourceDir);
+			// AC-2 + AC-4: Build prompt with approved kit data, requiring domain/RN refs
+			const prompt = buildArchitectPrompt(approvedKits, outputPath, sourceDir);
 			pi.sendUserMessage([{ type: "text", text: prompt }]);
 		},
 	});
