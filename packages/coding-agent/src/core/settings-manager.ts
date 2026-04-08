@@ -49,6 +49,10 @@ export interface CaveModeSettings {
 	toolCompression?: boolean; // default: true
 }
 
+export interface RtkSettings {
+	enabled?: boolean; // default: false
+}
+
 export type TransportSetting = Transport;
 
 /**
@@ -102,6 +106,7 @@ export interface Settings {
 	markdown?: MarkdownSettings;
 	sessionDir?: string; // Custom session storage directory (same format as --session-dir CLI flag)
 	caveMode?: CaveModeSettings;
+	rtk?: RtkSettings;
 }
 
 /** Deep merge settings: project/overrides take precedence, nested objects merge recursively */
@@ -1009,5 +1014,18 @@ export class SettingsManager {
 			intensity: this.getCaveModeIntensity(),
 			toolCompression: this.getCaveModeToolCompression(),
 		};
+	}
+
+	getRtkEnabled(): boolean {
+		return this.settings.rtk?.enabled ?? false;
+	}
+
+	setRtkEnabled(enabled: boolean): void {
+		if (!this.globalSettings.rtk) {
+			this.globalSettings.rtk = {};
+		}
+		this.globalSettings.rtk.enabled = enabled;
+		this.markModified("rtk", "enabled");
+		this.save();
 	}
 }

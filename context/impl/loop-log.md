@@ -19,3 +19,11 @@
 - T-014: ASCII Art Logo — DONE. Files: interactive-mode.ts, theme.ts. Build P, Tests P. Next: T-015
 - T-015: Version Display + Keybinding Hints — DONE. Verified existing code meets all ACs. Next: T-016
 - T-016: Cave Mode Status Line + Earendil Removal — DONE. Files: interactive-mode.ts. Build P, Tests P. All tasks complete.
+
+### Iteration 4 — 2026-04-09 (RTK Integration)
+- T-017: RTK Binary Detection Module — DONE. Files: rtk.ts (new). Build P, Tests P. Next: T-018
+- T-018: RTK Integration Settings — DONE. Files: settings-manager.ts. Build P, Tests P. Next: T-019
+- T-019: RTK Command Rewrite Function — DONE. Files: rtk.ts. Build P, Tests P. Next: T-020
+- T-020: RTK BashSpawnHook Factory — DONE. Files: rtk.ts. Build P, Tests P. Next: T-021
+- T-021: Wire RTK Hook into Agent Session — DONE. Files: agent-session.ts. Build P, Tests P. Next: T-022
+- T-022: RTK Integration Tests — DONE. Files: rtk.test.ts (new), 17/17 tests pass. Build P, Tests P. All RTK tasks complete.
