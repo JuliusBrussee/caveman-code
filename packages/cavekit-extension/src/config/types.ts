@@ -13,12 +13,18 @@ export interface CaveKitConfig {
 	preset: ModelPreset;
 	/** Controls when Codex adversarial review fires at tier gates */
 	tierGateMode: TierGateMode;
+	/** Model identifier used when tier gate fires (e.g. "claude-opus-4-6") */
+	tierGateModel: string;
 	/** Controls bash command safety interception */
 	commandGate: CommandGateMode;
 	/** Caveman compression level (0=off, 1=light, 2=standard, 3=aggressive) */
 	cavemanLevel: CavemanLevel;
+	/** Max retries for a failed task before it is marked blocked */
+	maxRetries: number;
 	/** Max iterations per task before circuit breaker fires */
 	maxIterations: number;
+	/** Task timeout in milliseconds (0 = no timeout) */
+	taskTimeout: number;
 	/** Max parallel wave tasks (maps to createAgentSession concurrency) */
 	maxParallel: number;
 	/** Whether to use git worktree isolation for parallel wave tasks */
@@ -27,18 +33,27 @@ export interface CaveKitConfig {
 	codexPath: string;
 	/** Whether speculative review (tier N-1 while tier N builds) is enabled */
 	speculativeReview: boolean;
+	/** Whether caveman context compression is applied to subagent sessions */
+	cavemanForSubagents: boolean;
+	/** Whether scoped context (per-task context injection) is enabled */
+	scopedContext: boolean;
 }
 
 export const DEFAULT_CONFIG: CaveKitConfig = {
 	preset: "quality",
 	tierGateMode: "severity",
+	tierGateModel: "claude-opus-4-6",
 	commandGate: "off",
 	cavemanLevel: 2,
+	maxRetries: 3,
 	maxIterations: 20,
+	taskTimeout: 0,
 	maxParallel: 4,
 	worktreeIsolation: true,
 	codexPath: "auto",
 	speculativeReview: false,
+	cavemanForSubagents: true,
+	scopedContext: true,
 };
 
 /** Model assignments per DABI phase for each preset */

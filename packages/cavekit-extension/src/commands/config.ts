@@ -6,18 +6,24 @@
 
 import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
 import type { CaveKitConfig } from "../config/index.js";
-import { saveConfig } from "../config/index.js";
+import { getConfigWithSources, saveConfig } from "../config/index.js";
 import type { CavemanLevel, ModelPreset, TierGateMode } from "../config/types.js";
 
-const CONFIGURABLE_KEYS = [
+const CONFIGURABLE_KEYS: Array<keyof CaveKitConfig> = [
 	"preset",
 	"tierGateMode",
+	"tierGateModel",
 	"commandGate",
 	"cavemanLevel",
+	"maxRetries",
 	"maxIterations",
+	"taskTimeout",
 	"maxParallel",
 	"worktreeIsolation",
+	"codexPath",
 	"speculativeReview",
+	"cavemanForSubagents",
+	"scopedContext",
 ];
 
 export function registerConfigCommand(pi: ExtensionAPI, config: CaveKitConfig): void {
@@ -36,19 +42,30 @@ export function registerConfigCommand(pi: ExtensionAPI, config: CaveKitConfig): 
 			const value = parts.slice(1).join(" ");
 
 			if (!key) {
-				// Show current config
+				// Show current config with source provenance (AC-4)
+				const withSources = getConfigWithSources();
+				const SOURCE_TAG: Record<string, string> = {
+					default: "[default]",
+					global: "[global] ",
+					project: "[project]",
+				};
 				const lines = [
-					"╔══ CaveKit Config ══════════════════╗",
-					...Object.entries(config).map(([k, v]) => `║  ${k.padEnd(22)} ${String(v).padEnd(10)} ║`),
-					"╚════════════════════════════════════╝",
+					"╔══ CaveKit Config ═════════════════════════════════╗",
+					...Object.entries(withSources).map(([k, entry]) => {
+						const { value, source } = entry as { value: unknown; source: string };
+						const tag = SOURCE_TAG[source] ?? source;
+						return `║  ${tag} ${k.padEnd(22)} ${String(value).padEnd(12)} ║`;
+					}),
+					"╚═══════════════════════════════════════════════════╝",
 					"",
+					"Sources: [default] built-in  [global] ~/.cave/cavekit.json  [project] .cavekit/config.json",
 					"Use /ck:config <key> <value> to change a setting.",
 				];
 				ctx.ui.notify(lines.join("\n"), "info");
 				return;
 			}
 
-			if (!CONFIGURABLE_KEYS.includes(key)) {
+			if (!CONFIGURABLE_KEYS.includes(key as keyof CaveKitConfig)) {
 				ctx.ui.notify(`Unknown config key: ${key}. Valid keys: ${CONFIGURABLE_KEYS.join(", ")}`, "warning");
 				return;
 			}
@@ -84,6 +101,8 @@ function getValueCompletions(key: string): Array<{ value: string; label: string 
 			return (["0", "1", "2", "3"] as string[]).map((v) => ({ value: v, label: v }));
 		case "worktreeIsolation":
 		case "speculativeReview":
+		case "cavemanForSubagents":
+		case "scopedContext":
 			return [
 				{ value: "true", label: "true" },
 				{ value: "false", label: "false" },
@@ -105,17 +124,22 @@ function parseValue(key: string, value: string): unknown {
 			const n = Number(value);
 			return [0, 1, 2, 3].includes(n) ? (n as CavemanLevel) : null;
 		}
+		case "maxRetries":
 		case "maxIterations":
-		case "maxParallel": {
+		case "maxParallel":
+		case "taskTimeout": {
 			const n = Number(value);
-			return Number.isInteger(n) && n > 0 ? n : null;
+			return Number.isInteger(n) && n >= 0 ? n : null;
 		}
 		case "worktreeIsolation":
 		case "speculativeReview":
+		case "cavemanForSubagents":
+		case "scopedContext":
 			if (value === "true") return true;
 			if (value === "false") return false;
 			return null;
 		default:
+			// String fields (e.g. tierGateModel, codexPath)
 			return value || null;
 	}
 }

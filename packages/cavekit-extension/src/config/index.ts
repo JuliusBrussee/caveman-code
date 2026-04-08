@@ -1,7 +1,13 @@
 /**
  * Config loading for CaveKit.
- * Reads .cavekit/config (project-local) then ~/.pi/cavekit/config (global),
- * merging over DEFAULT_CONFIG.
+ *
+ * Resolution order (last wins):
+ *   1. DEFAULT_CONFIG (built-in defaults)
+ *   2. Global config:  ~/.cave/cavekit.json
+ *   3. Project-local:  <cwd>/.cavekit/config.json
+ *
+ * Both config files are optional JSON files. A KEY=VALUE flat format is also
+ * accepted for convenience.
  */
 
 import * as fs from "node:fs";
@@ -9,6 +15,28 @@ import * as os from "node:os";
 import * as path from "node:path";
 import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
 import { type CaveKitConfig, DEFAULT_CONFIG } from "./types.js";
+
+/** The source a config value came from. */
+export type ConfigSource = "default" | "global" | "project";
+
+/** A single resolved config entry annotated with its source. */
+export interface ConfigEntry {
+	value: string | number | boolean;
+	source: ConfigSource;
+}
+
+/** The full resolved config with per-key provenance information. */
+export type ConfigWithSources = Record<keyof CaveKitConfig, ConfigEntry>;
+
+/** Canonical config file paths. */
+export const CONFIG_PATHS = {
+	global: () => path.join(os.homedir(), ".cave", "cavekit.json"),
+	project: (cwd = process.cwd()) => path.join(cwd, ".cavekit", "config.json"),
+} as const;
+
+// ---------------------------------------------------------------------------
+// Internal helpers
+// ---------------------------------------------------------------------------
 
 function readConfigFile(filePath: string): Partial<CaveKitConfig> {
 	try {
@@ -39,26 +67,77 @@ function readConfigFile(filePath: string): Partial<CaveKitConfig> {
 	}
 }
 
-export function loadConfig(_pi: ExtensionAPI): CaveKitConfig {
-	// Determine project CWD via pi context — fall back to process.cwd()
-	// ExtensionAPI doesn't expose cwd directly at init time; we read it lazily
-	const cwd = process.cwd();
-	const globalConfigPath = path.join(os.homedir(), ".pi", "cavekit", "config");
-	const localConfigPath = path.join(cwd, ".cavekit", "config");
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
 
-	const globalOverrides = readConfigFile(globalConfigPath);
-	const localOverrides = readConfigFile(localConfigPath);
+/**
+ * Load the resolved CaveKit config, merging defaults → global → project.
+ *
+ * The optional `_pi` parameter is accepted for API compatibility with callers
+ * that pass an ExtensionAPI instance; it is not used because the config system
+ * reads files directly.
+ */
+export function loadConfig(_pi?: ExtensionAPI): CaveKitConfig {
+	const cwd = process.cwd();
+	const globalOverrides = readConfigFile(CONFIG_PATHS.global());
+	const localOverrides = readConfigFile(CONFIG_PATHS.project(cwd));
 
 	// Local takes precedence over global, global over defaults
 	return { ...DEFAULT_CONFIG, ...globalOverrides, ...localOverrides };
 }
 
+/**
+ * Return the resolved config with per-value provenance information.
+ *
+ * Each field is annotated with one of:
+ *   - "default"  — value comes from DEFAULT_CONFIG
+ *   - "global"   — value comes from ~/.cave/cavekit.json
+ *   - "project"  — value comes from .cavekit/config.json
+ *
+ * This is used by the /ck:config command to show sources (AC-4 of T-010).
+ */
+export function getConfigWithSources(_pi?: ExtensionAPI): ConfigWithSources {
+	const cwd = process.cwd();
+	const globalOverrides = readConfigFile(CONFIG_PATHS.global());
+	const localOverrides = readConfigFile(CONFIG_PATHS.project(cwd));
+
+	const result = {} as Record<string, ConfigEntry>;
+
+	for (const key of Object.keys(DEFAULT_CONFIG) as Array<keyof CaveKitConfig>) {
+		if (key in localOverrides) {
+			result[key] = {
+				value: (localOverrides[key] ?? DEFAULT_CONFIG[key]) as string | number | boolean,
+				source: "project",
+			};
+		} else if (key in globalOverrides) {
+			result[key] = {
+				value: (globalOverrides[key] ?? DEFAULT_CONFIG[key]) as string | number | boolean,
+				source: "global",
+			};
+		} else {
+			result[key] = {
+				value: DEFAULT_CONFIG[key] as string | number | boolean,
+				source: "default",
+			};
+		}
+	}
+
+	return result as ConfigWithSources;
+}
+
+/**
+ * Persist a partial config update to disk.
+ *
+ * @param config  Key-value pairs to write (merged with any existing file).
+ * @param scope   "local" → .cavekit/config.json | "global" → ~/.cave/cavekit.json
+ */
 export function saveConfig(config: Partial<CaveKitConfig>, scope: "local" | "global" = "local"): void {
 	const cwd = process.cwd();
-	const dir = scope === "global" ? path.join(os.homedir(), ".pi", "cavekit") : path.join(cwd, ".cavekit");
+	const filePath = scope === "global" ? CONFIG_PATHS.global() : CONFIG_PATHS.project(cwd);
+	const dir = path.dirname(filePath);
 
 	fs.mkdirSync(dir, { recursive: true });
-	const filePath = path.join(dir, "config");
 
 	// Read existing, merge, write back
 	let existing: Record<string, unknown> = {};

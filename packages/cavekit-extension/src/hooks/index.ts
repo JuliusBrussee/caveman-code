@@ -8,6 +8,7 @@ import { registerCommandSafetyGate } from "./command-safety-gate.js";
 import { registerCompactionHook } from "./compaction.js";
 import { registerContextInjectionHook } from "./context-injection.js";
 import { registerConvergenceMonitor } from "./convergence-monitor.js";
+import { registerSkillsDiscoveryHook } from "./skills-discovery.js";
 
 export function registerHooks(pi: ExtensionAPI, config: CaveKitConfig): void {
 	// Inject DESIGN.md and kit context into every agent start
@@ -23,4 +24,7 @@ export function registerHooks(pi: ExtensionAPI, config: CaveKitConfig): void {
 
 	// Preserve CaveKit state during context compaction
 	registerCompactionHook(pi, config);
+
+	// Register bundled CaveKit skills with the resource loader (T-011)
+	registerSkillsDiscoveryHook(pi, config);
 }
