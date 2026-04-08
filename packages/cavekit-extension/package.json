@@ -20,7 +20,8 @@
 		"build": "tsc -p tsconfig.json",
 		"dev": "tsc -p tsconfig.json --watch",
 		"clean": "shx rm -rf dist",
-		"check": "tsc -p tsconfig.json --noEmit"
+		"check": "tsc -p tsconfig.json --noEmit",
+		"test": "vitest --run"
 	},
 	"keywords": [
 		"cavekit",
@@ -42,7 +43,8 @@
 		"@cavepi/pi-tui": "*",
 		"@types/node": "^22.10.5",
 		"shx": "^0.4.0",
-		"typescript": "^5.9.2"
+		"typescript": "^5.9.2",
+		"vitest": "^3.2.4"
 	},
 	"dependencies": {
 		"yaml": "^2.8.2"

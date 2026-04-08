@@ -390,9 +390,14 @@ export class AgentSession {
 				this.settingsManager.getCaveModeToolCompression() &&
 				this.settingsManager.getCaveModeEnabled()
 			) {
-				processedContent = compressCaveToolContentBlocks(
-					result.content as Array<{ type: string; text?: string; [key: string]: unknown }>,
-				) as typeof result.content;
+				try {
+					processedContent = compressCaveToolContentBlocks(
+						result.content as Array<{ type: string; text?: string; [key: string]: unknown }>,
+					) as typeof result.content;
+				} catch {
+					// Fallback: use original unmodified output if compression encounters an error
+					processedContent = result.content;
+				}
 			}
 
 			const runner = this._extensionRunner;
