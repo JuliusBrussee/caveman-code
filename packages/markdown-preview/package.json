@@ -1,0 +1,31 @@
+{
+	"name": "@cave/markdown-preview",
+	"version": "0.9.6",
+	"description": "Rendered markdown + LaTeX preview for cave, with terminal, browser, and PDF output",
+	"type": "module",
+	"pi": {
+		"extensions": [
+			"./index.ts"
+		]
+	},
+	"license": "MIT",
+	"keywords": [
+		"pi-package",
+		"cave",
+		"markdown",
+		"preview"
+	],
+	"peerDependencies": {
+		"@cavepi/pi-coding-agent": "*",
+		"@cavepi/pi-tui": "*"
+	},
+	"dependencies": {
+		"puppeteer-core": "^24.22.3"
+	},
+	"devDependencies": {
+		"@cavepi/pi-coding-agent": "*",
+		"@cavepi/pi-tui": "*",
+		"@types/node": "^24.3.0",
+		"typescript": "^5.7.3"
+	}
+}

@@ -12,6 +12,7 @@ import { registerDesignCommand } from "./design.js";
 import { registerDraftCommand } from "./draft.js";
 import { registerHelpCommand } from "./help.js";
 import { registerInspectCommand } from "./inspect.js";
+import { registerPreviewCommand } from "./preview.js";
 import { registerProgressCommand } from "./progress.js";
 import { registerResearchCommand } from "./research.js";
 
@@ -26,4 +27,5 @@ export function registerCommands(pi: ExtensionAPI, config: CaveKitConfig): void 
 	registerHelpCommand(pi, config);
 	registerProgressCommand(pi, config);
 	registerConvergenceCommand(pi, config);
+	registerPreviewCommand(pi, config);
 }

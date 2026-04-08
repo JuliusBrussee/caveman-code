@@ -102,7 +102,7 @@ export function registerInspectCommand(pi: ExtensionAPI, _config: CaveKitConfig)
 			const { totalMet, totalAC, coveragePct } = analysis;
 			const notifyLevel = coveragePct >= 80 ? "info" : coveragePct >= 50 ? "warning" : "error";
 			ctx.ui.notify(
-				`Inspect complete: ${totalMet}/${totalAC} AC met (${coveragePct}%). Report saved to ${path.relative(cwd, reportPath)}`,
+				`Inspect complete: ${totalMet}/${totalAC} AC met (${coveragePct}%). Report saved to ${path.relative(cwd, reportPath)}. Preview: /ck:preview gap`,
 				notifyLevel,
 			);
 

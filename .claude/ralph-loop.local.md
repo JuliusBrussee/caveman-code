@@ -1,17 +1,17 @@
 ---
 active: true
 iteration: 1
-session_id: 6547a90c-44a9-4a67-9e5f-f9ee0f8ef1cf
+session_id: bd4f9ca0-f783-476e-8828-f9a0fb8a8a9a
 max_iterations: 20
-completion_promise: "BLUEPRINT COMPLETE"
-started_at: "2026-04-08T13:38:24Z"
+completion_promise: "CAVEKIT COMPLETE"
+started_at: "2026-04-08T22:28:20Z"
 ---
 
-# Blueprint Build
+# Cavekit Build
 
 ## Your Role
 You are implementing tasks from a build site. Each iteration: find the next
-unblocked task, read its blueprint, implement it, validate, commit.
+unblocked task, read its cavekit, implement it, validate, commit.
 
 ## Read These First (every iteration)
 1. `context/impl/loop-log.md` — your iteration history (if exists)
@@ -20,14 +20,14 @@ unblocked task, read its blueprint, implement it, validate, commit.
    An impl file is scoped if it contains `Build site: context/plans/build-site.md` (or the matching basename).
    Ignore impl files that declare a different build site. If no scoped files exist, read all impl files.
 
-## Blueprints (read when implementing a specific requirement)
+## Kits (read when implementing a specific requirement)
 
-- `context/blueprints/blueprint-cave-mode.md`
-- `context/blueprints/blueprint-extension-commands.md`
-- `context/blueprints/blueprint-extension-core.md`
-- `context/blueprints/blueprint-extension-ui.md`
-- `context/blueprints/blueprint-fork-identity.md`
-- `context/blueprints/blueprint-overview.md`
+- `context/kits/cavekit-brand-cleanup.md`
+- `context/kits/cavekit-documentation.md`
+- `context/kits/cavekit-overview.md`
+- `context/kits/cavekit-rtk-integration.md`
+- `context/kits/cavekit-startup-experience.md`
+- `context/kits/cavekit-visual-theme.md`
 false_SECTION
 ## Each Iteration
 
@@ -40,7 +40,7 @@ false_SECTION
 - Among equals, pick the one that unblocks the most downstream work
 
 ### 3. Implement
-- Read the task's blueprint requirement and acceptance criteria
+- Read the task's cavekit requirement and acceptance criteria
 - Implement it, following existing codebase patterns
 - One task per iteration
 
@@ -84,11 +84,11 @@ Append to `context/impl/loop-log.md` (create if missing):
 ```
 
 ### 6. Commit
-Descriptive message with task ID and blueprint requirement. Do NOT push.
+Descriptive message with task ID and cavekit requirement. Do NOT push.
 
 ### 7. Done?
 All tasks across all tiers DONE + build passes + tests pass?
-→ output: <promise>BLUEPRINT COMPLETE</promise>
+→ output: <promise>CAVEKIT COMPLETE</promise>
 
 Otherwise → next iteration.
 

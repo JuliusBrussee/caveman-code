@@ -78,6 +78,8 @@ export function registerArchitectCommand(pi: ExtensionAPI, _config: CaveKitConfi
 			// AC-2 + AC-4: Build prompt with approved kit data, requiring domain/RN refs
 			const prompt = buildArchitectPrompt(approvedKits, outputPath, sourceDir);
 			pi.sendUserMessage([{ type: "text", text: prompt }]);
+
+			ctx.ui.notify("Build site will be written to context/plans/. Preview with: /ck:preview plan", "info");
 		},
 	});
 }

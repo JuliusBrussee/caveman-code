@@ -43,6 +43,8 @@ export function registerDraftCommand(pi: ExtensionAPI, _config: CaveKitConfig): 
 
 			// After the agent completes, the kit files will be written to context/kits/
 			// The /ck:architect command reads from there.
+			// Hint: preview kits with /ck:preview
+			ctx.ui.notify("Kits will be written to context/kits/. Preview with: /ck:preview <domain>", "info");
 		},
 	});
 }

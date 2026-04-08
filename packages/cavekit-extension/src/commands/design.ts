@@ -69,6 +69,8 @@ async function handleDesignCreate(pi: ExtensionAPI, ctx: ExtensionCommandContext
 			text: buildDesignCreatePrompt(designPath, blueprintContext),
 		},
 	]);
+
+	ctx.ui.notify("DESIGN.md will be created. Preview with: /ck:preview design", "info");
 }
 
 async function handleDesignAudit(pi: ExtensionAPI, ctx: ExtensionCommandContext, designPath: string): Promise<void> {

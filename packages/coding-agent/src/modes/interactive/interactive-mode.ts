@@ -1019,7 +1019,10 @@ export class InteractiveMode {
 		force?: boolean;
 		showDiagnosticsWhenQuiet?: boolean;
 	}): void {
-		const showListing = options?.force || this.options.verbose || !this.settingsManager.getQuietStartup();
+		const showListing =
+			options?.force ||
+			this.options.verbose ||
+			(!this.settingsManager.getQuietStartup() && !this.settingsManager.getQuietResourceListing());
 		const showDiagnostics = showListing || options?.showDiagnosticsWhenQuiet === true;
 		if (!showListing && !showDiagnostics) {
 			return;
