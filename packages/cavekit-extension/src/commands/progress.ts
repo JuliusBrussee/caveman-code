@@ -7,6 +7,7 @@ import * as path from "node:path";
 import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
 import type { CaveKitConfig } from "../config/index.js";
 import { getBuildSiteDir } from "../paths.js";
+import { analyzeConvergence, parseLoopLog } from "../wave/convergence-analysis.js";
 import { type ExecutorTask, parseBuildSite } from "../wave/executor.js";
 
 export function registerProgressCommand(pi: ExtensionAPI, _config: CaveKitConfig): void {
@@ -61,6 +62,29 @@ export function registerProgressCommand(pi: ExtensionAPI, _config: CaveKitConfig
 					return `  Tier ${tier}: ${tierDone}/${tierTasks.length} (${tierPct}%)  ${tierTasks.map((t) => statusIcon(t)).join(" ")}`;
 				}),
 			];
+
+			// T-049 / AC-2: Add convergence metrics from loop log
+			const loopLogPath = path.join(cwd, "context", "impl", "loop-log.md");
+			if (fs.existsSync(loopLogPath)) {
+				try {
+					const logContent = fs.readFileSync(loopLogPath, "utf8");
+					const iterations = parseLoopLog(logContent);
+					if (iterations.length > 0) {
+						const report = analyzeConvergence(iterations);
+						lines.push("");
+						lines.push("Convergence:");
+						lines.push(`  Status: ${report.status} (${iterations.length} iterations)`);
+						if (report.latestPassRate !== null) {
+							lines.push(`  Pass rate: ${Math.round(report.latestPassRate * 100)}%`);
+						}
+						if (report.recommendations.length > 0) {
+							lines.push(`  Recommendation: ${report.recommendations[0]}`);
+						}
+					}
+				} catch {
+					// Non-fatal — skip convergence metrics if parsing fails
+				}
+			}
 
 			ctx.ui.notify(lines.join("\n"), "info");
 		},

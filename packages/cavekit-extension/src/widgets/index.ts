@@ -14,11 +14,12 @@ import * as path from "node:path";
 import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
 import type { CaveKitConfig } from "../config/index.js";
 import { parseBuildSite } from "../wave/executor.js";
+import { getActiveDashboard } from "./build-dashboard.js";
 import { renderDependencyGraph } from "./dependency-graph.js";
 
 export type { DashboardContext } from "./build-dashboard.js";
 // Re-export overlay helpers so commands and hooks can import from a single location.
-export { BuildDashboardWidget } from "./build-dashboard.js";
+export { BuildDashboardWidget, getActiveDashboard } from "./build-dashboard.js";
 export type { DependencyGraphContext } from "./dependency-graph.js";
 export { buildDependencyGraphLines, renderDependencyGraph } from "./dependency-graph.js";
 export type { KitReviewerContext, KitReviewResult } from "./kit-reviewer.js";
@@ -31,13 +32,15 @@ export function registerWidgets(pi: ExtensionAPI, _config: CaveKitConfig): void 
 	pi.registerShortcut("ctrl+shift+b", {
 		description: "Toggle CaveKit build dashboard",
 		handler: async (ctx) => {
-			// The active BuildDashboardWidget instance is owned by the build command.
-			// Notify the user that the shortcut is wired; actual toggle happens via
-			// the widget reference passed from WaveExecutor.
-			ctx.ui.notify(
-				"Use /ck:build to start a build session. Dashboard toggles automatically during builds.",
-				"info",
-			);
+			const dashboard = getActiveDashboard();
+			if (dashboard) {
+				dashboard.toggle();
+			} else {
+				ctx.ui.notify(
+					"No active build session. Use /ck:build to start one.",
+					"info",
+				);
+			}
 		},
 	});
 
