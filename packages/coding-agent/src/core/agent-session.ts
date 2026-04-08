@@ -23,6 +23,7 @@ import { theme } from "../modes/interactive/theme/theme.js";
 import { stripFrontmatter } from "../utils/frontmatter.js";
 import { sleep } from "../utils/sleep.js";
 import { type BashResult, executeBashWithOperations } from "./bash-executor.js";
+import { compressCaveToolContentBlocks } from "./cave-tool-compression.js";
 import {
 	type CompactionResult,
 	calculateContextTokens,
@@ -289,6 +290,10 @@ export class AgentSession {
 	// Base system prompt (without extension appends) - used to apply fresh appends each turn
 	private _baseSystemPrompt = "";
 
+	// Cave mode session overrides (null = use settings value)
+	private _sessionCaveModeIntensity: "lite" | "full" | "ultra" | null = null;
+	private _sessionCaveModeDisabled = false;
+
 	constructor(config: AgentSessionConfig) {
 		this.agent = config.agent;
 		this.sessionManager = config.sessionManager;
@@ -378,8 +383,24 @@ export class AgentSession {
 		};
 
 		this.agent.afterToolCall = async ({ toolCall, args, result, isError }) => {
+			// Cave mode tool result compression (runs before extension hooks, never on errors)
+			let processedContent = result.content;
+			if (
+				!isError &&
+				this.settingsManager.getCaveModeToolCompression() &&
+				this.settingsManager.getCaveModeEnabled()
+			) {
+				processedContent = compressCaveToolContentBlocks(
+					result.content as Array<{ type: string; text?: string; [key: string]: unknown }>,
+				) as typeof result.content;
+			}
+
 			const runner = this._extensionRunner;
 			if (!runner?.hasHandlers("tool_result")) {
+				// If no extension hooks but we compressed, return the compressed content
+				if (processedContent !== result.content) {
+					return { content: processedContent, details: result.details };
+				}
 				return undefined;
 			}
 
@@ -388,7 +409,7 @@ export class AgentSession {
 				toolName: toolCall.name,
 				toolCallId: toolCall.id,
 				input: args as Record<string, unknown>,
-				content: result.content,
+				content: processedContent,
 				details: isError ? undefined : result.details,
 				isError,
 			});
@@ -894,6 +915,10 @@ export class AgentSession {
 		const loadedSkills = this._resourceLoader.getSkills().skills;
 		const loadedContextFiles = this._resourceLoader.getAgentsFiles().agentsFiles;
 
+		const caveModeSettings = this.settingsManager.getCaveModeSettings();
+		// Session overrides: _sessionCaveModeDisabled turns off cave mode for session;
+		// _sessionCaveModeIntensity overrides the persisted intensity for the session.
+		const caveModeEnabled = this._sessionCaveModeDisabled ? false : caveModeSettings.enabled;
 		return buildSystemPrompt({
 			cwd: this._cwd,
 			skills: loadedSkills,
@@ -903,6 +928,10 @@ export class AgentSession {
 			selectedTools: validToolNames,
 			toolSnippets,
 			promptGuidelines,
+			caveMode: {
+				enabled: caveModeEnabled,
+				intensity: this._sessionCaveModeIntensity ?? caveModeSettings.intensity,
+			},
 		});
 	}
 
@@ -1642,6 +1671,7 @@ export class AgentSession {
 					headers,
 					customInstructions,
 					this._compactionAbortController.signal,
+					this.settingsManager.getCaveModeEnabled(),
 				);
 				summary = result.summary;
 				firstKeptEntryId = result.firstKeptEntryId;
@@ -1906,6 +1936,7 @@ export class AgentSession {
 					headers,
 					undefined,
 					this._autoCompactionAbortController.signal,
+					this.settingsManager.getCaveModeEnabled(),
 				);
 				summary = compactResult.summary;
 				firstKeptEntryId = compactResult.firstKeptEntryId;
@@ -2505,6 +2536,43 @@ export class AgentSession {
 	}
 
 	// =========================================================================
+	// Cave Mode Session Controls
+	// =========================================================================
+
+	/**
+	 * Get current effective cave mode state for this session.
+	 * Returns the session-level overrides if set, otherwise falls back to persisted settings.
+	 */
+	getCaveModeSessionState(): { enabled: boolean; intensity: "lite" | "full" | "ultra" } {
+		const settings = this.settingsManager.getCaveModeSettings();
+		return {
+			enabled: this._sessionCaveModeDisabled ? false : settings.enabled,
+			intensity: this._sessionCaveModeIntensity ?? settings.intensity,
+		};
+	}
+
+	/**
+	 * Set cave mode intensity for the current session (does not persist to settings).
+	 * Pass null to reset to the persisted settings value.
+	 */
+	setCaveModeSessionIntensity(intensity: "lite" | "full" | "ultra" | null): void {
+		this._sessionCaveModeIntensity = intensity;
+		this._sessionCaveModeDisabled = false;
+		this._baseSystemPrompt = this._rebuildSystemPrompt(this.getActiveToolNames());
+		this.agent.state.systemPrompt = this._baseSystemPrompt;
+	}
+
+	/**
+	 * Disable cave mode for the current session (does not persist to settings).
+	 */
+	setCaveModeSessionDisabled(): void {
+		this._sessionCaveModeDisabled = true;
+		this._sessionCaveModeIntensity = null;
+		this._baseSystemPrompt = this._rebuildSystemPrompt(this.getActiveToolNames());
+		this.agent.state.systemPrompt = this._baseSystemPrompt;
+	}
+
+	// =========================================================================
 	// Bash Execution
 	// =========================================================================
 
@@ -2729,6 +2797,7 @@ export class AgentSession {
 				customInstructions,
 				replaceInstructions,
 				reserveTokens: branchSummarySettings.reserveTokens,
+				caveModeEnabled: this.settingsManager.getCaveModeEnabled(),
 			});
 			this._branchSummaryAbortController = undefined;
 			if (result.aborted) {

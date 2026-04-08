@@ -523,6 +523,15 @@ Use this EXACT format:
 
 Keep each section concise. Preserve exact file paths, function names, and error messages.`;
 
+// ============================================================================
+// Cave Mode Compaction Prompt Additions
+// ============================================================================
+
+/** Cave mode addendum appended to compaction prompts to compress output. */
+const CAVE_MODE_COMPACTION_ADDENDUM = `
+
+Cave mode: compress summary output. Drop articles/filler. Use fragments over full sentences where meaning is clear. Omit "(none)" entries entirely. Target 20%+ shorter than default format while preserving all technical substance (file paths, function names, error messages, decisions).`;
+
 /**
  * Generate a summary of the conversation using the LLM.
  * If previousSummary is provided, uses the update prompt to merge.
@@ -536,11 +545,15 @@ export async function generateSummary(
 	signal?: AbortSignal,
 	customInstructions?: string,
 	previousSummary?: string,
+	caveModeEnabled?: boolean,
 ): Promise<string> {
 	const maxTokens = Math.floor(0.8 * reserveTokens);
 
 	// Use update prompt if we have a previous summary, otherwise initial prompt
 	let basePrompt = previousSummary ? UPDATE_SUMMARIZATION_PROMPT : SUMMARIZATION_PROMPT;
+	if (caveModeEnabled) {
+		basePrompt = `${basePrompt}${CAVE_MODE_COMPACTION_ADDENDUM}`;
+	}
 	if (customInstructions) {
 		basePrompt = `${basePrompt}\n\nAdditional focus: ${customInstructions}`;
 	}
@@ -711,6 +724,7 @@ Be concise. Focus on what's needed to understand the kept suffix.`;
  *
  * @param preparation - Pre-calculated preparation from prepareCompaction()
  * @param customInstructions - Optional custom focus for the summary
+ * @param caveModeEnabled - If true, use cave mode compressed output for summary
  */
 export async function compact(
 	preparation: CompactionPreparation,
@@ -719,6 +733,7 @@ export async function compact(
 	headers?: Record<string, string>,
 	customInstructions?: string,
 	signal?: AbortSignal,
+	caveModeEnabled?: boolean,
 ): Promise<CompactionResult> {
 	const {
 		firstKeptEntryId,
@@ -747,6 +762,7 @@ export async function compact(
 						signal,
 						customInstructions,
 						previousSummary,
+						caveModeEnabled,
 					)
 				: Promise.resolve("No prior history."),
 			generateTurnPrefixSummary(turnPrefixMessages, model, settings.reserveTokens, apiKey, headers, signal),
@@ -764,6 +780,7 @@ export async function compact(
 			signal,
 			customInstructions,
 			previousSummary,
+			caveModeEnabled,
 		);
 	}
 

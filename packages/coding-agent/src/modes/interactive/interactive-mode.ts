@@ -2208,6 +2208,11 @@ export class InteractiveMode {
 				await this.handleCompactCommand(customInstructions);
 				return;
 			}
+			if (text === "/cave" || text.startsWith("/cave ")) {
+				this.editor.setText("");
+				this.handleCaveCommand(text);
+				return;
+			}
 			if (text === "/reload") {
 				this.editor.setText("");
 				await this.handleReloadCommand();
@@ -4687,6 +4692,40 @@ export class InteractiveMode {
 		} catch {
 			// Ignore, will be emitted as an event
 		}
+	}
+
+	private handleCaveCommand(text: string): void {
+		const arg = text.startsWith("/cave ") ? text.slice(6).trim().toLowerCase() : "";
+
+		if (!arg) {
+			// No argument: show current cave mode state
+			const state = this.session.getCaveModeSessionState();
+			const status = state.enabled ? `on (intensity: ${state.intensity})` : "off";
+			this.chatContainer.addChild(new Spacer(1));
+			this.chatContainer.addChild(new Text(theme.fg("muted", `Cave mode: ${status}`), 1, 0));
+			this.ui.requestRender();
+			return;
+		}
+
+		if (arg === "off") {
+			this.session.setCaveModeSessionDisabled();
+			this.chatContainer.addChild(new Spacer(1));
+			this.chatContainer.addChild(new Text(theme.fg("muted", "Cave mode: off (session)"), 1, 0));
+			this.ui.requestRender();
+			return;
+		}
+
+		if (arg === "lite" || arg === "full" || arg === "ultra") {
+			this.session.setCaveModeSessionIntensity(arg);
+			this.chatContainer.addChild(new Spacer(1));
+			this.chatContainer.addChild(
+				new Text(theme.fg("muted", `Cave mode: on, intensity set to ${arg} (session)`), 1, 0),
+			);
+			this.ui.requestRender();
+			return;
+		}
+
+		this.showWarning(`/cave: unknown argument '${arg}'. Usage: /cave [lite|full|ultra|off]`);
 	}
 
 	stop(): void {
