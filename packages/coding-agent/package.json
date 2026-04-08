@@ -92,7 +92,7 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/badlogic/pi-mono.git",
+		"url": "git+https://github.com/JuliusBrussee/caveman-cli.git",
 		"directory": "packages/coding-agent"
 	},
 	"engines": {
