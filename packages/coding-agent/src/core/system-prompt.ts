@@ -22,6 +22,75 @@ export interface BuildSystemPromptOptions {
 	contextFiles?: Array<{ path: string; content: string }>;
 	/** Pre-loaded skills. */
 	skills?: Skill[];
+	/** Cave mode settings for communication style injection. */
+	caveMode?: {
+		enabled: boolean;
+		intensity: "lite" | "full" | "ultra";
+	};
+}
+
+// ============================================================================
+// Cave Mode System Prompt
+// ============================================================================
+
+/**
+ * Build the cave mode communication rules block based on intensity level.
+ * Returns empty string when cave mode is disabled.
+ */
+export function buildCaveModePrompt(intensity: "lite" | "full" | "ultra"): string {
+	const lite = `
+## Communication Style (Cave Mode: lite)
+Communicate in terse, compressed style. Drop unnecessary articles (a, an, the) and filler words where meaning is clear.
+
+Intensity: light compression — preserve most natural language, just trim obvious filler.
+
+EXCEPTIONS (always use normal English for):
+- Code blocks and inline code
+- Commit messages and PR descriptions
+- Security warnings and destructive operation confirmations (e.g., deleting files, force-push, overwriting data)`;
+
+	const full = `
+## Communication Style (Cave Mode: full)
+Communicate in compressed, terse style. Drop articles, filler, pleasantries. Skip preamble. Answer directly.
+
+Rules:
+- No "I'll help you with that" or "Great question!" or similar filler
+- Drop articles where meaning is clear ("File saved" not "The file has been saved")
+- Skip pleasantries and acknowledgment phrases
+- Be direct: lead with the answer, not the explanation
+- Use bullet points over prose when listing multiple items
+
+EXCEPTIONS (always use normal English for):
+- Code blocks and inline code
+- Commit messages and PR descriptions
+- Security warnings and destructive operation confirmations (e.g., deleting files, force-push, overwriting data)`;
+
+	const ultra = `
+## Communication Style (Cave Mode: ultra)
+Maximum compression. Respond like terse technical documentation. No articles, no pleasantries, no preamble.
+
+Rules:
+- Drop all articles (a, an, the)
+- Drop all pleasantries and acknowledgments
+- No full sentences when fragments suffice ("Done." not "I have completed the task.")
+- Use abbreviations where unambiguous (e.g., "dir" for directory, "cmd" for command)
+- Prefer symbols over words where clear (→ for "leads to", ✓ for done)
+- Bullet points over prose always
+- Numbers over words for quantities
+
+EXCEPTIONS (always use normal, clear English for):
+- Code blocks and inline code
+- Commit messages and PR descriptions
+- Security warnings and destructive operation confirmations (e.g., deleting files, force-push, overwriting data)`;
+
+	switch (intensity) {
+		case "lite":
+			return lite;
+		case "ultra":
+			return ultra;
+		default:
+			return full;
+	}
 }
 
 /** Build the system prompt with tools, guidelines, and context */
@@ -35,7 +104,11 @@ export function buildSystemPrompt(options: BuildSystemPromptOptions = {}): strin
 		cwd,
 		contextFiles: providedContextFiles,
 		skills: providedSkills,
+		caveMode,
 	} = options;
+
+	// Build cave mode section (empty string if disabled)
+	const caveModeSection = caveMode?.enabled === true ? buildCaveModePrompt(caveMode.intensity ?? "full") : "";
 	const resolvedCwd = cwd ?? process.cwd();
 	const promptCwd = resolvedCwd.replace(/\\/g, "/");
 
@@ -66,6 +139,11 @@ export function buildSystemPrompt(options: BuildSystemPromptOptions = {}): strin
 		const customPromptHasRead = !selectedTools || selectedTools.includes("read");
 		if (customPromptHasRead && skills.length > 0) {
 			prompt += formatSkillsForPrompt(skills);
+		}
+
+		// Append cave mode communication rules (after everything else)
+		if (caveModeSection) {
+			prompt += `\n${caveModeSection}`;
 		}
 
 		// Add date and working directory last
@@ -158,6 +236,11 @@ Pi documentation (read only when the user asks about pi itself, its SDK, extensi
 	// Append skills section (only if read tool is available)
 	if (hasRead && skills.length > 0) {
 		prompt += formatSkillsForPrompt(skills);
+	}
+
+	// Append cave mode communication rules (after everything else)
+	if (caveModeSection) {
+		prompt += `\n${caveModeSection}`;
 	}
 
 	// Add date and working directory last

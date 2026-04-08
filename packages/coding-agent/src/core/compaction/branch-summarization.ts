@@ -77,6 +77,8 @@ export interface GenerateBranchSummaryOptions {
 	replaceInstructions?: boolean;
 	/** Tokens reserved for prompt + LLM response (default 16384) */
 	reserveTokens?: number;
+	/** If true, apply cave mode compressed output for summary */
+	caveModeEnabled?: boolean;
 }
 
 // ============================================================================
@@ -245,6 +247,10 @@ Summary of that exploration:
 
 `;
 
+const BRANCH_CAVE_MODE_ADDENDUM = `
+
+Cave mode: compress summary output. Drop articles/filler. Use fragments over full sentences where meaning is clear. Omit "(none)" entries entirely. Target 20%+ shorter than default format while preserving all technical substance (file paths, function names, error messages, decisions).`;
+
 const BRANCH_SUMMARY_PROMPT = `Create a structured summary of this conversation branch for context when returning later.
 
 Use this EXACT format:
@@ -284,7 +290,16 @@ export async function generateBranchSummary(
 	entries: SessionEntry[],
 	options: GenerateBranchSummaryOptions,
 ): Promise<BranchSummaryResult> {
-	const { model, apiKey, headers, signal, customInstructions, replaceInstructions, reserveTokens = 16384 } = options;
+	const {
+		model,
+		apiKey,
+		headers,
+		signal,
+		customInstructions,
+		replaceInstructions,
+		reserveTokens = 16384,
+		caveModeEnabled,
+	} = options;
 
 	// Token budget = context window minus reserved space for prompt + response
 	const contextWindow = model.contextWindow || 128000;
@@ -309,6 +324,9 @@ export async function generateBranchSummary(
 		instructions = `${BRANCH_SUMMARY_PROMPT}\n\nAdditional focus: ${customInstructions}`;
 	} else {
 		instructions = BRANCH_SUMMARY_PROMPT;
+	}
+	if (caveModeEnabled) {
+		instructions = `${instructions}${BRANCH_CAVE_MODE_ADDENDUM}`;
 	}
 	const promptText = `<conversation>\n${conversationText}\n</conversation>\n\n${instructions}`;
 
