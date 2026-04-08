@@ -1,5 +1,5 @@
 {
-	"name": "pi-monorepo",
+	"name": "cave-pi-monorepo",
 	"private": true,
 	"type": "module",
 	"workspaces": [
@@ -48,7 +48,7 @@
 	"version": "0.0.3",
 	"dependencies": {
 		"@mariozechner/jiti": "^2.6.5",
-		"@mariozechner/pi-coding-agent": "^0.30.2",
+		"@cavepi/pi-coding-agent": "^0.30.2",
 		"get-east-asian-width": "^1.4.0"
 	},
 	"overrides": {
@@ -57,5 +57,6 @@
 		"gaxios": {
 			"rimraf": "6.1.2"
 		}
-	}
+	},
+	"description": "Cave Pi - a fork of pi-mono by Mario Zechner (badlogic)"
 }

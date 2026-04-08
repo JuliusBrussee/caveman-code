@@ -1,16 +1,15 @@
-import type { AgentTool } from "@mariozechner/pi-agent-core";
-import { fauxAssistantMessage, fauxToolCall } from "@mariozechner/pi-ai";
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { AgentTool } from "@cavepi/pi-agent-core";
+import { fauxAssistantMessage, fauxToolCall } from "@cavepi/pi-ai";
 import { Type } from "@sinclair/typebox";
 import { afterEach, describe, expect, it } from "vitest";
+import type { ExtensionAPI, ExtensionFactory } from "../../src/index.js";
+import type { CreateTestExtensionsResultInput } from "../utilities.js";
 import { createHarness, getAssistantTexts, getMessageText, getUserTexts, type Harness } from "./harness.js";
 
 async function createWaitingHarness(
 	options: {
 		tools?: AgentTool[];
-		extensionFactories?: Harness["session"]["extensionRunner"] extends never
-			? never
-			: Array<(pi: ExtensionAPI) => void>;
+		extensionFactories?: Array<ExtensionFactory | CreateTestExtensionsResultInput>;
 	} = {},
 ): Promise<{
 	harness: Harness;

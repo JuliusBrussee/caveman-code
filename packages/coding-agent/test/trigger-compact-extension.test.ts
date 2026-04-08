@@ -36,7 +36,7 @@ describe("trigger-compact example extension", () => {
 			registerCommand: vi.fn(),
 		} as unknown as ExtensionAPI;
 
-		triggerCompactExtension(api);
+		triggerCompactExtension(api as any);
 		expect(turnEndHandler).toBeDefined();
 
 		const compact = vi.fn();

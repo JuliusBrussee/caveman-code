@@ -1,0 +1,49 @@
+{
+	"name": "@cavekit/pi-extension",
+	"version": "0.1.0",
+	"description": "CaveKit SDD workflow as a native Pi coding agent extension — spec → parallel build → validate → converge",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"scripts": {
+		"build": "tsc -p tsconfig.json",
+		"dev": "tsc -p tsconfig.json --watch",
+		"clean": "shx rm -rf dist",
+		"check": "tsc -p tsconfig.json --noEmit"
+	},
+	"keywords": [
+		"cavekit",
+		"caveman",
+		"pi",
+		"sdd",
+		"coding-agent",
+		"extension"
+	],
+	"license": "MIT",
+	"peerDependencies": {
+		"@cavepi/pi-coding-agent": ">=0.30.0",
+		"@cavepi/pi-ai": ">=0.30.0",
+		"@cavepi/pi-tui": ">=0.30.0"
+	},
+	"devDependencies": {
+		"@cavepi/pi-coding-agent": "*",
+		"@cavepi/pi-ai": "*",
+		"@cavepi/pi-tui": "*",
+		"@types/node": "^22.10.5",
+		"shx": "^0.4.0",
+		"typescript": "^5.9.2"
+	},
+	"dependencies": {
+		"yaml": "^2.8.2"
+	}
+}

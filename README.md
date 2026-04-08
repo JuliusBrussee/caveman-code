@@ -25,9 +25,11 @@ OSS weekend runs Thursday, April 2, 2026 through Monday, April 13, 2026. New iss
   <a href="https://exe.dev"><img src="packages/coding-agent/docs/images/exy.png" alt="Exy mascot" width="48" /><br />exe.dev</a>
 </p>
 
-# Pi Monorepo
+# Cave Pi
 
-> **Looking for the pi coding agent?** See **[packages/coding-agent](packages/coding-agent)** for installation and usage.
+> Cave Pi is a fork of [pi-mono](https://github.com/badlogic/pi-mono) by [Mario Zechner (badlogic)](https://mariozechner.at). The original project is MIT-licensed. Cave Pi adds Cave Mode, compression features, and is published under the `@cavepi/` package scope.
+
+> **Looking for the cave coding agent?** See **[packages/coding-agent](packages/coding-agent)** for installation and usage.
 
 Tools for building AI agents and managing LLM deployments.
 

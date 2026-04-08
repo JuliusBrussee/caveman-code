@@ -1,5 +1,5 @@
-import { getOAuthProviders } from "@mariozechner/pi-ai/oauth";
-import { Container, type Focusable, getKeybindings, Input, Spacer, Text, type TUI } from "@mariozechner/pi-tui";
+import { getOAuthProviders } from "@cavepi/pi-ai/oauth";
+import { Container, type Focusable, getKeybindings, Input, Spacer, Text, type TUI } from "@cavepi/pi-tui";
 import { exec } from "child_process";
 import { theme } from "../theme/theme.js";
 import { DynamicBorder } from "./dynamic-border.js";

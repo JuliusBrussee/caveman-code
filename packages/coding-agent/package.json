@@ -1,13 +1,14 @@
 {
-	"name": "@mariozechner/pi-coding-agent",
+	"name": "@cavepi/pi-coding-agent",
 	"version": "0.65.2",
 	"description": "Coding agent CLI with read, bash, edit, write tools and session management",
 	"type": "module",
 	"piConfig": {
-		"name": "pi",
-		"configDir": ".pi"
+		"name": "cave",
+		"configDir": ".cave"
 	},
 	"bin": {
+		"cave": "dist/cli.js",
 		"pi": "dist/cli.js"
 	},
 	"main": "./dist/index.js",
@@ -40,9 +41,9 @@
 	},
 	"dependencies": {
 		"@mariozechner/jiti": "^2.6.2",
-		"@mariozechner/pi-agent-core": "^0.65.2",
-		"@mariozechner/pi-ai": "^0.65.2",
-		"@mariozechner/pi-tui": "^0.65.2",
+		"@cavepi/pi-agent-core": "^0.65.2",
+		"@cavepi/pi-ai": "^0.65.2",
+		"@cavepi/pi-tui": "^0.65.2",
 		"@silvia-odwyer/photon-node": "^0.3.4",
 		"ajv": "^8.17.1",
 		"chalk": "^5.5.0",

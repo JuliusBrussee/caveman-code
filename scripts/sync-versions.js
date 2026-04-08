@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Syncs ALL @mariozechner/* package dependency versions to match their current versions.
+ * Syncs ALL @cavepi/* package dependency versions to match their current versions.
  * This ensures lockstep versioning across the monorepo.
  */
 

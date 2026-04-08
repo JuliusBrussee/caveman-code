@@ -8,7 +8,7 @@
  * paths relative to your cwd.
  */
 
-import { getModel } from "@mariozechner/pi-ai";
+import { getModel } from "@cavepi/pi-ai";
 import {
 	AuthStorage,
 	createAgentSession,
@@ -19,7 +19,7 @@ import {
 	type ResourceLoader,
 	SessionManager,
 	SettingsManager,
-} from "@mariozechner/pi-coding-agent";
+} from "@cavepi/pi-coding-agent";
 
 // Custom auth storage location
 const authStorage = AuthStorage.create("/tmp/my-agent/auth.json");

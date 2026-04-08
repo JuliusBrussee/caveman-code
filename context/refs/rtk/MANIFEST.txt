@@ -1,0 +1,117 @@
+RTK Reference Material - Complete Manifest
+============================================
+
+Directory Structure:
+/Users/julb/Desktop/GitHub/caveman-cli/context/refs/rtk/
+
+Files Downloaded: 14 documents | Total Size: 76 KB
+
+1. ROOT DOCUMENTATION
+   - INDEX.md (5.6 KB) - Navigation guide and integration points
+   - PATTERNS.md (9.7 KB) - Key algorithms and implementation patterns
+   - README.md (2.4 KB) - RTK overview and feature summary
+   - CONTRIBUTING.md (3.5 KB) - Contribution guidelines and workflow
+   - CLAUDE.md (1.8 KB) - AI agent quick reference
+
+2. ARCHITECTURE & TECHNICAL DOCS
+   docs/contributing/
+   - ARCHITECTURE.md - Complete architecture reference
+     * 5 core design principles
+     * 6-phase command lifecycle
+     * 12-strategy filtering taxonomy
+     * 64-module organization (42 command + 22 infrastructure)
+     * 9 ecosystem coverage with savings %
+     * Token tracking system design
+   
+   - TECHNICAL.md - Implementation details
+     * Layered pipeline architecture
+     * Command rewriting flow
+     * Filter systems overview
+     * Performance targets
+
+3. IMPLEMENTATION GUIDES
+   src/cmds/README.md - Command filter modules
+   - Scope & boundaries
+   - Rust vs. TOML decision matrix
+   - 9 ecosystem organizations with command lists
+   - runner::run_filtered() execution flow
+   - Exit code propagation patterns
+   - Step-by-step guide for adding filters
+
+   src/core/README.md - Core infrastructure
+   - Configuration and tracking
+   - TOML filter pipeline (8 stages)
+   - SQLite tracking schema
+   - Consumer contracts
+
+   src/discover/README.md - Command rewriting system
+   - Tokenization and state machine processing
+   - Compound command splitting
+   - Per-segment rewriting pipeline
+   - Safety guards and special cases
+   - Environment variable handling
+
+   src/filters/README.md - Built-in filters (TOML DSL)
+   - Core purpose and use cases
+   - 8-stage processing pipeline
+   - Configuration fields
+
+4. HOOK INTEGRATION DOCS
+   hooks/README.md - Agent hooks overview
+   - 7 supported agents with mechanisms
+   - Core hook mechanism (thin delegates)
+   - Design principles (non-blocking, graceful)
+   - Rewrite registry categories
+
+   hooks/claude/README.md - Claude Code specific
+   - PreToolUse hook implementation
+   - Safety mechanisms
+   - Testing capabilities
+
+   hooks/claude/rtk-rewrite.sh - Implementation
+   - Complete shell script with comments
+   - Dependency checks
+   - Exit code interpretation (0=allow, 1=pass, 2=deny, 3=ask)
+   - JSON manipulation logic
+
+KEY LEARNING AREAS FOR CAVEMAN-CLI:
+
+1. FILTERING TAXONOMY
+   12 distinct strategies achieving 60-99% token reduction:
+   - Stats Extraction (90-99%)
+   - Error-Only Mode (60-80%)
+   - Grouping by Pattern (80-90%)
+   - Deduplication (70-85%)
+   - Structure Only (80-95%)
+   - Code Filtering (20-90%)
+   - Failure Focus (94-99%)
+   - Tree Compression (50-70%)
+   - Progress Filtering (85-95%)
+   - JSON/Text Dual Mode (80%+)
+   - State Machine Parsing (90%+)
+   - NDJSON Streaming (90%+)
+
+2. COMMAND REWRITING ALGORITHM
+   Phase 1: Tokenization (shell-aware lexing)
+   Phase 2: Compound command splitting (operators: &&, ||, ;, |)
+   Phase 3: Per-segment rewriting (patterns → RTK equivalents)
+   Phase 4: Safety guards (write ops, structured flags, exclusions)
+
+3. MODULE ORGANIZATION
+   9 ecosystems: git, rust, js, python, go, dotnet, cloud, system, ruby
+   42 command modules + 22 infrastructure modules
+
+4. PERFORMANCE CONSTRAINTS
+   - Startup: < 10ms
+   - Memory: < 5MB resident
+   - Binary: < 5MB stripped
+   - Command overhead: 5-15ms
+
+5. INTEGRATION PATTERNS
+   - 7 agent hooks (Claude Code, Copilot, Cursor, etc.)
+   - Thin delegates calling Rust binary (single source of truth)
+   - Exit code handling for CI/CD safety
+
+Content Extraction Date: 2026-04-08
+RTK Repository: https://github.com/rtk-ai/rtk
+RTK Version Reference: 0.28.2+

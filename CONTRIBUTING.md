@@ -1,6 +1,8 @@
-# Contributing to pi
+# Contributing to Cave Pi
 
 Thanks for wanting to contribute! This guide exists to save both of us time.
+
+Cave Pi is a fork of [pi-mono](https://github.com/badlogic/pi-mono) by Mario Zechner (badlogic). Upstream contributions should be directed to the original project.
 
 ## The One Rule
 
@@ -8,7 +10,28 @@ Thanks for wanting to contribute! This guide exists to save both of us time.
 
 Using AI to write code is fine. You can gain understanding by interrogating an agent with access to the codebase until you grasp all edge cases and effects of your changes. What's not fine is submitting agent-generated slop without that understanding.
 
-If you use an agent, run it from the `pi-mono` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.
+If you use an agent, run it from the `caveman-cli` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.
+
+## Syncing with Upstream (pi-mono)
+
+The `upstream` remote tracks https://github.com/badlogic/pi-mono.git. Push to upstream is disabled to prevent accidental pushes.
+
+To pull in upstream changes:
+
+```bash
+# Fetch latest from upstream
+git fetch upstream
+
+# Merge or rebase onto upstream/main
+git merge upstream/main
+# or
+git rebase upstream/main
+
+# Resolve any conflicts, then push to origin
+git push origin main
+```
+
+Keep Cave Pi-specific changes (banner, config dir, package scope) in their own commits so they can be rebased cleanly over upstream updates.
 
 ## First-Time Contributors
 
