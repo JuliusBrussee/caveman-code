@@ -81,7 +81,6 @@ import { CustomEditor } from "./components/custom-editor.js";
 import { CustomMessageComponent } from "./components/custom-message.js";
 import { DaxnutsComponent } from "./components/daxnuts.js";
 import { DynamicBorder } from "./components/dynamic-border.js";
-import { EarendilAnnouncementComponent } from "./components/earendil-announcement.js";
 import { ExtensionEditorComponent } from "./components/extension-editor.js";
 import { ExtensionInputComponent } from "./components/extension-input.js";
 import { ExtensionSelectorComponent } from "./components/extension-selector.js";
@@ -429,23 +428,11 @@ export class InteractiveMode {
 		}
 	}
 
-	private shouldShowEarendilAnnouncement(): boolean {
-		const now = new Date();
-		return now.getFullYear() === 2026 && now.getMonth() === 3 && now.getDate() === 8;
-	}
-
 	private showStartupNoticesIfNeeded(): void {
 		if (this.startupNoticesShown) {
 			return;
 		}
 		this.startupNoticesShown = true;
-
-		if (this.shouldShowEarendilAnnouncement()) {
-			if (this.chatContainer.children.length > 0) {
-				this.chatContainer.addChild(new Spacer(1));
-			}
-			this.chatContainer.addChild(new EarendilAnnouncementComponent());
-		}
 
 		if (!this.changelogMarkdown) {
 			return;
@@ -495,7 +482,7 @@ export class InteractiveMode {
 				"╚██████╗██║  ██║  ╚██╔╝  ███████╗",
 				" ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝",
 			].join("\n");
-			const logo = theme.bold(theme.fg("brand", asciiArt)) + "\n" + theme.fg("dim", `Caveman Code v${this.version}`);
+			const logo = `${theme.bold(theme.fg("brand", asciiArt))}\n${theme.fg("dim", `Caveman Code v${this.version}`)}`;
 
 			// Build startup instructions using keybinding hint helpers
 			const hint = (keybinding: AppKeybinding, description: string) => keyHint(keybinding, description);
@@ -525,7 +512,11 @@ export class InteractiveMode {
 				"dim",
 				`Cave can explain its own features and look up its docs. Ask it how to use or extend Cave.`,
 			);
-			this.builtInHeader = new Text(`${logo}\n${instructions}\n\n${onboarding}`, 1, 0);
+			const caveModeEnabled = this.settingsManager.getCaveModeEnabled();
+			const caveModeStatus = caveModeEnabled
+				? `\n${theme.fg("accent", "cave mode: active | compression: enabled")}`
+				: "";
+			this.builtInHeader = new Text(`${logo}\n${instructions}\n\n${onboarding}${caveModeStatus}`, 1, 0);
 
 			// Setup UI layout
 			this.headerContainer.addChild(new Spacer(1));
