@@ -85,7 +85,8 @@
 				"thinkingMedium",
 				"thinkingHigh",
 				"thinkingXhigh",
-				"bashMode"
+				"bashMode",
+				"brand"
 			],
 			"properties": {
 				"accent": {
@@ -291,6 +292,10 @@
 				"bashMode": {
 					"$ref": "#/$defs/colorValue",
 					"description": "Editor border color in bash mode"
+				},
+				"brand": {
+					"$ref": "#/$defs/colorValue",
+					"description": "Brand identity color (logo, highlights)"
 				}
 			},
 			"additionalProperties": false

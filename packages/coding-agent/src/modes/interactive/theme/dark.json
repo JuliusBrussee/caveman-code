@@ -10,7 +10,8 @@
 		"gray": "#808080",
 		"dimGray": "#666666",
 		"darkGray": "#505050",
-		"accent": "#8abeb7",
+		"accent": "#00d7ff",
+		"brand": "#E8A840",
 		"selectedBg": "#2a2d52",
 		"userMsgBg": "#232545",
 		"toolPendingBg": "#24253d",
@@ -75,7 +76,8 @@
 		"thinkingHigh": "#b294bb",
 		"thinkingXhigh": "#d183e8",
 
-		"bashMode": "green"
+		"bashMode": "green",
+		"brand": "brand"
 	},
 	"export": {
 		"pageBg": "#1c1d30",
