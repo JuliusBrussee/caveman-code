@@ -141,7 +141,8 @@ export type ThemeColor =
 	| "thinkingMedium"
 	| "thinkingHigh"
 	| "thinkingXhigh"
-	| "bashMode";
+	| "bashMode"
+	| "brand";
 
 export type ThemeBg =
 	| "selectedBg"
