@@ -1,6 +1,6 @@
 ---
 created: "2026-04-08"
-last_edited: "2026-04-08"
+last_edited: "2026-04-08T20:00:00Z"
 ---
 
 # Implementation Tracking: extension-commands
@@ -17,9 +17,9 @@ Build site: context/plans/build-site.md
 | T-024 | DONE | Research command with WebSearch instruction |
 | T-025 | DONE | Design command with blueprint context reading |
 | T-026 | DONE | Draft command with refs context, R/AC structure |
-| T-029 | | Scoped context builder |
-| T-030 | | Architect command |
-| T-031 | | Convergence monitoring |
-| T-032 | | Build command |
-| T-033 | | Tier gate review |
-| T-034 | | Inspect command |
+| T-029 | DONE | Scoped context builder with fallback to full kit content |
+| T-030 | DONE | Architect command reads kits, generates tiered build site |
+| T-031 | DONE | Convergence monitoring with shared analysis, /ck:convergence command |
+| T-032 | DONE | Build command with wave orchestration, scoped context, circuit breaker |
+| T-033 | DONE | Tier gate review with severity-based blocking, per-tier reports |
+| T-034 | DONE | Inspect command with gap analysis, per-AC scoring, domain filter |
