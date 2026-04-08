@@ -1,81 +1,272 @@
-<!-- OSS_WEEKEND_START -->
-# 🏖️ OSS Weekend
-
-**Issue tracker reopens Monday, April 13, 2026.**
-
-OSS weekend runs Thursday, April 2, 2026 through Monday, April 13, 2026. New issues and PRs from unapproved contributors are auto-closed during this time. Approved contributors can still open issues and PRs if something is genuinely urgent, but please keep that to pressing matters only. For support, join [Discord](https://discord.com/invite/3cU7Bz4UPx).
-
-> _Current focus: at the moment i'm deep in refactoring internals, and need to focus._
-<!-- OSS_WEEKEND_END -->
-
----
-
-<p align="center">
-  <a href="https://shittycodingagent.ai">
-    <img src="https://shittycodingagent.ai/logo.svg" alt="pi logo" width="128">
-  </a>
-</p>
-<p align="center">
-  <a href="https://discord.com/invite/3cU7Bz4UPx"><img alt="Discord" src="https://img.shields.io/badge/discord-community-5865F2?style=flat-square&logo=discord&logoColor=white" /></a>
-  <a href="https://github.com/badlogic/pi-mono/actions/workflows/ci.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/badlogic/pi-mono/ci.yml?style=flat-square&branch=main" /></a>
-</p>
-<p align="center">
-  <a href="https://pi.dev">pi.dev</a> domain graciously donated by
-  <br /><br />
-  <a href="https://exe.dev"><img src="packages/coding-agent/docs/images/exy.png" alt="Exy mascot" width="48" /><br />exe.dev</a>
-</p>
-
 # Cave Pi
 
-> Cave Pi is a fork of [pi-mono](https://github.com/badlogic/pi-mono) by [Mario Zechner (badlogic)](https://mariozechner.at). The original project is MIT-licensed. Cave Pi adds Cave Mode, compression features, and is published under the `@cavepi/` package scope.
+> Cave Pi is a fork of [pi-mono](https://github.com/badlogic/pi-mono) by [Mario Zechner (badlogic)](https://mariozechner.at). The original project is MIT-licensed. Cave Pi adds Cave Mode, the CaveKit extension, and is published under the `@cavepi/` package scope.
 
-> **Looking for the cave coding agent?** See **[packages/coding-agent](packages/coding-agent)** for installation and usage.
-
-Tools for building AI agents and managing LLM deployments.
-
-## Share your OSS coding agent sessions
-
-If you use pi or other coding agents for open source work, please share your sessions.
-
-Public OSS session data helps improve coding agents with real-world tasks, tool use, failures, and fixes instead of toy benchmarks.
-
-For the full explanation, see [this post on X](https://x.com/badlogicgames/status/2037811643774652911).
-
-To publish sessions, use [`badlogic/pi-share-hf`](https://github.com/badlogic/pi-share-hf). Read its README.md for setup instructions. All you need is a Hugging Face account, the Hugging Face CLI, and `pi-share-hf`.
-
-You can also watch [this video](https://x.com/badlogicgames/status/2041151967695634619), where I show how I publish my `pi-mono` sessions.
-
-I regularly publish my own `pi-mono` work sessions here:
-
-- [badlogicgames/pi-mono on Hugging Face](https://huggingface.co/datasets/badlogicgames/pi-mono)
+A minimal, extensible terminal coding agent and multi-provider LLM toolkit — adapt it to your workflow, not the other way around.
 
 ## Packages
 
-| Package | Description |
+| Package | npm | Description |
+|---------|-----|-------------|
+| [`@cavepi/pi-coding-agent`](packages/coding-agent) | `cave` / `pi` CLI | Coding agent CLI with sessions, extensions, skills, and themes |
+| [`@cavepi/pi-ai`](packages/ai) | `pi-ai` CLI | Unified multi-provider LLM API (OpenAI, Anthropic, Google, and more) |
+| [`@cavepi/pi-agent-core`](packages/agent) | — | Agent runtime with tool calling and state management |
+| [`@cavepi/pi-tui`](packages/tui) | — | Terminal UI library with differential rendering |
+| [`@cavepi/pi-web-ui`](packages/web-ui) | — | Web components for AI chat interfaces |
+| [`@cavepi/pi-mom`](packages/mom) | `mom` CLI | Slack bot that delegates messages to the coding agent |
+| [`@cavepi/pi`](packages/pods) | `pi-pods` CLI | CLI for managing vLLM deployments on GPU pods |
+| [`@cavekit/pi-extension`](packages/cavekit-extension) | — | CaveKit SDD workflow extension (Draft → Architect → Build → Inspect) |
+
+---
+
+## Quick Start
+
+### Requirements
+
+- Node.js 20+
+- An API key for at least one supported provider, or an active subscription
+
+### Install the coding agent
+
+```bash
+npm install -g @cavepi/pi-coding-agent
+```
+
+This installs two aliases: `cave` (Cave Pi) and `pi` (vanilla pi-compatible).
+
+### Authenticate
+
+```bash
+# Via API key (Anthropic example)
+export ANTHROPIC_API_KEY=sk-ant-...
+cave
+
+# Via OAuth subscription (Claude Pro/Max, ChatGPT Plus, Gemini, Copilot, etc.)
+cave
+/login   # then select provider
+```
+
+### Run
+
+```bash
+cave                  # interactive mode
+cave "explain this codebase"
+cave -p "summarize this file"   # non-interactive, print and exit
+cat README.md | cave -p "summarize this"   # pipe stdin
+```
+
+---
+
+## Features
+
+### Providers & Models
+
+Cave Pi maintains an up-to-date list of tool-capable models for every built-in provider.
+
+**Via subscription (OAuth):** Claude Pro/Max · ChatGPT Plus/Pro · GitHub Copilot · Google Gemini · Google Antigravity
+
+**Via API key:** Anthropic · OpenAI · Azure OpenAI · Google Gemini · Google Vertex · Amazon Bedrock · Mistral · Groq · Cerebras · xAI · OpenRouter · Vercel AI Gateway · Hugging Face · Kimi · MiniMax · ZAI · OpenCode
+
+**Custom providers:** Add any OpenAI/Anthropic/Google-compatible endpoint via `~/.pi/agent/models.json`. For full custom OAuth or APIs, use the [Extensions API](packages/coding-agent/docs/extensions.md).
+
+Switch models at any time with `/model` (or `Ctrl+L`). Cycle between a scoped set of favourites with `Ctrl+P`.
+
+### Interactive Mode
+
+The TUI shows a startup header, message history (including tool calls and thinking blocks), a live editor, and a footer with cost/token/context stats.
+
+| Feature | How |
+|---------|-----|
+| File reference | Type `@` to fuzzy-search project files |
+| Path completion | Tab |
+| Multi-line input | Shift+Enter |
+| Paste images | Ctrl+V |
+| Run shell commands | `!cmd` (sends output to LLM) · `!!cmd` (runs silently) |
+| Thinking level | Shift+Tab to cycle (`off → minimal → low → medium → high → xhigh`) |
+| Collapse tool output | Ctrl+O |
+| Collapse thinking | Ctrl+T |
+
+### Commands
+
+Type `/` to trigger any command. Extensions can register their own.
+
+| Command | Description |
 |---------|-------------|
-| **[@mariozechner/pi-ai](packages/ai)** | Unified multi-provider LLM API (OpenAI, Anthropic, Google, etc.) |
-| **[@mariozechner/pi-agent-core](packages/agent)** | Agent runtime with tool calling and state management |
-| **[@mariozechner/pi-coding-agent](packages/coding-agent)** | Interactive coding agent CLI |
-| **[@mariozechner/pi-mom](packages/mom)** | Slack bot that delegates messages to the pi coding agent |
-| **[@mariozechner/pi-tui](packages/tui)** | Terminal UI library with differential rendering |
-| **[@mariozechner/pi-web-ui](packages/web-ui)** | Web components for AI chat interfaces |
-| **[@mariozechner/pi-pods](packages/pods)** | CLI for managing vLLM deployments on GPU pods |
+| `/login` / `/logout` | OAuth authentication |
+| `/model` | Switch model |
+| `/settings` | Thinking level, theme, transport, compaction |
+| `/resume` | Browse previous sessions |
+| `/new` | Start a new session |
+| `/tree` | Navigate the full session tree and branch from any point |
+| `/fork` | Create a new session from a selected branch point |
+| `/compact [prompt]` | Manually compact context |
+| `/copy` | Copy last assistant message to clipboard |
+| `/export [file]` | Export session to HTML |
+| `/share` | Upload session as a private GitHub Gist |
+| `/reload` | Reload extensions, skills, prompts, keybindings, and context files |
+| `/hotkeys` | Show all keyboard shortcuts |
+| `/changelog` | View version history |
 
-## Contributing
+### Sessions
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and [AGENTS.md](AGENTS.md) for project-specific rules (for both humans and agents).
+Sessions auto-save to `~/.pi/agent/sessions/`, organised by working directory. Each session is a JSONL file with a full tree structure so branching never overwrites history.
+
+```bash
+cave -c                    # continue most recent session
+cave -r                    # browse and select a session
+cave --session <path|id>   # open a specific session
+cave --fork <path|id>      # fork a session into a new file
+cave --no-session          # ephemeral mode
+```
+
+**`/tree`** — navigate and branch in-place. Search, fold, page, and filter (default / no-tools / user-only / labeled-only). Press `Shift+L` to label bookmarks.
+
+**Compaction** — automatic context compaction triggers on overflow or when approaching the limit. Use `/compact` for manual control with optional custom instructions. Full history remains in the JSONL file.
+
+### Customization
+
+**Prompt Templates** — reusable Markdown prompts with `{{placeholders}}`. Place in `~/.pi/agent/prompts/` or `.pi/prompts/` and invoke with `/templatename`.
+
+**Skills** — on-demand capability packages. Place in `~/.pi/agent/skills/` or `.pi/skills/` (or install via `cave install`). Invoke with `/skill:name` or let the agent auto-load them.
+
+**Extensions** — TypeScript modules loaded at startup. Register tools, commands, keyboard shortcuts, event handlers, and UI components:
+
+```typescript
+export default function (pi: ExtensionAPI) {
+  pi.registerTool({ name: "deploy", ... });
+  pi.registerCommand("stats", { ... });
+  pi.on("tool_call", async (event, ctx) => { ... });
+}
+```
+
+Extensions can add sub-agents, plan mode, permission gates, custom editors, status lines, headers, footers, overlays, MCP integration, git checkpointing, and more.
+
+**Themes** — built-in `dark` and `light`; themes hot-reload. Place custom themes in `~/.pi/agent/themes/` or `.pi/themes/`.
+
+**Pi Packages** — bundle and share extensions, skills, prompts, and themes via npm or git:
+
+```bash
+cave install npm:@foo/pi-tools
+cave install git:github.com/user/repo
+cave remove npm:@foo/pi-tools
+cave list
+cave update
+cave config   # enable/disable package resources
+```
+
+### CaveKit Extension (`@cavekit/pi-extension`)
+
+Integrates the **CaveKit SDD (Spec-Driven Development) workflow** as first-class `/ck:*` commands — from natural language spec to built, validated code.
+
+| Command | Description |
+|---------|-------------|
+| `/ck:draft <description>` | Decompose a project description into domain kit files with R-numbered requirements and acceptance criteria |
+| `/ck:architect` | Generate a tiered task graph (build site) from approved kits, with dependency edges and coverage matrix |
+| `/ck:build` | Execute the build site via wave-based parallel dispatch; tasks in the same wave run concurrently |
+| `/ck:inspect` | Gap analysis — classify each acceptance criterion as met / partial / not met; flag over-builds |
+| `/ck:research <topic>` | Dispatch parallel subagents to explore a topic and return a consolidated summary |
+| `/ck:design [create\|audit]` | Create or audit a structured `DESIGN.md` (9-section design system format) |
+| `/ck:progress` | Show build state: task statuses, wave progress, tier gate results, convergence metrics |
+| `/ck:config [key] [value]` | Read or write CaveKit configuration |
+| `/ck:help [command]` | List all `/ck:*` commands or show detailed usage for one |
+
+**Tier Gate Review** — at each tier boundary, an adversarial reviewer evaluates completed work. P0/P1 findings pause the build and prompt: approve, generate fix tasks, or abort.
+
+**Convergence Monitoring** — tracks lines changed per iteration and test pass rates. Detects healthy convergence vs. iteration ceiling and recommends stopping when further iteration is unproductive.
+
+**Scoped Context** — each dispatched subagent receives only the kit sections relevant to its assigned tasks, keeping context focused.
+
+### Programmatic Usage
+
+**SDK:**
+
+```typescript
+import { AuthStorage, createAgentSession, ModelRegistry, SessionManager } from "@cavepi/pi-coding-agent";
+
+const authStorage = AuthStorage.create();
+const modelRegistry = ModelRegistry.create(authStorage);
+const { session } = await createAgentSession({
+  sessionManager: SessionManager.inMemory(),
+  authStorage,
+  modelRegistry,
+});
+
+await session.prompt("What files are in the current directory?");
+```
+
+**RPC mode** — for non-Node.js integrations, communicate over stdin/stdout via JSONL:
+
+```bash
+cave --mode rpc
+```
+
+**Print / JSON mode** — for scripting:
+
+```bash
+cave -p "Summarize this codebase"
+cave --mode json "List todos"
+```
+
+---
+
+## CLI Reference
+
+```bash
+cave [options] [@files...] [messages...]
+```
+
+### Key options
+
+| Option | Description |
+|--------|-------------|
+| `-c`, `--continue` | Continue most recent session |
+| `-r`, `--resume` | Browse and select session |
+| `-p`, `--print` | Non-interactive: print response and exit |
+| `--mode json\|rpc` | Structured output modes |
+| `--provider <name>` | Provider (anthropic, openai, google, …) |
+| `--model <pattern>` | Model ID or pattern; supports `provider/id` and `:<thinking>` suffix |
+| `--thinking <level>` | `off` · `minimal` · `low` · `medium` · `high` · `xhigh` |
+| `--tools <list>` | Enable specific built-in tools (default: `read,bash,edit,write`) |
+| `--no-tools` | Disable built-in tools (extension tools still active) |
+| `--no-extensions` | Disable extension discovery |
+| `-e`, `--extension <src>` | Load a specific extension (repeatable) |
+| `--api-key <key>` | API key (overrides env vars) |
+| `-v`, `--version` | Show version |
+| `-h`, `--help` | Show help |
+
+Available built-in tools: `read`, `bash`, `edit`, `write`, `grep`, `find`, `ls`
+
+### Environment variables
+
+| Variable | Description |
+|----------|-------------|
+| `ANTHROPIC_API_KEY` | Anthropic API key |
+| `OPENAI_API_KEY` | OpenAI API key |
+| `PI_CODING_AGENT_DIR` | Override config directory (default: `~/.pi/agent`) |
+| `PI_SKIP_VERSION_CHECK` | Skip startup version check |
+| `PI_CACHE_RETENTION` | Set to `long` for extended prompt cache (Anthropic: 1h, OpenAI: 24h) |
+
+---
 
 ## Development
 
 ```bash
-npm install          # Install all dependencies
-npm run build        # Build all packages
-npm run check        # Lint, format, and type check
-./test.sh            # Run tests (skips LLM-dependent tests without API keys)
-./pi-test.sh         # Run pi from sources (can be run from any directory)
+npm install          # install all dependencies
+npm run build        # build all packages (order-dependent, run before check)
+npm run check        # lint, format, and type check
+./test.sh            # run tests (LLM-dependent tests skipped without API keys)
+./pi-test.sh         # run cave from sources (works from any directory)
 ```
 
-> **Note:** `npm run check` requires `npm run build` to be run first. The web-ui package uses `tsc` which needs compiled `.d.ts` files from dependencies.
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and [AGENTS.md](AGENTS.md) for project-specific rules for humans and agents.
+
+Cave Pi tracks upstream pi-mono. Cave Pi-specific changes (binary name, package scope, CaveKit extension) are kept in separate commits for clean rebasing.
+
+---
 
 ## License
 

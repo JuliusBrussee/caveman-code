@@ -1,9 +1,9 @@
 #!/usr/bin/env tsx
 
 import { writeFileSync } from "fs";
-import { join, dirname } from "path";
+import { dirname, join } from "path";
 import { fileURLToPath } from "url";
-import { Api, KnownProvider, Model } from "../src/types.js";
+import type { Api, KnownProvider, Model } from "../src/types.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -70,7 +70,7 @@ async function fetchOpenRouterModels(): Promise<Model<any>[]> {
 			if (!model.supported_parameters?.includes("tools")) continue;
 
 			// Parse provider from model ID
-			let provider: KnownProvider = "openrouter";
+			const provider: KnownProvider = "openrouter";
 			let modelKey = model.id;
 
 			modelKey = model.id; // Keep full ID for OpenRouter
@@ -187,7 +187,7 @@ async function loadModelsDevData(): Promise<Model<any>[]> {
 				const m = model as ModelsDevModel;
 				if (m.tool_call !== true) continue;
 
-				let id = modelId;
+				const id = modelId;
 
 				if (id.startsWith("ai21.jamba")) {
 					// These models doesn't support tool use in streaming mode
@@ -529,7 +529,7 @@ async function loadModelsDevData(): Promise<Model<any>[]> {
 				if (m.status === "deprecated") continue;
 
 				// Claude 4.x models route to Anthropic Messages API
-				const isCopilotClaude4 = /^claude-(haiku|sonnet|opus)-4([.\-]|$)/.test(modelId);
+				const isCopilotClaude4 = /^claude-(haiku|sonnet|opus)-4([.-]|$)/.test(modelId);
 				// gpt-5 models require responses API, others use completions
 				const needsResponsesApi = modelId.startsWith("gpt-5") || modelId.startsWith("oswe");
 
@@ -557,13 +557,15 @@ async function loadModelsDevData(): Promise<Model<any>[]> {
 					maxTokens: m.limit?.output || 8192,
 					headers: { ...COPILOT_STATIC_HEADERS },
 					// compat only applies to openai-completions
-					...(api === "openai-completions" ? {
-						compat: {
-							supportsStore: false,
-							supportsDeveloperRole: false,
-							supportsReasoningEffort: false,
-						},
-					} : {}),
+					...(api === "openai-completions"
+						? {
+								compat: {
+									supportsStore: false,
+									supportsDeveloperRole: false,
+									supportsReasoningEffort: false,
+								},
+							}
+						: {}),
 				};
 
 				models.push(copilotModel);
@@ -656,7 +658,7 @@ async function generateModels() {
 
 	// Fix incorrect cache pricing for Claude Opus 4.5 from models.dev
 	// models.dev has 3x the correct pricing (1.5/18.75 instead of 0.5/6.25)
-	const opus45 = allModels.find(m => m.provider === "anthropic" && m.id === "claude-opus-4-5");
+	const opus45 = allModels.find((m) => m.provider === "anthropic" && m.id === "claude-opus-4-5");
 	if (opus45) {
 		opus45.cost.cacheRead = 0.5;
 		opus45.cost.cacheWrite = 6.25;
@@ -714,9 +716,7 @@ async function generateModels() {
 			candidate.cost.output = 1.9;
 			candidate.cost.cacheRead = 0.119;
 		}
-
 	}
-
 
 	// Add missing EU Opus 4.6 profile
 	if (!allModels.some((m) => m.provider === "amazon-bedrock" && m.id === "eu.anthropic.claude-opus-4-6-v1")) {
@@ -740,7 +740,7 @@ async function generateModels() {
 	}
 
 	// Add missing Claude Opus 4.6
-	if (!allModels.some(m => m.provider === "anthropic" && m.id === "claude-opus-4-6")) {
+	if (!allModels.some((m) => m.provider === "anthropic" && m.id === "claude-opus-4-6")) {
 		allModels.push({
 			id: "claude-opus-4-6",
 			name: "Claude Opus 4.6",
@@ -761,7 +761,7 @@ async function generateModels() {
 	}
 
 	// Add missing Claude Sonnet 4.6
-	if (!allModels.some(m => m.provider === "anthropic" && m.id === "claude-sonnet-4-6")) {
+	if (!allModels.some((m) => m.provider === "anthropic" && m.id === "claude-sonnet-4-6")) {
 		allModels.push({
 			id: "claude-sonnet-4-6",
 			name: "Claude Sonnet 4.6",
@@ -803,7 +803,7 @@ async function generateModels() {
 	}
 
 	// Add missing gpt models
-	if (!allModels.some(m => m.provider === "openai" && m.id === "gpt-5-chat-latest")) {
+	if (!allModels.some((m) => m.provider === "openai" && m.id === "gpt-5-chat-latest")) {
 		allModels.push({
 			id: "gpt-5-chat-latest",
 			name: "GPT-5 Chat Latest",
@@ -823,7 +823,7 @@ async function generateModels() {
 		});
 	}
 
-	if (!allModels.some(m => m.provider === "openai" && m.id === "gpt-5.1-codex")) {
+	if (!allModels.some((m) => m.provider === "openai" && m.id === "gpt-5.1-codex")) {
 		allModels.push({
 			id: "gpt-5.1-codex",
 			name: "GPT-5.1 Codex",
@@ -843,7 +843,7 @@ async function generateModels() {
 		});
 	}
 
-	if (!allModels.some(m => m.provider === "openai" && m.id === "gpt-5.1-codex-max")) {
+	if (!allModels.some((m) => m.provider === "openai" && m.id === "gpt-5.1-codex-max")) {
 		allModels.push({
 			id: "gpt-5.1-codex-max",
 			name: "GPT-5.1 Codex Max",
@@ -863,7 +863,7 @@ async function generateModels() {
 		});
 	}
 
-	if (!allModels.some(m => m.provider === "openai" && m.id === "gpt-5.3-codex-spark")) {
+	if (!allModels.some((m) => m.provider === "openai" && m.id === "gpt-5.3-codex-spark")) {
 		allModels.push({
 			id: "gpt-5.3-codex-spark",
 			name: "GPT-5.3 Codex Spark",
@@ -884,9 +884,7 @@ async function generateModels() {
 	}
 
 	// Add missing GitHub Copilot GPT-5.3 models until models.dev includes them.
-	const copilotBaseModel = allModels.find(
-		(m) => m.provider === "github-copilot" && m.id === "gpt-5.2-codex",
-	);
+	const copilotBaseModel = allModels.find((m) => m.provider === "github-copilot" && m.id === "gpt-5.2-codex");
 	if (copilotBaseModel) {
 		if (!allModels.some((m) => m.provider === "github-copilot" && m.id === "gpt-5.3-codex")) {
 			allModels.push({
@@ -1058,7 +1056,7 @@ async function generateModels() {
 	allModels.push(...codexModels);
 
 	// Add missing Grok models
-	if (!allModels.some(m => m.provider === "xai" && m.id === "grok-code-fast-1")) {
+	if (!allModels.some((m) => m.provider === "xai" && m.id === "grok-code-fast-1")) {
 		allModels.push({
 			id: "grok-code-fast-1",
 			name: "Grok Code Fast 1",
@@ -1079,7 +1077,7 @@ async function generateModels() {
 	}
 
 	// Add "auto" alias for openrouter/auto
-	if (!allModels.some(m => m.provider === "openrouter" && m.id === "auto")) {
+	if (!allModels.some((m) => m.provider === "openrouter" && m.id === "auto")) {
 		allModels.push({
 			id: "auto",
 			name: "Auto",
@@ -1091,10 +1089,10 @@ async function generateModels() {
 			cost: {
 				// we dont know about the costs because OpenRouter auto routes to different models
 				// and then charges you for the underlying used model
-				input:0,
-				output:0,
-				cacheRead:0,
-				cacheWrite:0,
+				input: 0,
+				output: 0,
+				cacheRead: 0,
+				cacheWrite: 0,
 			},
 			contextWindow: 2000000,
 			maxTokens: 30000,
@@ -1489,7 +1487,7 @@ async function generateModels() {
 	];
 	// Only add if not already present from models.dev
 	for (const model of kimiCodingModels) {
-		if (!allModels.some(m => m.provider === "kimi-coding" && m.id === model.id)) {
+		if (!allModels.some((m) => m.provider === "kimi-coding" && m.id === model.id)) {
 			allModels.push(model);
 		}
 	}
@@ -1551,7 +1549,7 @@ export const MODELS = {
 `;
 			}
 			output += `\t\t\treasoning: ${model.reasoning},\n`;
-			output += `\t\t\tinput: [${model.input.map(i => `"${i}"`).join(", ")}],\n`;
+			output += `\t\t\tinput: [${model.input.map((i) => `"${i}"`).join(", ")}],\n`;
 			output += `\t\t\tcost: {\n`;
 			output += `\t\t\t\tinput: ${model.cost.input},\n`;
 			output += `\t\t\t\toutput: ${model.cost.output},\n`;
@@ -1575,7 +1573,7 @@ export const MODELS = {
 
 	// Print statistics
 	const totalModels = allModels.length;
-	const reasoningModels = allModels.filter(m => m.reasoning).length;
+	const reasoningModels = allModels.filter((m) => m.reasoning).length;
 
 	console.log(`\nModel Statistics:`);
 	console.log(`  Total tool-capable models: ${totalModels}`);

@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-import { createReadStream } from "node:fs";
-import { promises as fs } from "node:fs";
+import { createReadStream, promises as fs } from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
 import { createInterface } from "node:readline";
@@ -105,7 +104,8 @@ async function resolveAutoSinceMs(options) {
 	if (!options.autoSincePath) return null;
 	try {
 		const stats = await fs.stat(options.autoSincePath);
-		const birthtimeMs = Number.isFinite(stats.birthtimeMs) && stats.birthtimeMs > 0 ? stats.birthtimeMs : stats.mtimeMs;
+		const birthtimeMs =
+			Number.isFinite(stats.birthtimeMs) && stats.birthtimeMs > 0 ? stats.birthtimeMs : stats.mtimeMs;
 		if (!Number.isFinite(birthtimeMs) || birthtimeMs <= 0) return null;
 		return { ms: birthtimeMs, source: `birth time of ${options.autoSincePath}` };
 	} catch {
@@ -275,7 +275,10 @@ function analyzeToolArguments(args) {
 
 	if (Array.isArray(normalizedArgs.edits)) {
 		const perEdit = normalizedArgs.edits.map((edit) =>
-			analyzeReplacement(typeof edit?.oldText === "string" ? edit.oldText : "", typeof edit?.newText === "string" ? edit.newText : "")
+			analyzeReplacement(
+				typeof edit?.oldText === "string" ? edit.oldText : "",
+				typeof edit?.newText === "string" ? edit.newText : "",
+			),
 		);
 		const inflations = perEdit.map((edit) => edit.inflationRatio).filter((value) => value !== null);
 		const totals = perEdit.reduce(
@@ -304,7 +307,7 @@ function analyzeToolArguments(args) {
 				coreBytes: 0,
 				wrapperPayloadBytes: 0,
 				noCoreChangeCount: 0,
-			}
+			},
 		);
 		return {
 			path: filePath,
@@ -320,8 +323,18 @@ function analyzeToolArguments(args) {
 		};
 	}
 
-	const oldText = typeof normalizedArgs.oldText === "string" ? normalizedArgs.oldText : typeof normalizedArgs.old_string === "string" ? normalizedArgs.old_string : "";
-	const newText = typeof normalizedArgs.newText === "string" ? normalizedArgs.newText : typeof normalizedArgs.new_string === "string" ? normalizedArgs.new_string : "";
+	const oldText =
+		typeof normalizedArgs.oldText === "string"
+			? normalizedArgs.oldText
+			: typeof normalizedArgs.old_string === "string"
+				? normalizedArgs.old_string
+				: "";
+	const newText =
+		typeof normalizedArgs.newText === "string"
+			? normalizedArgs.newText
+			: typeof normalizedArgs.new_string === "string"
+				? normalizedArgs.new_string
+				: "";
 	const replacement = analyzeReplacement(oldText, newText);
 	return {
 		path: filePath,
@@ -390,11 +403,13 @@ function buildSameFileClusterStats(records) {
 	}
 
 	const clusters = [...groups.values()].filter((group) => group.length >= 2);
-	const assistantMessagesWithCluster = new Set(clusters.map((group) => `${group[0].sessionFile}::${group[0].assistantEntryId}`));
+	const assistantMessagesWithCluster = new Set(
+		clusters.map((group) => `${group[0].sessionFile}::${group[0].assistantEntryId}`),
+	);
 	const assistantMessagesWithMultiEdit = new Set(
 		records
 			.filter((record) => record.mode === "multi" && record.editsCount > 1)
-			.map((record) => `${record.sessionFile}::${record.assistantEntryId}`)
+			.map((record) => `${record.sessionFile}::${record.assistantEntryId}`),
 	);
 	const callsInsideClusters = clusters.reduce((sum, group) => sum + group.length, 0);
 
@@ -405,7 +420,9 @@ function buildSameFileClusterStats(records) {
 		callsInsideClusters,
 		averageCallsPerCluster: clusters.length === 0 ? null : callsInsideClusters / clusters.length,
 		ratioClusterAssistantMessagesToMultiEditAssistantMessages:
-			assistantMessagesWithMultiEdit.size === 0 ? null : assistantMessagesWithCluster.size / assistantMessagesWithMultiEdit.size,
+			assistantMessagesWithMultiEdit.size === 0
+				? null
+				: assistantMessagesWithCluster.size / assistantMessagesWithMultiEdit.size,
 	};
 }
 
@@ -413,8 +430,16 @@ function buildInflationBuckets(records) {
 	const buckets = [
 		{ key: "no_core_change", label: "no-core-change", test: (record) => record.inflationRatio === null },
 		{ key: "lt4", label: "<4x", test: (record) => record.inflationRatio !== null && record.inflationRatio < 4 },
-		{ key: "4to10", label: "4-10x", test: (record) => record.inflationRatio !== null && record.inflationRatio >= 4 && record.inflationRatio < 10 },
-		{ key: "10to25", label: "10-25x", test: (record) => record.inflationRatio !== null && record.inflationRatio >= 10 && record.inflationRatio < 25 },
+		{
+			key: "4to10",
+			label: "4-10x",
+			test: (record) => record.inflationRatio !== null && record.inflationRatio >= 4 && record.inflationRatio < 10,
+		},
+		{
+			key: "10to25",
+			label: "10-25x",
+			test: (record) => record.inflationRatio !== null && record.inflationRatio >= 10 && record.inflationRatio < 25,
+		},
 		{ key: "gte25", label: "25x+", test: (record) => record.inflationRatio !== null && record.inflationRatio >= 25 },
 	];
 
@@ -466,7 +491,8 @@ function buildWorstExamples(records, top) {
 }
 
 function buildSummary(records, meta, options) {
-	const uniqueAssistantMessages = new Set(records.map((record) => `${record.sessionFile}::${record.assistantEntryId}`)).size;
+	const uniqueAssistantMessages = new Set(records.map((record) => `${record.sessionFile}::${record.assistantEntryId}`))
+		.size;
 	const resolved = records.filter((record) => record.success !== null);
 	const success = resolved.filter((record) => record.success).length;
 	const failed = resolved.filter((record) => record.success === false).length;
@@ -521,7 +547,12 @@ function buildSummary(records, meta, options) {
 		threshold,
 		count: records.filter((record) => record.inflationRatio !== null && record.inflationRatio >= threshold).length,
 	}));
-	const failureKinds = [...groupCounts(records.filter((record) => record.success === false), (record) => record.errorKind ?? "other").entries()]
+	const failureKinds = [
+		...groupCounts(
+			records.filter((record) => record.success === false),
+			(record) => record.errorKind ?? "other",
+		).entries(),
+	]
 		.map(([kind, count]) => ({ kind, count }))
 		.sort((a, b) => b.count - a.count || a.kind.localeCompare(b.kind));
 
@@ -581,47 +612,72 @@ function printGroupTable(title, groups, formatter) {
 }
 
 function printHumanReport(summary) {
-	const { scan, counts, modeStats, multiEditLengthBuckets, argStyles, providerStats, extensionStats, inflation, sameFileClusters, failureKinds, worstExamples, filters } = summary;
+	const {
+		scan,
+		counts,
+		modeStats,
+		multiEditLengthBuckets,
+		argStyles,
+		providerStats,
+		extensionStats,
+		inflation,
+		sameFileClusters,
+		failureKinds,
+		worstExamples,
+		filters,
+	} = summary;
 	console.log(`Scanned ${formatInt(scan.sessionFilesIncluded)} session files in ${scan.sessionsDir}`);
 	if (scan.since) {
 		console.log(`Session filter: files created at or after ${scan.since.iso} (${scan.since.source})`);
-		console.log(`Skipped older session files: ${formatInt(scan.sessionFilesSkippedOlderThanSince)} of ${formatInt(scan.sessionFilesScanned)}`);
+		console.log(
+			`Skipped older session files: ${formatInt(scan.sessionFilesSkippedOlderThanSince)} of ${formatInt(scan.sessionFilesScanned)}`,
+		);
 	}
-	console.log(`Found ${formatInt(counts.totalEditCalls)} edit tool calls in ${formatInt(counts.assistantMessagesWithEditCalls)} assistant messages`);
+	console.log(
+		`Found ${formatInt(counts.totalEditCalls)} edit tool calls in ${formatInt(counts.assistantMessagesWithEditCalls)} assistant messages`,
+	);
 	if (filters.model || filters.extension || filters.failedOnly) {
 		const filterParts = [];
-		if (filters.model) filterParts.push(`model contains \"${filters.model}\"`);
+		if (filters.model) filterParts.push(`model contains "${filters.model}"`);
 		if (filters.extension) filterParts.push(`extension = ${filters.extension}`);
 		if (filters.failedOnly) filterParts.push("failed only");
 		console.log(`Filters: ${filterParts.join(", ")}`);
 	}
 
 	console.log("\nSuccess rate");
-	console.log(`  success:    ${formatInt(counts.success)}  ${formatPercent(counts.success, counts.resolvedEditCalls)}`);
+	console.log(
+		`  success:    ${formatInt(counts.success)}  ${formatPercent(counts.success, counts.resolvedEditCalls)}`,
+	);
 	console.log(`  failed:     ${formatInt(counts.failed)}  ${formatPercent(counts.failed, counts.resolvedEditCalls)}`);
 	console.log(`  unresolved: ${formatInt(counts.unresolved)}`);
 
 	console.log("\nMode usage");
-	console.log(`  single replacement: ${formatInt(counts.single)}  ${formatPercent(counts.single, counts.totalEditCalls)}`);
-	console.log(`  multi-edit (edits): ${formatInt(counts.multi)}  ${formatPercent(counts.multi, counts.totalEditCalls)}`);
+	console.log(
+		`  single replacement: ${formatInt(counts.single)}  ${formatPercent(counts.single, counts.totalEditCalls)}`,
+	);
+	console.log(
+		`  multi-edit (edits): ${formatInt(counts.multi)}  ${formatPercent(counts.multi, counts.totalEditCalls)}`,
+	);
 
 	console.log("\nFailures by edit type");
 	for (const mode of modeStats) {
 		console.log(
-			`  ${mode.mode.padEnd(6)} calls=${formatInt(mode.calls).padStart(4)} success=${mode.successRate === null ? "n/a" : formatPercent(mode.success, mode.resolved).padStart(6)} failed=${mode.failureRate === null ? "n/a" : formatPercent(mode.failed, mode.resolved).padStart(6)} unresolved=${formatInt(mode.unresolved)}`
+			`  ${mode.mode.padEnd(6)} calls=${formatInt(mode.calls).padStart(4)} success=${mode.successRate === null ? "n/a" : formatPercent(mode.success, mode.resolved).padStart(6)} failed=${mode.failureRate === null ? "n/a" : formatPercent(mode.failed, mode.resolved).padStart(6)} unresolved=${formatInt(mode.unresolved)}`,
 		);
 	}
 
 	console.log("\nMulti-edit bucket split");
 	for (const bucket of multiEditLengthBuckets) {
 		console.log(
-			`  ${bucket.label.padEnd(20)} ${formatInt(bucket.calls).padStart(4)} calls  success=${bucket.successRate === null ? "n/a" : formatPercent(bucket.success, bucket.resolved).padStart(6)} failed=${bucket.failureRate === null ? "n/a" : formatPercent(bucket.failed, bucket.resolved).padStart(6)}`
+			`  ${bucket.label.padEnd(20)} ${formatInt(bucket.calls).padStart(4)} calls  success=${bucket.successRate === null ? "n/a" : formatPercent(bucket.success, bucket.resolved).padStart(6)} failed=${bucket.failureRate === null ? "n/a" : formatPercent(bucket.failed, bucket.resolved).padStart(6)}`,
 		);
 	}
 
 	console.log("\nArgument style");
 	for (const entry of argStyles) {
-		console.log(`  ${entry.style.padEnd(22)} ${formatInt(entry.count).padStart(8)}  ${formatPercent(entry.count, counts.totalEditCalls)}`);
+		console.log(
+			`  ${entry.style.padEnd(22)} ${formatInt(entry.count).padStart(8)}  ${formatPercent(entry.count, counts.totalEditCalls)}`,
+		);
 	}
 
 	printGroupTable("By provider/model", providerStats, (group) => {
@@ -657,12 +713,20 @@ function printHumanReport(summary) {
 	}
 
 	console.log("\nSame-file multi-call behavior");
-	console.log(`  assistant msgs with 2+ edit calls to same file: ${formatInt(sameFileClusters.assistantMessagesWithCluster)}`);
+	console.log(
+		`  assistant msgs with 2+ edit calls to same file: ${formatInt(sameFileClusters.assistantMessagesWithCluster)}`,
+	);
 	console.log(`  total same-file clusters:                      ${formatInt(sameFileClusters.clustersCount)}`);
 	console.log(`  calls inside those clusters:                  ${formatInt(sameFileClusters.callsInsideClusters)}`);
-	console.log(`  average calls per cluster:                    ${sameFileClusters.averageCallsPerCluster === null ? "n/a" : sameFileClusters.averageCallsPerCluster.toFixed(2)}`);
-	console.log(`  assistant msgs using one multi-edit call:     ${formatInt(sameFileClusters.assistantMessagesWithMultiEdit)}`);
-	console.log(`  ratio multi-call / multi-edit assistant msgs: ${sameFileClusters.ratioClusterAssistantMessagesToMultiEditAssistantMessages === null ? "n/a" : sameFileClusters.ratioClusterAssistantMessagesToMultiEditAssistantMessages.toFixed(2)}`);
+	console.log(
+		`  average calls per cluster:                    ${sameFileClusters.averageCallsPerCluster === null ? "n/a" : sameFileClusters.averageCallsPerCluster.toFixed(2)}`,
+	);
+	console.log(
+		`  assistant msgs using one multi-edit call:     ${formatInt(sameFileClusters.assistantMessagesWithMultiEdit)}`,
+	);
+	console.log(
+		`  ratio multi-call / multi-edit assistant msgs: ${sameFileClusters.ratioClusterAssistantMessagesToMultiEditAssistantMessages === null ? "n/a" : sameFileClusters.ratioClusterAssistantMessagesToMultiEditAssistantMessages.toFixed(2)}`,
+	);
 
 	console.log("\nFailures by kind");
 	if (failureKinds.length === 0) {
@@ -675,23 +739,28 @@ function printHumanReport(summary) {
 
 	console.log("\nFailure rate by inflation bucket");
 	for (const bucket of inflation.failureByBucket) {
-		console.log(`  ${bucket.label.padEnd(14)} ${bucket.failureRate === null ? "n/a" : formatPercent(bucket.failed, bucket.resolved).padStart(6)}  (${formatInt(bucket.count)} calls)`);
+		console.log(
+			`  ${bucket.label.padEnd(14)} ${bucket.failureRate === null ? "n/a" : formatPercent(bucket.failed, bucket.resolved).padStart(6)}  (${formatInt(bucket.count)} calls)`,
+		);
 	}
 
 	console.log(`\nWorst ${formatInt(worstExamples.length)} examples`);
 	for (let i = 0; i < worstExamples.length; i++) {
 		const example = worstExamples[i];
 		console.log(
-			`  ${i + 1}. ${example.providerModel} ${example.extension} inflation=${formatRatio(example.inflationRatio)} failed=${example.failed ? example.errorKind : "false"}`
+			`  ${i + 1}. ${example.providerModel} ${example.extension} inflation=${formatRatio(example.inflationRatio)} failed=${example.failed ? example.errorKind : "false"}`,
 		);
 		console.log(`     path: ${example.path}`);
-		console.log(`     totalEditBytes=${formatBytes(example.totalEditBytes)} coreBytes=${formatBytes(example.coreBytes)} mode=${example.mode} edits=${example.editsCount}`);
+		console.log(
+			`     totalEditBytes=${formatBytes(example.totalEditBytes)} coreBytes=${formatBytes(example.coreBytes)} mode=${example.mode} edits=${example.editsCount}`,
+		);
 	}
 
 	if (scan.malformedLines > 0 || scan.unmatchedToolResults > 0) {
 		console.log("\nParser notes");
 		if (scan.malformedLines > 0) console.log(`  malformed lines skipped: ${formatInt(scan.malformedLines)}`);
-		if (scan.unmatchedToolResults > 0) console.log(`  unmatched edit tool results: ${formatInt(scan.unmatchedToolResults)}`);
+		if (scan.unmatchedToolResults > 0)
+			console.log(`  unmatched edit tool results: ${formatInt(scan.unmatchedToolResults)}`);
 	}
 }
 

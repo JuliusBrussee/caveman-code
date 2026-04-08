@@ -1,6 +1,6 @@
 ---
 created: 2026-04-08
-last_edited: 2026-04-08
+last_edited: 2026-04-08-inspect
 status: draft
 domain: extension-ui
 depends_on:
@@ -77,8 +77,17 @@ This blueprint covers the terminal UI surfaces of the CaveKit extension: the bui
 - blueprint-extension-commands: Provides all data consumed by UI surfaces (build state for R1, kit data for R2, findings for R3, build site for R4)
 - PRD reference: Part 2 sections 2.7, 2.8
 
+### R6: Kit Reviewer Integration
+
+**Description:** The kit reviewer overlay must be invoked as part of the `/ck:draft` workflow, and rejected kits must be excluded by the architect command.
+
+**Acceptance Criteria:**
+- [ ] AC-1: After `/ck:draft` generates kits, the kit reviewer overlay is presented to the user.
+- [ ] AC-2: Kits rejected during review are excluded from `/ck:architect` processing.
+
 ## Changelog
 
 | Date | Change |
 |------|--------|
 | 2026-04-08 | Initial draft |
+| 2026-04-08 | Added R6 — kit reviewer integration discovered unused during inspection |

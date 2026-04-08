@@ -159,7 +159,7 @@ for (const day of sortedDays) {
 		providerTotals[provider].requests += s.requests;
 
 		console.log(
-			`  ${provider.padEnd(15)} $${s.total.toFixed(4).padStart(8)}  (${s.requests} reqs, in: $${s.input.toFixed(4)}, out: $${s.output.toFixed(4)}, cache: $${(s.cacheRead + s.cacheWrite).toFixed(4)})`
+			`  ${provider.padEnd(15)} $${s.total.toFixed(4).padStart(8)}  (${s.requests} reqs, in: $${s.input.toFixed(4)}, out: $${s.output.toFixed(4)}, cache: $${(s.cacheRead + s.cacheWrite).toFixed(4)})`,
 		);
 	}
 
@@ -174,7 +174,7 @@ console.log("-".repeat(40));
 for (const provider of Object.keys(providerTotals).sort()) {
 	const t = providerTotals[provider];
 	console.log(
-		`  ${provider.padEnd(15)} $${t.total.toFixed(4).padStart(8)}  (${t.requests} reqs, in: $${t.input.toFixed(4)}, out: $${t.output.toFixed(4)}, cache: $${(t.cacheRead + t.cacheWrite).toFixed(4)})`
+		`  ${provider.padEnd(15)} $${t.total.toFixed(4).padStart(8)}  (${t.requests} reqs, in: $${t.input.toFixed(4)}, out: $${t.output.toFixed(4)}, cache: $${(t.cacheRead + t.cacheWrite).toFixed(4)})`,
 	);
 }
 
