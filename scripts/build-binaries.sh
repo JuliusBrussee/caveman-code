@@ -12,11 +12,11 @@
 #
 # Output:
 #   packages/coding-agent/binaries/
-#     pi-darwin-arm64.tar.gz
-#     pi-darwin-x64.tar.gz
-#     pi-linux-x64.tar.gz
-#     pi-linux-arm64.tar.gz
-#     pi-windows-x64.zip
+#     cave-darwin-arm64.tar.gz
+#     cave-darwin-x64.tar.gz
+#     cave-linux-x64.tar.gz
+#     cave-linux-arm64.tar.gz
+#     cave-windows-x64.zip
 
 set -euo pipefail
 
@@ -142,12 +142,12 @@ cd binaries
 for platform in "${PLATFORMS[@]}"; do
     if [[ "$platform" == "windows-x64" ]]; then
         # Windows (zip)
-        echo "Creating pi-$platform.zip..."
-        (cd $platform && zip -r ../pi-$platform.zip .)
+        echo "Creating cave-$platform.zip..."
+        (cd $platform && zip -r ../cave-$platform.zip .)
     else
         # Unix platforms (tar.gz) - use wrapper directory for mise compatibility
-        echo "Creating pi-$platform.tar.gz..."
-        mv $platform pi && tar -czf pi-$platform.tar.gz pi && mv pi $platform
+        echo "Creating cave-$platform.tar.gz..."
+        mv $platform pi && tar -czf cave-$platform.tar.gz pi && mv pi $platform
     fi
 done
 
@@ -156,9 +156,9 @@ echo "==> Extracting archives for testing..."
 for platform in "${PLATFORMS[@]}"; do
     rm -rf $platform
     if [[ "$platform" == "windows-x64" ]]; then
-        mkdir -p $platform && (cd $platform && unzip -q ../pi-$platform.zip)
+        mkdir -p $platform && (cd $platform && unzip -q ../cave-$platform.zip)
     else
-        tar -xzf pi-$platform.tar.gz && mv pi $platform
+        tar -xzf cave-$platform.tar.gz && mv pi $platform
     fi
 done
 
