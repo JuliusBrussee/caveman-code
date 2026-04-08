@@ -8,5 +8,4 @@ last_edited: "2026-04-08"
 ## Build Sites
 | Site | File | Tasks | Done | Status |
 |------|------|-------|------|--------|
-
-No build sites yet. Run `/bp:architect` to generate one.
+| Cave Pi | build-site.md | 39 | 39 | COMPLETE |
