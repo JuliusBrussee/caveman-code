@@ -128,6 +128,27 @@ export interface WaveExecutorContext {
 	signal: AbortSignal | undefined;
 }
 
+/** Optional callbacks that extend WaveExecutor behaviour. */
+export interface WaveExecutorHooks {
+	/**
+	 * Called after each wave completes (after status is written to disk).
+	 * The caller can use this to append a loop-log entry, commit, etc.
+	 */
+	onWaveComplete?: (
+		waveNum: number,
+		results: Array<[ExecutorTask, boolean]>,
+		allTasks: ExecutorTask[],
+	) => Promise<void>;
+
+	/**
+	 * Override the default kit-context builder.
+	 * Receives the task and should return a context string for injection into
+	 * the subagent prompt.  When omitted the executor falls back to a minimal
+	 * "Kit references: …" stub.
+	 */
+	buildContext?: (task: ExecutorTask) => string;
+}
+
 export class WaveExecutor {
 	private tasks: ExecutorTask[];
 	private siteFile: string;
@@ -137,6 +158,7 @@ export class WaveExecutor {
 		private config: CaveKitConfig,
 		private ctx: WaveExecutorContext,
 		private dashboard: BuildDashboardWidget,
+		private hooks: WaveExecutorHooks = {},
 	) {
 		this.siteFile = siteFile;
 		const content = fs.readFileSync(siteFile, "utf8");
@@ -150,19 +172,30 @@ export class WaveExecutor {
 			const frontier = computeFrontier(this.tasks);
 			if (frontier.length === 0) break;
 
+			// Circuit-breaker: refuse to start a wave where every task has
+			// already hit or exceeded maxIterations.
+			const workable = frontier.filter((t) => t.iterations < this.config.maxIterations);
+			if (workable.length === 0) {
+				this.ctx.ui.notify(
+					`Circuit breaker: all frontier tasks have reached maxIterations (${this.config.maxIterations}). Stopping.`,
+					"error",
+				);
+				break;
+			}
+
 			waveNum++;
-			this.ctx.ui.notify(`Wave ${waveNum}: dispatching ${frontier.length} task(s)`, "info");
-			this.dashboard.updateWave(waveNum, frontier);
+			this.ctx.ui.notify(`Wave ${waveNum}: dispatching ${workable.length} task(s)`, "info");
+			this.dashboard.updateWave(waveNum, workable);
 
 			// Mark tasks as in-progress
-			for (const task of frontier) {
+			for (const task of workable) {
 				task.status = "in-progress";
 				task.iterations++;
 			}
 			this.dashboard.render(this.tasks);
 
 			// Dispatch parallel tasks (Phase 1: print-mode)
-			const results = await this.dispatchWave(frontier);
+			const results = await this.dispatchWave(workable);
 
 			// Process results
 			let blocked = 0;
@@ -179,6 +212,15 @@ export class WaveExecutor {
 			}
 
 			this.dashboard.render(this.tasks);
+			this.dashboard.incrementIteration();
+
+			// Persist updated status to build site
+			this.persistStatus();
+
+			// Call the wave-complete hook (loop-log, git commit, etc.)
+			if (this.hooks.onWaveComplete) {
+				await this.hooks.onWaveComplete(waveNum, results, this.tasks);
+			}
 
 			if (blocked > 0) {
 				const resume = await this.ctx.ui.confirm(
@@ -188,11 +230,8 @@ export class WaveExecutor {
 				if (!resume) break;
 			}
 
-			// Persist updated status to build site
-			this.persistStatus();
-
 			// Tier gate: check if we just completed a full tier
-			await this.checkTierGate(frontier);
+			await this.checkTierGate(workable);
 		}
 
 		const done = this.tasks.filter((t) => t.status === "done").length;
@@ -269,12 +308,19 @@ export class WaveExecutor {
 	}
 
 	private buildKitContext(task: ExecutorTask): string {
+		// Prefer the injected context builder (e.g. buildScopedContext from T-029).
+		if (this.hooks.buildContext) {
+			return this.hooks.buildContext(task);
+		}
 		if (task.kitRefs.length === 0) return "";
-		// TODO: load and compress relevant kit sections (Phase 4: caveman compression)
+		// Fallback: plain kit-ref list (Phase 4 will add caveman compression)
 		return `Kit references: ${task.kitRefs.join(", ")}`;
 	}
 
 	private loadDesignContext(): string {
+		// When a context builder hook is provided it already includes DESIGN.md,
+		// so we skip the separate load to avoid duplication.
+		if (this.hooks.buildContext) return "";
 		const designPath = path.join(this.ctx.cwd, "DESIGN.md");
 		if (!fs.existsSync(designPath)) return "";
 		return fs.readFileSync(designPath, "utf8");
