@@ -210,7 +210,10 @@ export class WaveExecutor {
 				} else if (task.iterations >= this.config.maxRetries) {
 					task.status = "blocked";
 					blocked++;
-					this.ctx.ui.notify(`BLOCKED: ${task.id} (${task.name}) — exhausted ${this.config.maxRetries} retries`, "error");
+					this.ctx.ui.notify(
+						`BLOCKED: ${task.id} (${task.name}) — exhausted ${this.config.maxRetries} retries`,
+						"error",
+					);
 				} else {
 					task.status = "pending"; // Reset for retry on next wave
 				}

@@ -36,10 +36,7 @@ export function registerWidgets(pi: ExtensionAPI, _config: CaveKitConfig): void 
 			if (dashboard) {
 				dashboard.toggle();
 			} else {
-				ctx.ui.notify(
-					"No active build session. Use /ck:build to start one.",
-					"info",
-				);
+				ctx.ui.notify("No active build session. Use /ck:build to start one.", "info");
 			}
 		},
 	});

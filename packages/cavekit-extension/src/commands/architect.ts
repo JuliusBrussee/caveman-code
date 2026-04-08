@@ -56,7 +56,10 @@ export function registerArchitectCommand(pi: ExtensionAPI, _config: CaveKitConfi
 				return;
 			}
 			if (rejectedKits.length > 0) {
-				ctx.ui.notify(`${rejectedKits.length} kit(s) rejected, proceeding with ${approvedKits.length} approved kit(s).`, "info");
+				ctx.ui.notify(
+					`${rejectedKits.length} kit(s) rejected, proceeding with ${approvedKits.length} approved kit(s).`,
+					"info",
+				);
 			}
 
 			// AC-3: Output path is context/plans/build-site.md
