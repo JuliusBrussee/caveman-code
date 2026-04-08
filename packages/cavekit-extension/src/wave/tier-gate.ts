@@ -50,12 +50,14 @@ export async function runTierGateReview(
 
 	ctx.ui.notify(`Tier ${tier}: running gate review…`, "info");
 
-	// --- Load kits from context/kits/ ---
+	// --- Load kits from context/blueprints/ (preferred) or context/kits/ ---
+	const blueprintsDir = path.join(cwd, "context", "blueprints");
 	const kitsDir = path.join(cwd, "context", "kits");
-	const { kits, errors: kitErrors } = parseKitDirectory(kitsDir);
+	const sourceDir = fs.existsSync(blueprintsDir) ? blueprintsDir : kitsDir;
+	const { kits, errors: kitErrors } = parseKitDirectory(sourceDir);
 
 	if (kitErrors.length > 0 && kits.length === 0) {
-		const msg = `Tier gate: no kits found in ${kitsDir} — skipping review.`;
+		const msg = `Tier gate: no kits found in ${sourceDir} — skipping review.`;
 		ctx.ui.notify(msg, "warning");
 		return { tier, findings: [], blocked: false, summary: msg };
 	}

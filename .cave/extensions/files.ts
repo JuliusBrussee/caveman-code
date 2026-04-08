@@ -5,9 +5,9 @@
  * coalesced by path and sorted newest first. Selecting a file opens it in VS Code.
  */
 
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
-import { DynamicBorder } from "@mariozechner/pi-coding-agent";
-import { Container, Key, matchesKey, type SelectItem, SelectList, Text } from "@mariozechner/pi-tui";
+import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+import { DynamicBorder } from "@cavepi/pi-coding-agent";
+import { Container, Key, matchesKey, type SelectItem, SelectList, Text } from "@cavepi/pi-tui";
 
 interface FileEntry {
 	path: string;

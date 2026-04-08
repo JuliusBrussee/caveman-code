@@ -265,7 +265,7 @@ export class WaveExecutor {
 	private async dispatchTask(task: ExecutorTask): Promise<boolean> {
 		return new Promise((resolve) => {
 			const prompt = this.buildTaskPrompt(task);
-			const piArgs = ["-p", prompt, "--no-interactive"];
+			const piArgs = ["-p", prompt];
 
 			// T-043: Resolve binary dynamically — prefer basename of current process entry
 			const binary = process.argv[1] ? path.basename(process.argv[1]) : "cave";
