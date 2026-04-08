@@ -1,8 +1,8 @@
-# Contributing to Cave Pi
+# Contributing to Caveman Code
 
 Thanks for wanting to contribute! This guide exists to save both of us time.
 
-Cave Pi is a fork of [pi-mono](https://github.com/badlogic/pi-mono) by Mario Zechner (badlogic). Upstream contributions should be directed to the original project.
+Caveman Code is a fork of [pi-mono](https://github.com/badlogic/pi-mono) by Mario Zechner (badlogic). Upstream contributions should be directed to the original project.
 
 ## The One Rule
 
@@ -31,7 +31,7 @@ git rebase upstream/main
 git push origin main
 ```
 
-Keep Cave Pi-specific changes (banner, config dir, package scope) in their own commits so they can be rebased cleanly over upstream updates.
+Keep Caveman Code-specific changes (banner, config dir, package scope) in their own commits so they can be rebased cleanly over upstream updates.
 
 ## First-Time Contributors
 

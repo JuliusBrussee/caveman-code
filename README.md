@@ -1,6 +1,6 @@
-# Cave Pi
+# Caveman Code
 
-> Cave Pi is a fork of [pi-mono](https://github.com/badlogic/pi-mono) by [Mario Zechner (badlogic)](https://mariozechner.at). The original project is MIT-licensed. Cave Pi adds Cave Mode, the CaveKit extension, and is published under the `@cavepi/` package scope.
+> Caveman Code is a fork of [pi-mono](https://github.com/badlogic/pi-mono) by [Mario Zechner (badlogic)](https://mariozechner.at). The original project is MIT-licensed. Caveman Code adds Cave Mode, the CaveKit extension, and is published under the `@cavepi/` package scope.
 
 A minimal, extensible terminal coding agent and multi-provider LLM toolkit — adapt it to your workflow, not the other way around.
 
@@ -8,7 +8,7 @@ A minimal, extensible terminal coding agent and multi-provider LLM toolkit — a
 
 | Package | npm | Description |
 |---------|-----|-------------|
-| [`@cavepi/pi-coding-agent`](packages/coding-agent) | `cave` / `pi` CLI | Coding agent CLI with sessions, extensions, skills, and themes |
+| [`@cavepi/pi-coding-agent`](packages/coding-agent) | `cave` CLI | Coding agent CLI with sessions, extensions, skills, and themes |
 | [`@cavepi/pi-ai`](packages/ai) | `pi-ai` CLI | Unified multi-provider LLM API (OpenAI, Anthropic, Google, and more) |
 | [`@cavepi/pi-agent-core`](packages/agent) | — | Agent runtime with tool calling and state management |
 | [`@cavepi/pi-tui`](packages/tui) | — | Terminal UI library with differential rendering |
@@ -32,7 +32,7 @@ A minimal, extensible terminal coding agent and multi-provider LLM toolkit — a
 npm install -g @cavepi/pi-coding-agent
 ```
 
-This installs two aliases: `cave` (Cave Pi) and `pi` (vanilla pi-compatible).
+This installs the `cave` CLI.
 
 ### Authenticate
 
@@ -61,13 +61,13 @@ cat README.md | cave -p "summarize this"   # pipe stdin
 
 ### Providers & Models
 
-Cave Pi maintains an up-to-date list of tool-capable models for every built-in provider.
+Caveman Code maintains an up-to-date list of tool-capable models for every built-in provider.
 
 **Via subscription (OAuth):** Claude Pro/Max · ChatGPT Plus/Pro · GitHub Copilot · Google Gemini · Google Antigravity
 
 **Via API key:** Anthropic · OpenAI · Azure OpenAI · Google Gemini · Google Vertex · Amazon Bedrock · Mistral · Groq · Cerebras · xAI · OpenRouter · Vercel AI Gateway · Hugging Face · Kimi · MiniMax · ZAI · OpenCode
 
-**Custom providers:** Add any OpenAI/Anthropic/Google-compatible endpoint via `~/.pi/agent/models.json`. For full custom OAuth or APIs, use the [Extensions API](packages/coding-agent/docs/extensions.md).
+**Custom providers:** Add any OpenAI/Anthropic/Google-compatible endpoint via `~/.cave/agent/models.json`. For full custom OAuth or APIs, use the [Extensions API](packages/coding-agent/docs/extensions.md).
 
 Switch models at any time with `/model` (or `Ctrl+L`). Cycle between a scoped set of favourites with `Ctrl+P`.
 
@@ -109,7 +109,7 @@ Type `/` to trigger any command. Extensions can register their own.
 
 ### Sessions
 
-Sessions auto-save to `~/.pi/agent/sessions/`, organised by working directory. Each session is a JSONL file with a full tree structure so branching never overwrites history.
+Sessions auto-save to `~/.cave/agent/sessions/`, organised by working directory. Each session is a JSONL file with a full tree structure so branching never overwrites history.
 
 ```bash
 cave -c                    # continue most recent session
@@ -125,9 +125,9 @@ cave --no-session          # ephemeral mode
 
 ### Customization
 
-**Prompt Templates** — reusable Markdown prompts with `{{placeholders}}`. Place in `~/.pi/agent/prompts/` or `.pi/prompts/` and invoke with `/templatename`.
+**Prompt Templates** — reusable Markdown prompts with `{{placeholders}}`. Place in `~/.cave/agent/prompts/` or `.pi/prompts/` and invoke with `/templatename`.
 
-**Skills** — on-demand capability packages. Place in `~/.pi/agent/skills/` or `.pi/skills/` (or install via `cave install`). Invoke with `/skill:name` or let the agent auto-load them.
+**Skills** — on-demand capability packages. Place in `~/.cave/agent/skills/` or `.pi/skills/` (or install via `cave install`). Invoke with `/skill:name` or let the agent auto-load them.
 
 **Extensions** — TypeScript modules loaded at startup. Register tools, commands, keyboard shortcuts, event handlers, and UI components:
 
@@ -141,9 +141,9 @@ export default function (pi: ExtensionAPI) {
 
 Extensions can add sub-agents, plan mode, permission gates, custom editors, status lines, headers, footers, overlays, MCP integration, git checkpointing, and more.
 
-**Themes** — built-in `dark` and `light`; themes hot-reload. Place custom themes in `~/.pi/agent/themes/` or `.pi/themes/`.
+**Themes** — built-in `dark` and `light`; themes hot-reload. Place custom themes in `~/.cave/agent/themes/` or `.pi/themes/`.
 
-**Pi Packages** — bundle and share extensions, skills, prompts, and themes via npm or git:
+**Cave Packages** — bundle and share extensions, skills, prompts, and themes via npm or git:
 
 ```bash
 cave install npm:@foo/pi-tools
@@ -242,9 +242,9 @@ Available built-in tools: `read`, `bash`, `edit`, `write`, `grep`, `find`, `ls`
 |----------|-------------|
 | `ANTHROPIC_API_KEY` | Anthropic API key |
 | `OPENAI_API_KEY` | OpenAI API key |
-| `PI_CODING_AGENT_DIR` | Override config directory (default: `~/.pi/agent`) |
-| `PI_SKIP_VERSION_CHECK` | Skip startup version check |
-| `PI_CACHE_RETENTION` | Set to `long` for extended prompt cache (Anthropic: 1h, OpenAI: 24h) |
+| `CAVE_CODING_AGENT_DIR` | Override config directory (default: `~/.cave/agent`) |
+| `CAVE_SKIP_VERSION_CHECK` | Skip startup version check |
+| `CAVE_CACHE_RETENTION` | Set to `long` for extended prompt cache (Anthropic: 1h, OpenAI: 24h) |
 
 ---
 
@@ -264,7 +264,10 @@ npm run check        # lint, format, and type check
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and [AGENTS.md](AGENTS.md) for project-specific rules for humans and agents.
 
-Cave Pi tracks upstream pi-mono. Cave Pi-specific changes (binary name, package scope, CaveKit extension) are kept in separate commits for clean rebasing.
+Caveman Code tracks upstream pi-mono. Caveman Code-specific changes (binary name, package scope, CaveKit extension) are kept in separate commits for clean rebasing.
+
+**Upstream:** [github.com/badlogic/pi-mono](https://github.com/badlogic/pi-mono)
+**Fork:** [github.com/JuliusBrussee/caveman-cli](https://github.com/JuliusBrussee/caveman-cli)
 
 ---
 
