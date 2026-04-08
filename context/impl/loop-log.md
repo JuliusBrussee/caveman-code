@@ -1,3 +1,19 @@
+### Iteration 12 — 2026-04-08
+- **Task:** T-046 through T-051 — Tier 9 P2 fixes and formalization
+- **Tier:** 9
+- **Status:** DONE
+- **Files:** context-injection.ts, build-dashboard.ts, widgets/index.ts, architect.ts, progress.ts
+- **Validation:** Build P, Tests P, Acceptance 14/14
+- **Next:** BUILD COMPLETE
+
+### Iteration 11 — 2026-04-08
+- **Task:** T-040 through T-045 — Tier 8 P0/P1 inspect fixes
+- **Tier:** 8
+- **Status:** DONE
+- **Files:** paths.ts (new), draft.ts, build.ts, progress.ts, executor.ts, compaction.ts, context-injection.ts
+- **Validation:** Build P, Tests P, Acceptance 12/12
+- **Next:** T-046 through T-051 (Tier 9)
+
 ### Iteration 1 — 2026-04-08
 - **Task:** T-001 through T-006 — Fork Identity (all 6 tasks)
 - **Tier:** 0

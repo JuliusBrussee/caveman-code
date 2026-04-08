@@ -13,4 +13,6 @@ last_edited: "2026-04-08"
 | extension-commands | 14 | 14 | DONE |
 | cave-mode | 6 | 6 | DONE |
 | extension-ui | 5 | 5 | DONE |
-| **Total** | **39** | **39** | **DONE** |
+| inspect-fixes-p0p1 | 6 | 6 | DONE |
+| inspect-fixes-p2 | 6 | 6 | DONE |
+| **Total** | **51** | **51** | **DONE** |
