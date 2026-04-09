@@ -1,10 +1,12 @@
 # Plans
 
-Plans define HOW to implement blueprints. They contain task dependency graphs.
+Plans define HOW to implement kits. Task dependency graphs.
 
 ## Conventions
-- Start with plan-overview.md for the build site index
-- Build sites use T-numbered tasks organized into dependency tiers
-- Each task references blueprint requirements by ID
-- build-site.md is the primary build site
-- build-site-{feature}.md for feature-specific sites
+
+- Start: `plan-overview.md`
+- Tasks: T-numbered, organized into dependency tiers
+- Each task references cavekit requirements by R-ID
+- Primary build site: `build-site.md`
+- Feature sites: `build-site-{feature}.md`
+- Generate: `/ck:map`

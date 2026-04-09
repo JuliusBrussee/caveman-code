@@ -1,15 +1,20 @@
 # Context Hierarchy
 
-This project uses Blueprint's context hierarchy.
+Cavekit context hierarchy for caveman-cli.
 
 ## Tiers
-- refs/ — Source material (Tier 1: what IS). Read-only.
-- blueprints/ — Requirements (Tier 2: what MUST BE). Start at blueprint-overview.md.
-- designs/ — Visual design system (cross-cutting constraint). Start at DESIGN.md.
-- plans/ — Task graphs (Tier 3: HOW). Start at plan-overview.md.
-- impl/ — Progress tracking (Tier 4: what WAS DONE). Start at impl-overview.md.
+
+| Tier | Dir | Question | Entry |
+|------|-----|----------|-------|
+| 1 | refs/ | What IS | INDEX.md or subdirectory |
+| 2 | kits/ | What MUST BE | cavekit-overview.md |
+| 2b | designs/ | How it LOOKS | DESIGN.md |
+| 3 | plans/ | HOW | plan-overview.md |
+| 4 | impl/ | What WAS DONE | impl-overview.md |
 
 ## Navigation
-Start at the overview file in whichever tier is relevant to your task.
-Only load domain-specific files when the overview points you there.
-For UI work, always read DESIGN.md at the project root first.
+
+- Start at tier overview. Load domain files only when overview points there.
+- UI work: read DESIGN.md first.
+- `blueprints/` is legacy. Use `kits/` for all new requirements.
+- Commands: `/ck:sketch` (write kits), `/ck:map` (plan), `/ck:make` (build), `/ck:check` (inspect).

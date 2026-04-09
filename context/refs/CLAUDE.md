@@ -1,8 +1,17 @@
 # Reference Materials
 
-Source of truth that blueprints are derived from. Read-only.
+Source of truth. Kits derive from these. Read-only.
 
 ## Conventions
-- Organized by source in subdirectories (e.g., prd/, old-code-docs/, api-spec/)
-- Agents read but never modify these files
-- Blueprints reference specific files and sections via file:line
+
+- Subdirs by source: prd/, old-code-docs/, api-spec/, rtk/, etc.
+- Never modify. Agents read only.
+- Kits reference via `file:line`.
+
+## Contents
+
+- `cave-pi-prd.md` — product requirements
+- `rtk/` — RTK (Rust Token Killer) docs and CLAUDE context
+- `skills/`, `kits/`, `plans/` — upstream skill/kit references
+- `research-caveman-product-direction/` — product direction research
+- `INDEX.md` — entry point

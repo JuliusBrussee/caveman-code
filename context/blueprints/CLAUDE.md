@@ -1,11 +1,14 @@
-# Blueprints
+# Blueprints (Legacy)
 
-Blueprints define WHAT needs implementing. They are implementation-agnostic.
+**Deprecated.** Use `context/kits/` for all new requirements.
 
-## Conventions
-- Start with blueprint-overview.md for the domain index
-- R-numbered requirements (R1, R2, R3...)
-- Every requirement has testable acceptance criteria
-- Never prescribe HOW — that belongs in plans/
-- Cross-reference related domains
-- Decompose into subdirectories when a domain covers multiple independent concerns
+These files predate the Cavekit rename. Kept for reference; do not add new files here.
+
+## Migration
+
+New kits go in `context/kits/`. Use `/ck:sketch` to author them.
+
+## Contents (Read-Only)
+
+- `blueprint-overview.md` — legacy domain index
+- `blueprint-cave-mode.md`, `blueprint-extension-*`, `blueprint-fork-identity.md`
