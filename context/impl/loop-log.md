@@ -225,3 +225,36 @@
 - ✗ T-022: RTK Integration Tests → **blocked**
 
 ---
+### Iteration 1
+
+**Wave:** 1  
+**Date:** 2026-04-11T19:32:42.153Z  
+**Status:** DONE  
+**Acceptance 22/22**  
+**Blocked:** 0  **Failed:** 0  **Active:** 0
+
+**Tasks this wave:**
+- ✓ T-001: Process Title, Onboarding Hint, and Tmux Warning Text → **done**
+- ✓ T-002: System Prompt References → **done**
+- ✓ T-003: Config URLs -- Share Viewer and Bun Binary Update → **done**
+- ✓ T-004: Binary Release Artifact Names → **done**
+- ✓ T-005: Test Script Paths → **done**
+- ✓ T-006: Earendil Announcement Text → **done**
+- ✓ T-007: Dark Theme Background Palette → **done**
+- ✓ T-008: Dark Theme Accent Color and Brand Color Slot → **done**
+- ✓ T-009: Documentation Link Fixes -- AGENTS.md, Package.json URLs, Prompt Templates, Issue Templates → **done**
+- ✓ T-010: CLI Args Help Text → **done**
+- ✓ T-011: Dark Theme Border Colors → **done**
+- ✓ T-012: Dark Theme Interactive States and Light Theme Complement → **done**
+- ✓ T-013: Root README, Coding Agent README, and Contributing Guide → **done**
+- ✓ T-014: ASCII Art Logo → **done**
+- ✓ T-015: Version Display and Keybinding Hints → **done**
+- ✓ T-016: Cave Mode Status Line and Earendil Announcement Removal → **done**
+- ✓ T-017: RTK Binary Detection Module → **done**
+- ✓ T-018: RTK Integration Settings → **done**
+- ✓ T-019: RTK Command Rewrite Function → **done**
+- ✓ T-020: RTK BashSpawnHook Factory → **done**
+- ✓ T-021: Wire RTK Hook into Agent Session Tool Initialization → **done**
+- ✓ T-022: RTK Integration Tests → **done**
+
+---

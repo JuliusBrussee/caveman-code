@@ -11,7 +11,7 @@
 **Kit Refs:** fork-identity/R1 (AC-1, AC-2, AC-3), fork-identity/R2 (AC-1, AC-2, AC-3), fork-identity/R3 (AC-1, AC-2, AC-3), fork-identity/R6 (AC-1, AC-2)
 **Dependencies:** none
 **Complexity:** M
-**Status:** pending
+**Status:** done
 
 Establish fork-facing identity primitives that every later feature assumes: binary naming, package scope rename, default configuration directory, and preservation of upstream license obligations. This task creates single source-of-truth identifiers so commands, config discovery, packaging, and startup surfaces all resolve to consistent fork identity semantics.
 
@@ -21,7 +21,7 @@ Establish fork-facing identity primitives that every later feature assumes: bina
 **Kit Refs:** fork-identity/R5 (AC-1, AC-2, AC-3)
 **Dependencies:** none
 **Complexity:** S
-**Status:** pending
+**Status:** done
 
 Define repository-level upstream tracking expectations so fork maintenance remains explicit and auditable. This task covers remote naming, tracking references, and discoverable sync metadata needed to keep fork relationship intact without leaking ambiguity into user-facing identity.
 
@@ -31,7 +31,7 @@ Define repository-level upstream tracking expectations so fork maintenance remai
 **Kit Refs:** extension-core/R1 (AC-1, AC-2, AC-3, AC-4), extension-core/R2 (AC-1, AC-2, AC-3, AC-4), extension-core/R3 (AC-1, AC-2, AC-3, AC-4, AC-5, AC-6)
 **Dependencies:** none
 **Complexity:** L
-**Status:** pending
+**Status:** done
 
 Create extension runtime foundation: loadable entry point, configuration resolution, and strongly typed shared contracts used across commands, UI, and runtime hooks. This task is prerequisite for nearly every other extension capability because it defines how features register, how settings flow, and how data structures stay consistent across boundaries.
 
@@ -41,7 +41,7 @@ Create extension runtime foundation: loadable entry point, configuration resolut
 **Kit Refs:** extension-core/R4 (AC-1, AC-2, AC-3), extension-core/R6 (AC-1, AC-2), extension-core/R8 (AC-1, AC-2, AC-3)
 **Dependencies:** none
 **Complexity:** M
-**Status:** pending
+**Status:** done
 
 Provide packaging and compatibility layer for bundled CaveKit resources while preserving operation in vanilla Pi-compatible environments. This task ensures skills and related assets can be discovered reliably, and that extension behavior degrades cleanly when host capability surface is narrower than full CaveKit mode.
 
@@ -51,7 +51,7 @@ Provide packaging and compatibility layer for bundled CaveKit resources while pr
 **Kit Refs:** extension-commands/R12 (AC-1, AC-2, AC-3), extension-commands/R13 (AC-1, AC-2, AC-3), extension-commands/R18 (AC-1, AC-2), extension-commands/R19 (AC-1, AC-2)
 **Dependencies:** none
 **Complexity:** L
-**Status:** pending
+**Status:** done
 
 Implement canonical parsing and path resolution for kit files and build sites, including consistency rules for draft output and generated plan locations. This task creates deterministic structured IO contracts that later commands rely on for reading kits, generating plans, and keeping file layout stable across phases.
 
@@ -61,7 +61,7 @@ Implement canonical parsing and path resolution for kit files and build sites, i
 **Kit Refs:** extension-commands/R20 (AC-1, AC-2), extension-commands/R21 (AC-1, AC-2), extension-commands/R22 (AC-1, AC-2)
 **Dependencies:** none
 **Complexity:** M
-**Status:** pending
+**Status:** done
 
 Define subagent process invocation baseline, including binary name selection, git-safe staging constraints for build commits, and robust stderr capture behavior. This task is isolated early because build execution, retry, and tool-call workflows all depend on reliable subprocess semantics and non-destructive git operations.
 
@@ -73,7 +73,7 @@ Define subagent process invocation baseline, including binary name selection, gi
 **Kit Refs:** extension-core/R5 (AC-1, AC-2, AC-3), extension-core/R7 (AC-1, AC-2, AC-3, AC-4)
 **Dependencies:** T-003
 **Complexity:** M
-**Status:** pending
+**Status:** done
 
 Add runtime hooks that protect critical CaveKit context from compaction loss and inject scoped build context into subagent execution. This task closes core lifecycle gaps between static configuration and actual runtime behavior, enabling downstream command orchestration and cave-mode behavior to operate with correct contextual guarantees.
 
@@ -83,7 +83,7 @@ Add runtime hooks that protect critical CaveKit context from compaction loss and
 **Kit Refs:** extension-commands/R1 (AC-1, AC-2, AC-3, AC-4, AC-5)
 **Dependencies:** T-003, T-006
 **Complexity:** M
-**Status:** pending
+**Status:** done
 
 Implement `/ck:draft` end-to-end flow from natural-language prompt to generated kit artifacts, using canonical parser-facing output format and configured project paths. This task owns user-visible draft lifecycle behavior, including input handling, kit generation contract, write targets, and command-level completion semantics.
 
@@ -93,7 +93,7 @@ Implement `/ck:draft` end-to-end flow from natural-language prompt to generated 
 **Kit Refs:** extension-commands/R2 (AC-1, AC-2, AC-3, AC-4, AC-5)
 **Dependencies:** T-003, T-006
 **Complexity:** L
-**Status:** pending
+**Status:** done
 
 Implement `/ck:architect` so approved kits can be transformed into dependency-ordered build sites using parser-backed plan format and stable output paths. This task turns specification artifacts into execution-ready plans and creates data consumed later by build execution, graph visualization, and inspection.
 
@@ -103,7 +103,7 @@ Implement `/ck:architect` so approved kits can be transformed into dependency-or
 **Kit Refs:** extension-commands/R9 (AC-1, AC-2, AC-3), extension-commands/R10 (AC-1, AC-2, AC-3), extension-commands/R11 (AC-1, AC-2)
 **Dependencies:** T-003
 **Complexity:** S
-**Status:** pending
+**Status:** done
 
 Deliver lightweight command surfaces for configuration inspection, build/session progress reporting, and user help. This task provides operator visibility and discoverability around extension state without depending on full build orchestration, making it safe to parallelize after shared config/types exist.
 
@@ -113,7 +113,7 @@ Deliver lightweight command surfaces for configuration inspection, build/session
 **Kit Refs:** extension-commands/R7 (AC-1, AC-2, AC-3), extension-commands/R8 (AC-1, AC-2, AC-3)
 **Dependencies:** T-003, T-006
 **Complexity:** M
-**Status:** pending
+**Status:** done
 
 Implement `/ck:research` and `/ck:design` command workflows as structured, parser-compatible generators for discovery and design artifacts. This task expands non-build authoring capabilities while reusing common command foundation, path resolution, and structured output contracts.
 
@@ -123,7 +123,7 @@ Implement `/ck:research` and `/ck:design` command workflows as structured, parse
 **Kit Refs:** extension-commands/R14 (AC-1, AC-2, AC-3), extension-commands/R16 (AC-1, AC-2, AC-3, AC-4)
 **Dependencies:** T-003, T-006, T-007
 **Complexity:** L
-**Status:** pending
+**Status:** done
 
 Build scoped-context assembly and expose LLM-callable tools that let agents inspect kit/build state through bounded, deterministic interfaces. This task is central integration glue between specs, build execution, subagents, and UI because it defines what context is handed to automation and how programmatic access remains structured.
 
@@ -133,7 +133,7 @@ Build scoped-context assembly and expose LLM-callable tools that let agents insp
 **Kit Refs:** cave-mode/R1 (AC-1, AC-2, AC-3, AC-4), cave-mode/R6 (AC-1, AC-2)
 **Dependencies:** T-003, T-005
 **Complexity:** M
-**Status:** pending
+**Status:** done
 
 Implement cave-mode runtime behavior for system prompt injection while ensuring fail-open degradation when cave-specific facilities are unavailable. This task defines baseline cave-mode semantics and fallback behavior so later controls, compaction features, and tool compression can layer on top without threatening host stability.
 
@@ -143,7 +143,7 @@ Implement cave-mode runtime behavior for system prompt injection while ensuring 
 **Kit Refs:** cave-mode/R2 (AC-1, AC-2, AC-3, AC-4, AC-5), cave-mode/R3 (AC-1, AC-2, AC-3)
 **Dependencies:** T-003, T-013
 **Complexity:** M
-**Status:** pending
+**Status:** done
 
 Add user-facing controls for cave-mode intensity and settings management so mode selection is discoverable, persistent, and command-accessible. This task covers command/UI-adjacent control flow, setting persistence, and state exposure needed for practical adoption of cave-mode beyond hardcoded defaults.
 
@@ -165,7 +165,7 @@ Implement startup banner and branded launch presentation aligned with fork ident
 **Kit Refs:** cave-mode/R4 (AC-1, AC-2, AC-3, AC-4), cave-mode/R5 (AC-1, AC-2, AC-3, AC-4, AC-5)
 **Dependencies:** T-012, T-013
 **Complexity:** L
-**Status:** pending
+**Status:** done
 
 Implement caveman-aware compaction and tool-result compression pipeline so prompt budget savings apply both to model context and tool output flows. This task depends on runtime cave-mode semantics and callable tool/context plumbing because compression must integrate safely with actual agent execution surfaces rather than operate as isolated text transforms.
 
@@ -175,7 +175,7 @@ Implement caveman-aware compaction and tool-result compression pipeline so promp
 **Kit Refs:** extension-commands/R3 (AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7)
 **Dependencies:** T-008, T-009, T-012, T-007
 **Complexity:** L
-**Status:** pending
+**Status:** done
 
 Implement `/ck:build` as orchestration engine that reads build sites, dispatches wave/tier execution, coordinates subagents, and persists progress/status. This task is main execution backbone for CaveKit and is intentionally separated from review, convergence, and retry so core run loop can stabilize before adjacent control logic is added.
 
@@ -185,7 +185,7 @@ Implement `/ck:build` as orchestration engine that reads build sites, dispatches
 **Kit Refs:** extension-ui/R1 (AC-1, AC-2, AC-3, AC-4), extension-ui/R5 (AC-1, AC-2, AC-3)
 **Dependencies:** T-003, T-016
 **Complexity:** M
-**Status:** pending
+**Status:** done
 
 Deliver persistent build dashboard widget plus shortcut registration so active build state is visible and quickly accessible during sessions. This task depends on build orchestration because dashboard content and toggle behavior need live execution data rather than placeholder wiring.
 
@@ -195,7 +195,7 @@ Deliver persistent build dashboard widget plus shortcut registration so active b
 **Kit Refs:** extension-ui/R2 (AC-1, AC-2, AC-3, AC-4), extension-ui/R6 (AC-1, AC-2)
 **Dependencies:** T-003, T-008, T-009
 **Complexity:** M
-**Status:** pending
+**Status:** done
 
 Implement interactive kit review overlay and wire it into draft-to-architect handoff so approval decisions directly determine which kits proceed to planning. This task sits after both draft and architect workflows exist because it mediates real artifacts between those phases rather than mocking either side.
 
@@ -217,7 +217,7 @@ Implement dependency graph visualization for architected build sites, showing ta
 **Kit Refs:** extension-commands/R4 (AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7)
 **Dependencies:** T-016, T-012
 **Complexity:** L
-**Status:** pending
+**Status:** done
 
 Add tier gate review process that evaluates completed build tiers, produces severity-ranked findings, and returns machine-actionable outcomes for continue, fix, or abort paths. This task sits after base build orchestration because gate reviews consume build artifacts and scoped evidence produced during actual execution.
 
@@ -227,7 +227,7 @@ Add tier gate review process that evaluates completed build tiers, produces seve
 **Kit Refs:** extension-commands/R5 (AC-1, AC-2, AC-3, AC-4, AC-5), extension-commands/R15 (AC-1, AC-2, AC-3, AC-4)
 **Dependencies:** T-016
 **Complexity:** M
-**Status:** pending
+**Status:** done
 
 Implement convergence analysis over build iterations and expose it through dedicated monitoring and command surfaces. This task turns raw build history into actionable signal about progress vs. plateau, supporting operator decisions and automation loops without being coupled to individual task implementation details.
 
@@ -237,7 +237,7 @@ Implement convergence analysis over build iterations and expose it through dedic
 **Kit Refs:** extension-commands/R17 (AC-1, AC-2, AC-3)
 **Dependencies:** T-016, T-007
 **Complexity:** M
-**Status:** pending
+**Status:** done
 
 Implement retry handling for failed build tasks with correct dependency checks, subprocess semantics, and safe git behavior. This task extends base build engine with recovery capability once failure states and dispatch contracts are already established.
 
@@ -259,7 +259,7 @@ Build UI overlay for tier gate findings so users can inspect severity-ranked rev
 **Kit Refs:** extension-commands/R6 (AC-1, AC-2, AC-3, AC-4, AC-5)
 **Dependencies:** T-009, T-016, T-017, T-018
 **Complexity:** L
-**Status:** pending
+**Status:** done
 
 Implement `/ck:inspect` to compare specification artifacts against build output, synthesize findings, and report implementation gaps with traceability. This task intentionally lands last because meaningful inspection requires stable plan generation, completed build evidence, gate review output, and convergence history.
 

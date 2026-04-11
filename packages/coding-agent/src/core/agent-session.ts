@@ -70,7 +70,7 @@ import type { BashExecutionMessage, CustomMessage } from "./messages.js";
 import type { ModelRegistry } from "./model-registry.js";
 import { expandPromptTemplate, type PromptTemplate } from "./prompt-templates.js";
 import type { ResourceExtensionPaths, ResourceLoader } from "./resource-loader.js";
-import { createRtkSpawnHook } from "./rtk.js";
+import { createRtkSpawnHook, getRtkStatus } from "./rtk.js";
 import type { BranchSummaryEntry, CompactionEntry, SessionManager } from "./session-manager.js";
 import { CURRENT_SESSION_VERSION, getLatestCompactionEntry, type SessionHeader } from "./session-manager.js";
 import type { SettingsManager } from "./settings-manager.js";
@@ -322,7 +322,7 @@ export class AgentSession {
 		this._unsubscribeAgent = this.agent.subscribe(this._handleAgentEvent);
 		this._installAgentToolHooks();
 
-		this._buildRuntime({
+		void this._buildRuntime({
 			activeToolNames: this._initialActiveToolNames,
 			includeAllExtensionTools: true,
 		});
@@ -2384,15 +2384,21 @@ export class AgentSession {
 		this.setActiveToolsByName([...new Set(nextActiveToolNames)]);
 	}
 
-	private _buildRuntime(options: {
+	private async _buildRuntime(options: {
 		activeToolNames?: string[];
 		flagValues?: Map<string, boolean | string>;
 		includeAllExtensionTools?: boolean;
-	}): void {
+	}): Promise<void> {
 		const autoResizeImages = this.settingsManager.getImageAutoResize();
 		const shellCommandPrefix = this.settingsManager.getShellCommandPrefix();
 		const rtkEnabled = this.settingsManager.getRtkEnabled();
-		const rtkSpawnHook = rtkEnabled ? createRtkSpawnHook() : undefined;
+		let rtkSpawnHook: ReturnType<typeof createRtkSpawnHook> | undefined;
+		if (rtkEnabled) {
+			const rtkStatus = await getRtkStatus();
+			if (rtkStatus.available) {
+				rtkSpawnHook = createRtkSpawnHook();
+			}
+		}
 		const baseToolDefinitions = this._baseToolsOverride
 			? Object.fromEntries(
 					Object.entries(this._baseToolsOverride).map(([name, tool]) => [
@@ -2452,7 +2458,7 @@ export class AgentSession {
 		await this.settingsManager.reload();
 		resetApiProviders();
 		await this._resourceLoader.reload();
-		this._buildRuntime({
+		await this._buildRuntime({
 			activeToolNames: this.getActiveToolNames(),
 			flagValues: previousFlagValues,
 			includeAllExtensionTools: true,
