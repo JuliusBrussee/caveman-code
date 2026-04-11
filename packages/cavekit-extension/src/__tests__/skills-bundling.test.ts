@@ -12,7 +12,7 @@ import {
 
 describe("bundled CaveKit skills", () => {
 	it("ships all expected CaveKit skill files in host-compatible layout", () => {
-		expect(BUNDLED_SKILLS).toHaveLength(15);
+		expect(BUNDLED_SKILLS).toHaveLength(16);
 		expect(fs.existsSync(getBundledSkillsRoot())).toBe(true);
 
 		for (const skill of BUNDLED_SKILLS) {
@@ -38,7 +38,8 @@ describe("bundled CaveKit skills", () => {
 		for (const skill of BUNDLED_SKILLS) {
 			const source = fs.readFileSync(getBundledSkillSourceFile(skill.id), "utf8").trim();
 			const bundled = fs.readFileSync(getBundledSkillFile(skill.id), "utf8");
-			const [, body = ""] = bundled.split(/---\n\n/);
+			const closingIndex = bundled.indexOf("\n---\n", 1);
+			const body = closingIndex >= 0 ? bundled.slice(closingIndex + 5) : "";
 			expect(body.trim(), `${skill.id} bundled body diverged from legacy markdown`).toBe(source);
 		}
 	});

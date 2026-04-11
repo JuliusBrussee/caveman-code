@@ -318,6 +318,7 @@ export class InteractiveMode {
 		// Register themes from resource loader and initialize
 		setRegisteredThemes(this.session.resourceLoader.getThemes().themes);
 		initTheme(this.settingsManager.getTheme(), true);
+		this.ui.setGlobalBackground(theme.getPageBgFn());
 	}
 
 	private getAutocompleteSourceTag(sourceInfo?: SourceInfo): string | undefined {
@@ -534,6 +535,7 @@ export class InteractiveMode {
 		this.ui.addChild(this.widgetContainerBelow);
 		this.ui.addChild(this.actionBar);
 		this.ui.addChild(this.footer);
+		this.ui.setBottomPinnedChildren(2); // actionBar + footer pinned to bottom
 		this.ui.setFocus(this.editor);
 
 		this.setupKeyHandlers();
@@ -557,6 +559,7 @@ export class InteractiveMode {
 
 		// Set up theme file watcher
 		onThemeChange(() => {
+			this.ui.setGlobalBackground(theme.getPageBgFn());
 			this.ui.invalidate();
 			this.updateEditorBorderColor();
 			this.ui.requestRender();

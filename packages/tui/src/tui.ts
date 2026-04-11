@@ -9,7 +9,7 @@ import { performance } from "node:perf_hooks";
 import { isKeyRelease, matchesKey } from "./keys.js";
 import type { Terminal } from "./terminal.js";
 import { getCapabilities, isImageLine, setCellDimensions } from "./terminal-image.js";
-import { extractSegments, sliceByColumn, sliceWithWidth, visibleWidth } from "./utils.js";
+import { applyBackgroundToLine, extractSegments, sliceByColumn, sliceWithWidth, visibleWidth } from "./utils.js";
 
 /**
  * Component interface - all components must implement this
@@ -251,6 +251,8 @@ export class TUI extends Container {
 	private previousViewportTop = 0; // Track previous viewport top for resize-aware cursor moves
 	private fullRedrawCount = 0;
 	private stopped = false;
+	private globalBgFn: ((text: string) => string) | null = null;
+	private bottomPinnedChildren = 0;
 
 	// Side panel for column-based layout alongside main content
 	private sidePanelEntry: {
@@ -305,6 +307,21 @@ export class TUI extends Container {
 	 */
 	setClearOnShrink(enabled: boolean): void {
 		this.clearOnShrink = enabled;
+	}
+
+	setGlobalBackground(bgFn: ((text: string) => string) | null): void {
+		this.globalBgFn = bgFn;
+		this.invalidate();
+		this.requestRender();
+	}
+
+	/**
+	 * Pin the last N children to the bottom of the viewport.
+	 * When content is shorter than the terminal, empty padding is inserted
+	 * between main content and the pinned children to push them down.
+	 */
+	setBottomPinnedChildren(count: number): void {
+		this.bottomPinnedChildren = count;
 	}
 
 	setFocus(component: Component | null): void {
@@ -877,14 +894,44 @@ export class TUI extends Container {
 		return result;
 	}
 
+	/**
+	 * Render with bottom-pinned children pushed to the bottom of the viewport.
+	 */
+	private renderWithBottomPin(width: number, height: number): string[] {
+		const pinnedCount = this.bottomPinnedChildren;
+		if (pinnedCount <= 0 || pinnedCount >= this.children.length) {
+			return this.render(width);
+		}
+
+		const splitAt = this.children.length - pinnedCount;
+		const mainLines: string[] = [];
+		for (let i = 0; i < splitAt; i++) {
+			mainLines.push(...this.children[i].render(width));
+		}
+		const bottomLines: string[] = [];
+		for (let i = splitAt; i < this.children.length; i++) {
+			bottomLines.push(...this.children[i].render(width));
+		}
+
+		const totalContent = mainLines.length + bottomLines.length;
+		if (totalContent >= height) {
+			return [...mainLines, ...bottomLines];
+		}
+
+		const padCount = height - totalContent;
+		const emptyLines = new Array<string>(padCount).fill("");
+		return [...mainLines, ...emptyLines, ...bottomLines];
+	}
+
 	private static readonly SEGMENT_RESET = "\x1b[0m\x1b]8;;\x07";
 
-	private applyLineResets(lines: string[]): string[] {
+	private applyLineResets(lines: string[], width: number): string[] {
 		const reset = TUI.SEGMENT_RESET;
 		for (let i = 0; i < lines.length; i++) {
 			const line = lines[i];
 			if (!isImageLine(line)) {
-				lines[i] = line + reset;
+				const processedLine = this.globalBgFn ? applyBackgroundToLine(line, width, this.globalBgFn) : line;
+				lines[i] = processedLine + reset;
 			}
 		}
 		return lines;
@@ -989,6 +1036,8 @@ export class TUI extends Container {
 		let newLines: string[];
 		if (this.sidePanelEntry) {
 			newLines = this.renderWithSidePanel(width, height);
+		} else if (this.bottomPinnedChildren > 0) {
+			newLines = this.renderWithBottomPin(width, height);
 		} else {
 			newLines = this.render(width);
 		}
@@ -1001,7 +1050,15 @@ export class TUI extends Container {
 		// Extract cursor position before applying line resets (marker must be found first)
 		const cursorPos = this.extractCursorPosition(newLines, height);
 
-		newLines = this.applyLineResets(newLines);
+		newLines = this.applyLineResets(newLines, width);
+
+		// Pad to fill terminal height when global background is active
+		if (this.globalBgFn && newLines.length < height) {
+			const emptyBgLine = applyBackgroundToLine("", width, this.globalBgFn) + TUI.SEGMENT_RESET;
+			while (newLines.length < height) {
+				newLines.push(emptyBgLine);
+			}
+		}
 
 		// Helper to clear scrollback and viewport and render all new lines
 		const fullRender = (clear: boolean): void => {

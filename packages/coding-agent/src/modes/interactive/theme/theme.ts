@@ -347,17 +347,19 @@ export class Theme {
 	private fgColors: Map<ThemeColor, string>;
 	private bgColors: Map<ThemeBg, string>;
 	private mode: ColorMode;
+	private pageBgAnsi: string | null;
 
 	constructor(
 		fgColors: Record<ThemeColor, string | number>,
 		bgColors: Record<ThemeBg, string | number>,
 		mode: ColorMode,
-		options: { name?: string; sourcePath?: string; sourceInfo?: SourceInfo } = {},
+		options: { name?: string; sourcePath?: string; sourceInfo?: SourceInfo; pageBgAnsi?: string } = {},
 	) {
 		this.name = options.name;
 		this.sourcePath = options.sourcePath;
 		this.sourceInfo = options.sourceInfo;
 		this.mode = mode;
+		this.pageBgAnsi = options.pageBgAnsi ?? null;
 		this.fgColors = new Map();
 		for (const [key, value] of Object.entries(fgColors) as [ThemeColor, string | number][]) {
 			this.fgColors.set(key, fgAnsi(value, mode));
@@ -438,6 +440,12 @@ export class Theme {
 
 	getBashModeBorderColor(): (str: string) => string {
 		return (str: string) => this.fg("bashMode", str);
+	}
+
+	getPageBgFn(): ((text: string) => string) | null {
+		if (!this.pageBgAnsi) return null;
+		const ansi = this.pageBgAnsi;
+		return (text: string) => `${ansi}${text}\x1b[49m`;
 	}
 }
 
@@ -598,9 +606,17 @@ function createTheme(themeJson: ThemeJson, mode?: ColorMode, sourcePath?: string
 			fgColors[key as ThemeColor] = value;
 		}
 	}
+	let pageBgAnsi: string | undefined;
+	if (themeJson.export?.pageBg !== undefined) {
+		const resolved = resolveVarRefs(themeJson.export.pageBg, themeJson.vars ?? {});
+		if (resolved !== "") {
+			pageBgAnsi = bgAnsi(resolved, colorMode);
+		}
+	}
 	return new Theme(fgColors, bgColors, colorMode, {
 		name: themeJson.name,
 		sourcePath,
+		pageBgAnsi,
 	});
 }
 

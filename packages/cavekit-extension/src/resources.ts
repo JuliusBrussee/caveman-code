@@ -81,6 +81,12 @@ export const BUNDLED_SKILLS = [
 		legacyMarkdownFile: "ck-writing.md",
 		description: "Write clear, implementation-agnostic CaveKit kits with measurable acceptance criteria.",
 	},
+	{
+		id: "ck-caveman",
+		legacyMarkdownFile: "ck-caveman.md",
+		description:
+			"Ultra-compressed communication mode. Cuts token usage ~75% by speaking like caveman while keeping full technical accuracy.",
+	},
 ] as const;
 
 export type BundledSkillId = (typeof BUNDLED_SKILLS)[number]["id"];
