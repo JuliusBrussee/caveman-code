@@ -1,0 +1,1 @@
+The fetchData function in http.ts is deprecated. Replace all usages of fetchData across all files with requestData instead. Update the imports accordingly.

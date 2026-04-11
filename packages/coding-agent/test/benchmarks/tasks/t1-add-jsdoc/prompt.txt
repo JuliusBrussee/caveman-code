@@ -1,0 +1,1 @@
+Read index.ts and add JSDoc comments to all exported functions. Each JSDoc should include @param and @returns tags with descriptions.

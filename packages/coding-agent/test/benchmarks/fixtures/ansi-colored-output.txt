@@ -1,0 +1,96 @@
+[34m[1m RUN [22m[39m v3.2.4 /app
+
+[32m stdout | [39m[32m[1mserver.test.ts[22m[39m
+[32m stdout | [39m  [32m✓[39m [90mshould start server on port 3000[39m [90m(12ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould return 200 for health check[39m [90m(5ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould handle GET /api/users[39m [90m(45ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould handle POST /api/users with valid body[39m [90m(23ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould reject POST /api/users with invalid body[39m [90m(8ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould handle PUT /api/users/:id[39m [90m(18ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould handle DELETE /api/users/:id[39m [90m(14ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould return 404 for unknown routes[39m [90m(3ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould set CORS headers[39m [90m(6ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould rate limit excessive requests[39m [90m(1204ms)[39m
+
+[32m stdout | [39m[32m[1mauth.test.ts[22m[39m
+[32m stdout | [39m  [32m✓[39m [90mshould authenticate with valid JWT[39m [90m(15ms)[39m
+[32m stdout | [39m  [31m✗[39m [90mshould reject expired JWT[39m [90m(8ms)[39m
+[31m stderr | [39m    [31mAssertionError: expected 200 to equal 401[39m
+[31m stderr | [39m      [90mat Object.<anonymous> (test/auth.test.ts:45:28)[39m
+[31m stderr | [39m      [90mat processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould reject malformed JWT[39m [90m(4ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould refresh token before expiry[39m [90m(22ms)[39m
+[32m stdout | [39m  [31m✗[39m [90mshould handle concurrent refresh requests[39m [90m(156ms)[39m
+[31m stderr | [39m    [31mError: Race condition detected in token refresh[39m
+[31m stderr | [39m      [90mat TokenManager.refresh (src/auth/token-manager.ts:89:13)[39m
+[31m stderr | [39m      [90mat async Promise.all (index 2)[39m
+[31m stderr | [39m      [90mat Object.<anonymous> (test/auth.test.ts:78:5)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould revoke token on logout[39m [90m(11ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould deny access without token[39m [90m(3ms)[39m
+
+[32m stdout | [39m[32m[1mdatabase.test.ts[22m[39m
+[32m stdout | [39m  [32m✓[39m [90mshould connect to PostgreSQL[39m [90m(234ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould run migrations[39m [90m(567ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould seed test data[39m [90m(89ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould query users table[39m [90m(12ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould handle concurrent transactions[39m [90m(45ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould rollback on constraint violation[39m [90m(8ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould handle connection pool exhaustion[39m [90m(2034ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould reconnect after connection drop[39m [90m(1567ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould handle deadlock detection[39m [90m(345ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould optimize query with index[39m [90m(23ms)[39m
+
+[32m stdout | [39m[32m[1mcache.test.ts[22m[39m
+[32m stdout | [39m  [32m✓[39m [90mshould connect to Redis[39m [90m(45ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould set and get values[39m [90m(5ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould expire keys after TTL[39m [90m(3012ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould handle cache miss gracefully[39m [90m(3ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould invalidate cache on write[39m [90m(8ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould handle Redis connection failure[39m [90m(5023ms)[39m
+[32m stdout | [39m  [31m✗[39m [90mshould handle cache stampede[39m [90m(234ms)[39m
+[31m stderr | [39m    [31mError: Singleflight lock not acquired within timeout[39m
+[31m stderr | [39m      [90mat CacheManager.singleflight (src/cache/manager.ts:123:15)[39m
+[31m stderr | [39m      [90mat async CacheManager.getOrSet (src/cache/manager.ts:67:20)[39m
+[31m stderr | [39m      [90mat Object.<anonymous> (test/cache.test.ts:98:18)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould batch cache operations[39m [90m(15ms)[39m
+
+[32m stdout | [39m[32m[1mmiddleware.test.ts[22m[39m
+[32m stdout | [39m  [32m✓[39m [90mshould log request details[39m [90m(4ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould add request ID header[39m [90m(2ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould add trace context[39m [90m(5ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould compress response body[39m [90m(12ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould validate content-type[39m [90m(3ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould sanitize input[39m [90m(7ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould handle multipart uploads[39m [90m(34ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould limit request body size[39m [90m(6ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould timeout slow requests[39m [90m(5012ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould cache static responses[39m [90m(8ms)[39m
+
+[32m stdout | [39m[32m[1mwebsocket.test.ts[22m[39m
+[32m stdout | [39m  [32m✓[39m [90mshould establish WebSocket connection[39m [90m(23ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould broadcast to room[39m [90m(15ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould handle binary messages[39m [90m(8ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould reconnect on disconnect[39m [90m(2045ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould authenticate WebSocket upgrade[39m [90m(12ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould handle heartbeat ping/pong[39m [90m(1023ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould limit message rate[39m [90m(567ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould handle large payloads[39m [90m(34ms)[39m
+
+[32m stdout | [39m[32m[1mintegration.test.ts[22m[39m
+[32m stdout | [39m  [32m✓[39m [90mshould create user end-to-end[39m [90m(234ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould process order workflow[39m [90m(567ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould handle payment flow[39m [90m(345ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould send notification after order[39m [90m(123ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould track analytics events[39m [90m(89ms)[39m
+[32m stdout | [39m  [31m✗[39m [90mshould handle distributed transaction rollback[39m [90m(1234ms)[39m
+[31m stderr | [39m    [31mError: Saga compensation failed for step 3[39m
+[31m stderr | [39m      [90mat SagaOrchestrator.compensate (src/saga/orchestrator.ts:156:11)[39m
+[31m stderr | [39m      [90mat async SagaOrchestrator.execute (src/saga/orchestrator.ts:89:9)[39m
+[31m stderr | [39m      [90mat Object.<anonymous> (test/integration.test.ts:234:5)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould handle service timeout gracefully[39m [90m(5012ms)[39m
+[32m stdout | [39m  [32m✓[39m [90mshould retry failed external calls[39m [90m(678ms)[39m
+
+[36m[1m Test Files [22m[39m [31m4 failed[39m [90m(4)[39m | [32m4 passed[39m [90m(4)[39m
+[36m[1m      Tests [22m[39m [31m4 failed[39m [90m(4)[39m | [32m48 passed[39m [90m(48)[39m | 52 total
+[36m[1m   Start at [22m[39m 10:22:33
+[36m[1m   Duration [22m[39m 28.45s (transform 234ms, setup 1.2s, collect 567ms, tests 26.45s, environment 0ms, prepare 89ms)

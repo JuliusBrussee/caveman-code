@@ -1,0 +1,1 @@
+Create a calculator.ts file with exported functions: add, subtract, multiply, divide (all take two numbers, return a number). Division by zero should throw an Error. Also create calculator.test.ts with vitest tests covering all functions including edge cases.

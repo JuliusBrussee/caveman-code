@@ -1,0 +1,1 @@
+Run the tests with vitest and fix the failing test. The test expects divide(10, 0) to throw an error, but the implementation returns 0 instead. Fix the divide function to throw an Error when dividing by zero.
