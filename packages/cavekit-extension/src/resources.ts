@@ -8,7 +8,8 @@ export const BUNDLED_SKILLS = [
 	{
 		id: "ck-brownfield-adoption",
 		legacyMarkdownFile: "ck-brownfield-adoption.md",
-		description: "Adopt CaveKit incrementally inside existing codebases by retrofitting specs around bounded changes.",
+		description:
+			"Adopt CaveKit incrementally inside existing codebases by retrofitting specs around bounded changes.",
 	},
 	{
 		id: "ck-context-architecture",

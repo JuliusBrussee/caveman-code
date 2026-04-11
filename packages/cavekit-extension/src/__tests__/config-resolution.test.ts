@@ -3,13 +3,7 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { registerConfigCommand } from "../commands/config.js";
-import {
-	CONFIG_KEYS,
-	DEFAULT_CONFIG,
-	loadConfig,
-	resolveConfig,
-	type CaveKitConfig,
-} from "../index.js";
+import { CONFIG_KEYS, DEFAULT_CONFIG, loadConfig, resolveConfig } from "../index.js";
 
 function makeTempProject(): { homeDir: string; projectDir: string; cleanup: () => void } {
 	const root = fs.mkdtempSync(path.join(os.tmpdir(), "cavekit-config-"));
@@ -90,9 +84,11 @@ describe("config resolution", () => {
 			writeJson(projectPath, { maxRetries: 4 });
 
 			const api = {
-				registerCommand: vi.fn((name: string, command: { handler: (args: string, ctx: MockCommandContext) => Promise<void> }) => {
-					commands.set(name, command);
-				}),
+				registerCommand: vi.fn(
+					(name: string, command: { handler: (args: string, ctx: MockCommandContext) => Promise<void> }) => {
+						commands.set(name, command);
+					},
+				),
 			};
 
 			const config = loadConfig({ cwd: projectDir, homeDir });

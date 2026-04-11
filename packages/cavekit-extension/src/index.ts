@@ -10,14 +10,44 @@
  */
 
 import type { ExtensionAPI } from "cave";
-import { registerCommands, type CaveKitCommandId } from "./commands/index.js";
-import { type CaveKitConfig, type ConfigWithSources } from "./config/index.js";
-import { registerHooks, type CaveKitHookEventName } from "./hooks/index.js";
+import { type CaveKitCommandId, registerCommands } from "./commands/index.js";
+import type { CaveKitConfig, ConfigWithSources } from "./config/index.js";
+import { type CaveKitHookEventName, registerHooks } from "./hooks/index.js";
 import { initRtkExec } from "./rtk-exec.js";
-import { createRuntime, type CaveKitHostCapabilities, type CaveKitHostInfo } from "./runtime.js";
-import { registerTools, type CaveKitToolName } from "./tools/index.js";
-import { registerWidgets, type CaveKitShortcut } from "./widgets/index.js";
+import { type CaveKitHostCapabilities, type CaveKitHostInfo, createRuntime } from "./runtime.js";
+import { type CaveKitToolName, registerTools } from "./tools/index.js";
+import { type CaveKitShortcut, registerWidgets } from "./widgets/index.js";
 
+export { CAVEKIT_COMMAND_IDS } from "./commands/index.js";
+export type { ConfigEntry, ConfigResolutionOptions, ResolvedConfig } from "./config/index.js";
+export { CONFIG_PATHS, getConfigWithSources, loadConfig, resolveConfig, saveConfig } from "./config/index.js";
+export type {
+	CaveKitConfig,
+	CaveKitConfigKey,
+	CaveKitConfigValue,
+	CaveKitPhase,
+	CaveKitPhase as CaveKitModelPhase,
+	CavemanLevel,
+	CommandGateMode,
+	ModelPreset,
+	TierGateMode,
+} from "./config/types.js";
+export {
+	CAVEMAN_LEVELS,
+	COMMAND_GATE_MODES,
+	CONFIG_KEYS,
+	DEFAULT_CONFIG,
+	isConfigKey,
+	MODEL_PRESETS,
+	PRESET_MODELS,
+	parseConfigValue,
+	sanitizeConfigValue,
+	TIER_GATE_MODES,
+} from "./config/types.js";
+export { CAVEKIT_BASE_HOOK_EVENT_NAMES, CAVEKIT_COMMAND_GATE_HOOK_EVENT_NAMES } from "./hooks/index.js";
+export type { CaveKitHostCapabilities, CaveKitHostFlavor, CaveKitHostInfo, CaveKitRuntime } from "./runtime.js";
+export { createRuntime, detectHost, getHostCapabilities } from "./runtime.js";
+export { CAVEKIT_TOOL_NAMES } from "./tools/index.js";
 export type {
 	AcceptanceCriterion,
 	BuildDependencyEdge,
@@ -31,37 +61,7 @@ export type {
 	TaskStatus,
 } from "./types.js";
 export { BUILD_TASK_STATUSES, FINDING_SEVERITIES, isTaskComplete, isTaskStatus, normalizeTaskStatus } from "./types.js";
-export type { ConfigEntry, ConfigResolutionOptions, ResolvedConfig } from "./config/index.js";
-export { CONFIG_PATHS, getConfigWithSources, loadConfig, resolveConfig, saveConfig } from "./config/index.js";
-export type {
-	CaveKitConfig,
-	CaveKitConfigKey,
-	CaveKitPhase,
-	CaveKitPhase as CaveKitModelPhase,
-	CaveKitConfigValue,
-	CavemanLevel,
-	CommandGateMode,
-	ModelPreset,
-	TierGateMode,
-} from "./config/types.js";
-export {
-	CAVEMAN_LEVELS,
-	COMMAND_GATE_MODES,
-	CONFIG_KEYS,
-	DEFAULT_CONFIG,
-	MODEL_PRESETS,
-	PRESET_MODELS,
-	TIER_GATE_MODES,
-	isConfigKey,
-	parseConfigValue,
-	sanitizeConfigValue,
-} from "./config/types.js";
-export { CAVEKIT_COMMAND_IDS } from "./commands/index.js";
-export { CAVEKIT_BASE_HOOK_EVENT_NAMES, CAVEKIT_COMMAND_GATE_HOOK_EVENT_NAMES } from "./hooks/index.js";
-export { CAVEKIT_TOOL_NAMES } from "./tools/index.js";
 export { CAVEKIT_SHORTCUTS } from "./widgets/index.js";
-export type { CaveKitHostCapabilities, CaveKitHostFlavor, CaveKitHostInfo, CaveKitRuntime } from "./runtime.js";
-export { createRuntime, detectHost, getHostCapabilities } from "./runtime.js";
 
 export interface CaveKitBootstrapResult {
 	host: CaveKitHostInfo;
@@ -76,7 +76,7 @@ export interface CaveKitBootstrapResult {
 	};
 }
 
-export default function cavekit(pi: ExtensionAPI): CaveKitBootstrapResult | void {
+export default function cavekit(pi: ExtensionAPI): CaveKitBootstrapResult | undefined {
 	try {
 		const runtime = createRuntime(pi);
 		const commands = registerCommands(pi, runtime.config);

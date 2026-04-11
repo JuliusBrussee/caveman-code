@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vitest";
 import {
-	BUILD_TASK_STATUSES,
-	FINDING_SEVERITIES,
-	isTaskComplete,
-	isTaskStatus,
-	normalizeTaskStatus,
 	type AcceptanceCriterion,
+	BUILD_TASK_STATUSES,
 	type BuildSite,
 	type BuildTask,
+	FINDING_SEVERITIES,
 	type Finding,
+	isTaskComplete,
+	isTaskStatus,
 	type Kit,
+	normalizeTaskStatus,
 	type Requirement,
 } from "../index.js";
 

@@ -182,10 +182,7 @@ export function isConfigKey(value: string): value is CaveKitConfigKey {
 	return (CONFIG_KEYS as readonly string[]).includes(value);
 }
 
-export function parseConfigValue<K extends CaveKitConfigKey>(
-	key: K,
-	value: unknown,
-): CaveKitConfig[K] | undefined {
+export function parseConfigValue<K extends CaveKitConfigKey>(key: K, value: unknown): CaveKitConfig[K] | undefined {
 	return CONFIG_PARSERS[key](value);
 }
 

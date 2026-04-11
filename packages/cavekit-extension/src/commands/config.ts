@@ -5,16 +5,16 @@
  */
 
 import type { ExtensionAPI } from "cave";
-import { getConfigWithSources, loadConfig, saveConfig, type CaveKitConfig } from "../config/index.js";
+import { type CaveKitConfig, getConfigWithSources, loadConfig, saveConfig } from "../config/index.js";
 import {
 	CAVEMAN_LEVELS,
+	type CaveKitConfigKey,
 	COMMAND_GATE_MODES,
 	CONFIG_KEYS,
-	MODEL_PRESETS,
-	TIER_GATE_MODES,
 	isConfigKey,
+	MODEL_PRESETS,
 	parseConfigValue,
-	type CaveKitConfigKey,
+	TIER_GATE_MODES,
 } from "../config/types.js";
 
 const CONFIGURABLE_KEYS = [...CONFIG_KEYS];
@@ -84,11 +84,7 @@ export function registerConfigCommand(pi: ExtensionAPI, config: CaveKitConfig): 
 	});
 }
 
-function applyConfigValue<K extends CaveKitConfigKey>(
-	config: CaveKitConfig,
-	key: K,
-	value: CaveKitConfig[K],
-): void {
+function applyConfigValue<K extends CaveKitConfigKey>(config: CaveKitConfig, key: K, value: CaveKitConfig[K]): void {
 	config[key] = value;
 }
 

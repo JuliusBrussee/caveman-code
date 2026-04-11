@@ -54,8 +54,8 @@
 		"mdCodeBlock": "green",
 		"mdCodeBlockBorder": "borderDefault",
 		"mdQuote": "gray",
-		"mdQuoteBorder": "borderMuted",
-		"mdHr": "borderMuted",
+		"mdQuoteBorder": "borderMutedColor",
+		"mdHr": "borderMutedColor",
 		"mdListBullet": "accent",
 
 		"toolDiffAdded": "green",

@@ -10,8 +10,9 @@
 import { type ExecSyncOptionsWithStringEncoding, execSync } from "node:child_process";
 
 // Dynamic import cache — resolved once, reused.
-let _rtkFns: { getRtkStatus: () => { available: boolean }; rewriteCommandSync: (cmd: string) => string } | null = null;
+let _rtkFns: { getRtkStatus: () => Promise<{ available: boolean }>; rewriteCommandSync: (cmd: string) => string } | null = null;
 let _rtkResolved = false;
+let _rtkAvailable = false;
 
 async function loadRtk(): Promise<typeof _rtkFns> {
 	if (_rtkResolved) return _rtkFns;
@@ -30,14 +31,15 @@ async function loadRtk(): Promise<typeof _rtkFns> {
  * Falls back to direct execution if RTK is unavailable.
  */
 function rewrite(command: string): string {
-	// Use synchronous cached state — loadRtk must be called once at startup
-	if (!_rtkFns || !_rtkFns.getRtkStatus().available) return command;
+	// Use synchronous cached state — initRtkExec populates availability once at startup.
+	if (!_rtkFns || !_rtkAvailable) return command;
 	return _rtkFns.rewriteCommandSync(command);
 }
 
 /** Initialise RTK imports. Call once during extension init. */
 export async function initRtkExec(): Promise<void> {
 	await loadRtk();
+	_rtkAvailable = (await _rtkFns?.getRtkStatus())?.available ?? false;
 }
 
 /**

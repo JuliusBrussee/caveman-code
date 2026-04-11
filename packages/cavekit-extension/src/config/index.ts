@@ -16,12 +16,12 @@ import * as os from "node:os";
 import * as path from "node:path";
 import type { ExtensionAPI } from "cave";
 import {
+	type CaveKitConfig,
+	type CaveKitConfigKey,
 	CONFIG_KEYS,
 	DEFAULT_CONFIG,
 	isConfigKey,
 	parseConfigValue,
-	type CaveKitConfig,
-	type CaveKitConfigKey,
 } from "./types.js";
 
 /** The source a config value came from. */
@@ -142,9 +142,7 @@ function readConfigFile(filePath: string): ResolvedConfigFile {
 			return { path: filePath, exists: true, values: {} };
 		}
 
-		const parsed = raw.startsWith("{")
-			? (JSON.parse(raw) as Record<string, unknown>)
-			: parseFlatConfig(raw);
+		const parsed = raw.startsWith("{") ? (JSON.parse(raw) as Record<string, unknown>) : parseFlatConfig(raw);
 
 		return {
 			path: filePath,
@@ -156,11 +154,7 @@ function readConfigFile(filePath: string): ResolvedConfigFile {
 	}
 }
 
-function setResolvedValue<K extends CaveKitConfigKey>(
-	target: CaveKitConfig,
-	key: K,
-	value: CaveKitConfig[K],
-): void {
+function setResolvedValue<K extends CaveKitConfigKey>(target: CaveKitConfig, key: K, value: CaveKitConfig[K]): void {
 	target[key] = value;
 }
 

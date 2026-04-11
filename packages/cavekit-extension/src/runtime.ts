@@ -1,6 +1,6 @@
 import * as path from "node:path";
 import type { ExtensionAPI } from "cave";
-import { type ConfigResolutionOptions, resolveConfig, type ConfigWithSources } from "./config/index.js";
+import { type ConfigResolutionOptions, type ConfigWithSources, resolveConfig } from "./config/index.js";
 import type { CaveKitConfig } from "./config/types.js";
 
 export type CaveKitHostFlavor = "cave" | "pi" | "unknown";

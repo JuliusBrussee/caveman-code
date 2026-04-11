@@ -5,7 +5,7 @@
  * and provides a BashSpawnHook for transparent integration.
  */
 
-import { execFileSync, spawn } from "node:child_process";
+import { execFile, execFileSync, spawn } from "node:child_process";
 import type { BashSpawnContext, BashSpawnHook } from "./tools/bash.js";
 
 // --- Detection (R1) ---
@@ -109,16 +109,51 @@ const REWRITE_TIMEOUT_MS = 200;
 /**
  * Rewrite a bash command through RTK.
  * Returns the rewritten command on success, or the original command on any failure (fail-open).
- *
- * Exit code protocol for `rtk rewrite`:
- *   0 + stdout → rewrite found, use rewritten command
- *   1          → no RTK equivalent, pass through unchanged
- *   2          → deny rule matched, pass through
- *   3 + stdout → ask rule matched, use rewritten command
- *   any other  → pass through unchanged
  */
-export function rewriteCommand(command: string): string {
+export async function rewriteCommand(command: string): Promise<string> {
 	// Guard: don't double-rewrite commands already prefixed with rtk
+	if (command === "rtk" || command.startsWith("rtk ")) {
+		return command;
+	}
+
+	if (latestDetectionResult?.available === false) {
+		return command;
+	}
+
+	return new Promise((resolve) => {
+		try {
+			execFile(
+				"rtk",
+				["rewrite", command],
+				{
+					timeout: REWRITE_TIMEOUT_MS,
+					encoding: "utf-8",
+				},
+				(error, stdout) => {
+					if (error) {
+						if (typeof error.code === "string" && error.code === "ENOENT") {
+							rememberDetectionResult(UNAVAILABLE_RTK_RESULT);
+							cachedResult ??= Promise.resolve(UNAVAILABLE_RTK_RESULT);
+						}
+						resolve(command);
+						return;
+					}
+
+					const rewritten = stdout.trim();
+					resolve(rewritten || command);
+				},
+			);
+		} catch {
+			resolve(command);
+		}
+	});
+}
+
+/**
+ * Synchronous variant of rewriteCommand.
+ * Returns the rewritten command on success, or the original command on any failure (fail-open).
+ */
+export function rewriteCommandSync(command: string): string {
 	if (command === "rtk" || command.startsWith("rtk ")) {
 		return command;
 	}
@@ -131,20 +166,10 @@ export function rewriteCommand(command: string): string {
 		const stdout = execFileSync("rtk", ["rewrite", command], {
 			timeout: REWRITE_TIMEOUT_MS,
 			encoding: "utf-8",
-			stdio: ["ignore", "pipe", "ignore"],
 		});
 		const rewritten = stdout.trim();
 		return rewritten || command;
-	} catch (error: unknown) {
-		if (typeof error === "object" && error !== null && "code" in error && error.code === "ENOENT") {
-			rememberDetectionResult(UNAVAILABLE_RTK_RESULT);
-			cachedResult ??= Promise.resolve(UNAVAILABLE_RTK_RESULT);
-		}
-
-		// Fail-open: any error (non-zero exit, timeout, ENOENT) → use original command
-		// Exit codes 1 and 2 from `rtk rewrite` come through here as errors
-		// Exit code 3 also comes through — for our integration we treat it as pass-through
-		// since we don't have a user prompt mechanism in the spawn hook
+	} catch {
 		return command;
 	}
 }
@@ -153,14 +178,18 @@ export function rewriteCommand(command: string): string {
 
 /**
  * Create a BashSpawnHook that rewrites commands through RTK.
- * The hook is synchronous — `rtk rewrite` is called via execFileSync.
  *
  * commandPrefix is already applied to context.command before this hook runs
  * (see bash.ts resolveSpawnContext), so prefix ordering is preserved.
  */
 export function createRtkSpawnHook(): BashSpawnHook {
-	return (context: BashSpawnContext): BashSpawnContext => {
-		const rewritten = rewriteCommand(context.command);
+	return async (context: BashSpawnContext): Promise<BashSpawnContext> => {
+		const rtkStatus = await getRtkStatus();
+		if (!rtkStatus.available) {
+			return context;
+		}
+
+		const rewritten = await rewriteCommand(context.command);
 		if (rewritten === context.command) {
 			return context;
 		}
