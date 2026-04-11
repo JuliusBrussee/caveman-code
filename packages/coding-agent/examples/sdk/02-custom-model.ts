@@ -4,8 +4,8 @@
  * Shows how to select a specific model and thinking level.
  */
 
-import { getModel } from "@cavepi/pi-ai";
-import { AuthStorage, createAgentSession, ModelRegistry } from "@cavepi/pi-coding-agent";
+import { getModel } from "@cave/ai";
+import { AuthStorage, createAgentSession, ModelRegistry } from "cave";
 
 // Set up auth storage and model registry
 const authStorage = AuthStorage.create();

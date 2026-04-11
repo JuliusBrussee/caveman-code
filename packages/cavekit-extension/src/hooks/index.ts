@@ -2,7 +2,7 @@
  * Lifecycle hook registrations for CaveKit.
  */
 
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+import type { ExtensionAPI } from "cave";
 import type { CaveKitConfig } from "../config/index.js";
 import { registerCommandSafetyGate } from "./command-safety-gate.js";
 import { registerCompactionHook } from "./compaction.js";

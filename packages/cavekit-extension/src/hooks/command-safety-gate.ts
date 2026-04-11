@@ -7,8 +7,8 @@
  *   codex     — forward to Codex for classification (Phase 2, stub for now)
  */
 
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
-import { isToolCallEventType } from "@cavepi/pi-coding-agent";
+import type { ExtensionAPI } from "cave";
+import { isToolCallEventType } from "cave";
 import type { CaveKitConfig } from "../config/index.js";
 
 // Commands that are never safe regardless of mode

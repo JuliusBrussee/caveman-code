@@ -7,8 +7,8 @@
  * Usage: /status [message] - sends a status message with custom rendering
  */
 
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
-import { Box, Text } from "@cavepi/pi-tui";
+import { Box, Text } from "@cave/tui";
+import type { ExtensionAPI } from "cave";
 
 export default function (pi: ExtensionAPI) {
 	// Register custom renderer for "status-update" messages

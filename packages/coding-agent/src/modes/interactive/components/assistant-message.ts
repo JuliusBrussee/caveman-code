@@ -1,5 +1,5 @@
-import type { AssistantMessage } from "@cavepi/pi-ai";
-import { Container, Markdown, type MarkdownTheme, Spacer, Text } from "@cavepi/pi-tui";
+import type { AssistantMessage } from "@cave/ai";
+import { Container, Markdown, type MarkdownTheme, Spacer, Text } from "@cave/tui";
 import { getMarkdownTheme, theme } from "../theme/theme.js";
 
 /**

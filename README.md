@@ -1,21 +1,25 @@
-# Caveman Code
-
-> Caveman Code is a fork of [pi-mono](https://github.com/badlogic/pi-mono) by [Mario Zechner (badlogic)](https://mariozechner.at). The original project is MIT-licensed. Caveman Code adds Cave Mode, the CaveKit extension, and is published under the `@cavepi/` package scope.
+# CAVE CLI
 
 A minimal, extensible terminal coding agent and multi-provider LLM toolkit — adapt it to your workflow, not the other way around.
+
+## Install
+
+```bash
+npm install -g cave
+```
 
 ## Packages
 
 | Package | npm | Description |
 |---------|-----|-------------|
-| [`@cavepi/pi-coding-agent`](packages/coding-agent) | `cave` CLI | Coding agent CLI with sessions, extensions, skills, and themes |
-| [`@cavepi/pi-ai`](packages/ai) | `pi-ai` CLI | Unified multi-provider LLM API (OpenAI, Anthropic, Google, and more) |
-| [`@cavepi/pi-agent-core`](packages/agent) | — | Agent runtime with tool calling and state management |
-| [`@cavepi/pi-tui`](packages/tui) | — | Terminal UI library with differential rendering |
-| [`@cavepi/pi-web-ui`](packages/web-ui) | — | Web components for AI chat interfaces |
-| [`@cavepi/pi-mom`](packages/mom) | `mom` CLI | Slack bot that delegates messages to the coding agent |
-| [`@cavepi/pi`](packages/pods) | `pi-pods` CLI | CLI for managing vLLM deployments on GPU pods |
-| [`@cavekit/pi-extension`](packages/cavekit-extension) | — | CaveKit SDD workflow extension (Draft → Architect → Build → Inspect) |
+| [`cave`](packages/coding-agent) | `cave` CLI | Coding agent CLI with sessions, extensions, skills, and themes |
+| [`@cave/ai`](packages/ai) | `pi-ai` CLI | Unified multi-provider LLM API (OpenAI, Anthropic, Google, and more) |
+| [`@cave/agent`](packages/agent) | — | Agent runtime with tool calling and state management |
+| [`@cave/tui`](packages/tui) | — | Terminal UI library with differential rendering |
+| [`@cave/web-ui`](packages/web-ui) | — | Web components for AI chat interfaces |
+| [`@cave/mom`](packages/mom) | `mom` CLI | Slack bot that delegates messages to the coding agent |
+| [`@cave/pods`](packages/pods) | `cave-pods` CLI | CLI for managing vLLM deployments on GPU pods |
+| [`@cave/cavekit`](packages/cavekit-extension) | — | CaveKit SDD workflow extension (Draft → Architect → Build → Inspect) |
 
 ---
 
@@ -25,14 +29,6 @@ A minimal, extensible terminal coding agent and multi-provider LLM toolkit — a
 
 - Node.js 20+
 - An API key for at least one supported provider, or an active subscription
-
-### Install the coding agent
-
-```bash
-npm install -g @cavepi/pi-coding-agent
-```
-
-This installs the `cave` CLI.
 
 ### Authenticate
 
@@ -61,7 +57,7 @@ cat README.md | cave -p "summarize this"   # pipe stdin
 
 ### Providers & Models
 
-Caveman Code maintains an up-to-date list of tool-capable models for every built-in provider.
+CAVE CLI maintains an up-to-date list of tool-capable models for every built-in provider.
 
 **Via subscription (OAuth):** Claude Pro/Max · ChatGPT Plus/Pro · GitHub Copilot · Google Gemini · Google Antigravity
 
@@ -125,36 +121,36 @@ cave --no-session          # ephemeral mode
 
 ### Customization
 
-**Prompt Templates** — reusable Markdown prompts with `{{placeholders}}`. Place in `~/.cave/agent/prompts/` or `.pi/prompts/` and invoke with `/templatename`.
+**Prompt Templates** — reusable Markdown prompts with `{{placeholders}}`. Place in `~/.cave/agent/prompts/` or `.cave/prompts/` and invoke with `/templatename`.
 
-**Skills** — on-demand capability packages. Place in `~/.cave/agent/skills/` or `.pi/skills/` (or install via `cave install`). Invoke with `/skill:name` or let the agent auto-load them.
+**Skills** — on-demand capability packages. Place in `~/.cave/agent/skills/` or `.cave/skills/` (or install via `cave install`). Invoke with `/skill:name` or let the agent auto-load them.
 
 **Extensions** — TypeScript modules loaded at startup. Register tools, commands, keyboard shortcuts, event handlers, and UI components:
 
 ```typescript
-export default function (pi: ExtensionAPI) {
-  pi.registerTool({ name: "deploy", ... });
-  pi.registerCommand("stats", { ... });
-  pi.on("tool_call", async (event, ctx) => { ... });
+export default function (api: ExtensionAPI) {
+  api.registerTool({ name: "deploy", ... });
+  api.registerCommand("stats", { ... });
+  api.on("tool_call", async (event, ctx) => { ... });
 }
 ```
 
 Extensions can add sub-agents, plan mode, permission gates, custom editors, status lines, headers, footers, overlays, MCP integration, git checkpointing, and more.
 
-**Themes** — built-in `dark` and `light`; themes hot-reload. Place custom themes in `~/.cave/agent/themes/` or `.pi/themes/`.
+**Themes** — built-in `dark` and `light`; themes hot-reload. Place custom themes in `~/.cave/agent/themes/` or `.cave/themes/`.
 
 **Cave Packages** — bundle and share extensions, skills, prompts, and themes via npm or git:
 
 ```bash
-cave install npm:@foo/pi-tools
+cave install npm:@foo/cave-tools
 cave install git:github.com/user/repo
-cave remove npm:@foo/pi-tools
+cave remove npm:@foo/cave-tools
 cave list
 cave update
 cave config   # enable/disable package resources
 ```
 
-### CaveKit Extension (`@cavekit/pi-extension`)
+### CaveKit Extension (`@cave/cavekit`)
 
 Integrates the **CaveKit SDD (Spec-Driven Development) workflow** as first-class `/ck:*` commands — from natural language spec to built, validated code.
 
@@ -181,7 +177,7 @@ Integrates the **CaveKit SDD (Spec-Driven Development) workflow** as first-class
 **SDK:**
 
 ```typescript
-import { AuthStorage, createAgentSession, ModelRegistry, SessionManager } from "@cavepi/pi-coding-agent";
+import { AuthStorage, createAgentSession, ModelRegistry, SessionManager } from "cave";
 
 const authStorage = AuthStorage.create();
 const modelRegistry = ModelRegistry.create(authStorage);
@@ -255,19 +251,7 @@ npm install          # install all dependencies
 npm run build        # build all packages (order-dependent, run before check)
 npm run check        # lint, format, and type check
 ./test.sh            # run tests (LLM-dependent tests skipped without API keys)
-./pi-test.sh         # run cave from sources (works from any directory)
 ```
-
----
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and [AGENTS.md](AGENTS.md) for project-specific rules for humans and agents.
-
-Caveman Code tracks upstream pi-mono. Caveman Code-specific changes (binary name, package scope, CaveKit extension) are kept in separate commits for clean rebasing.
-
-**Upstream:** [github.com/badlogic/pi-mono](https://github.com/badlogic/pi-mono)
-**Fork:** [github.com/JuliusBrussee/caveman-cli](https://github.com/JuliusBrussee/caveman-cli)
 
 ---
 

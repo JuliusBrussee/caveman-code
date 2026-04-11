@@ -7,7 +7,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
-import type { ExtensionAPI, ExtensionCommandContext } from "@cavepi/pi-coding-agent";
+import type { ExtensionAPI, ExtensionCommandContext } from "cave";
 import type { CaveKitConfig } from "../config/index.js";
 
 const DESIGN_SUBCOMMANDS = ["create", "audit", "import", "show"];

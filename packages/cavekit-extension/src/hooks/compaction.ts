@@ -12,7 +12,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+import type { ExtensionAPI } from "cave";
 import type { CaveKitConfig } from "../config/index.js";
 import { getBuildSiteDir } from "../paths.js";
 import { parseBuildSite } from "../wave/executor.js";

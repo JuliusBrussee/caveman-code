@@ -2,9 +2,9 @@
  * Extension runner - executes extensions and manages their lifecycle.
  */
 
-import type { AgentMessage } from "@cavepi/pi-agent-core";
-import type { ImageContent, Model } from "@cavepi/pi-ai";
-import type { KeyId } from "@cavepi/pi-tui";
+import type { AgentMessage } from "@cave/agent";
+import type { ImageContent, Model } from "@cave/ai";
+import type { KeyId } from "@cave/tui";
 import { type Theme, theme } from "../../modes/interactive/theme/theme.js";
 import type { ResourceDiagnostic } from "../diagnostics.js";
 import type { KeybindingsConfig } from "../keybindings.js";

@@ -1,5 +1,5 @@
-import type { AgentMessage, ThinkingLevel } from "@cavepi/pi-agent-core";
-import type { Model } from "@cavepi/pi-ai";
+import type { AgentMessage, ThinkingLevel } from "@cave/agent";
+import type { Model } from "@cave/ai";
 
 /**
  * Transaction interface for atomic operations across stores.

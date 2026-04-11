@@ -7,7 +7,7 @@
  * - /timed-signal - Shows confirm using AbortSignal (manual approach)
  */
 
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+import type { ExtensionAPI } from "cave";
 
 export default function (pi: ExtensionAPI) {
 	// Simple approach: use timeout option (recommended)

@@ -10,7 +10,7 @@ import {
 	streamSimple,
 	type ToolResultMessage,
 	validateToolArguments,
-} from "@cavepi/pi-ai";
+} from "@cave/ai";
 import type {
 	AgentContext,
 	AgentEvent,

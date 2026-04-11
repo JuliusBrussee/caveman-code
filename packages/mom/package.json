@@ -1,7 +1,7 @@
 {
-	"name": "@cavepi/pi-mom",
+	"name": "@cave/mom",
 	"version": "0.65.2",
-	"description": "Slack bot that delegates messages to the pi coding agent",
+	"description": "Slack bot that delegates messages to the cave coding agent",
 	"type": "module",
 	"bin": {
 		"mom": "dist/main.js"
@@ -20,9 +20,9 @@
 	},
 	"dependencies": {
 		"@anthropic-ai/sandbox-runtime": "^0.0.16",
-		"@cavepi/pi-agent-core": "^0.65.2",
-		"@cavepi/pi-ai": "^0.65.2",
-		"@cavepi/pi-coding-agent": "^0.65.2",
+		"@cave/agent": "^0.65.2",
+		"@cave/ai": "^0.65.2",
+		"cave": "^0.65.2",
 		"@sinclair/typebox": "^0.34.0",
 		"@slack/socket-mode": "^2.0.0",
 		"@slack/web-api": "^7.0.0",

@@ -15,9 +15,9 @@
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
-import type { Agent, AgentEvent, AgentMessage, AgentState, AgentTool, ThinkingLevel } from "@cavepi/pi-agent-core";
-import type { AssistantMessage, ImageContent, Message, Model, TextContent } from "@cavepi/pi-ai";
-import { isContextOverflow, modelsAreEqual, resetApiProviders, supportsXhigh } from "@cavepi/pi-ai";
+import type { Agent, AgentEvent, AgentMessage, AgentState, AgentTool, ThinkingLevel } from "@cave/agent";
+import type { AssistantMessage, ImageContent, Message, Model, TextContent } from "@cave/ai";
+import { isContextOverflow, modelsAreEqual, resetApiProviders, supportsXhigh } from "@cave/ai";
 import { getDocsPath } from "../config.js";
 import { theme } from "../modes/interactive/theme/theme.js";
 import { stripFrontmatter } from "../utils/frontmatter.js";

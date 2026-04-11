@@ -1,4 +1,4 @@
-import { Editor, type EditorOptions, type EditorTheme, type TUI } from "@cavepi/pi-tui";
+import { Editor, type EditorOptions, type EditorTheme, type TUI } from "@cave/tui";
 import type { AppKeybinding, KeybindingsManager } from "../../../core/keybindings.js";
 
 /**

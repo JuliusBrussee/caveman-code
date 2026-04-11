@@ -1,5 +1,5 @@
-import type { AgentMessage } from "@cavepi/pi-agent-core";
-import type { ImageContent, Message, TextContent } from "@cavepi/pi-ai";
+import type { AgentMessage } from "@cave/agent";
+import type { ImageContent, Message, TextContent } from "@cave/ai";
 import { randomUUID } from "crypto";
 import {
 	appendFileSync,

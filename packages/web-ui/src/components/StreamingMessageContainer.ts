@@ -1,5 +1,5 @@
-import type { AgentMessage, AgentTool } from "@cavepi/pi-agent-core";
-import type { ToolResultMessage } from "@cavepi/pi-ai";
+import type { AgentMessage, AgentTool } from "@cave/agent";
+import type { ToolResultMessage } from "@cave/ai";
 import { html, LitElement } from "lit";
 import { property, state } from "lit/decorators.js";
 

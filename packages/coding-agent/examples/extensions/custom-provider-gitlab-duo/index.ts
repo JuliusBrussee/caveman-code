@@ -20,8 +20,8 @@ import {
 	type SimpleStreamOptions,
 	streamSimpleAnthropic,
 	streamSimpleOpenAIResponses,
-} from "@cavepi/pi-ai";
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+} from "@cave/ai";
+import type { ExtensionAPI } from "cave";
 
 // =============================================================================
 // Constants

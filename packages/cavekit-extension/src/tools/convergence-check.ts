@@ -8,8 +8,8 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { Type } from "@cavepi/pi-ai";
-import { defineTool } from "@cavepi/pi-coding-agent";
+import { Type } from "@cave/ai";
+import { defineTool } from "cave";
 import { analyzeConvergence, parseLoopLog } from "../wave/convergence-analysis.js";
 
 export const convergenceCheckTool = defineTool({

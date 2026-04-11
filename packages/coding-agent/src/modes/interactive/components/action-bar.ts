@@ -1,4 +1,4 @@
-import { type Component, truncateToWidth, visibleWidth } from "@cavepi/pi-tui";
+import { type Component, truncateToWidth, visibleWidth } from "@cave/tui";
 import { theme } from "../theme/theme.js";
 import { keyText } from "./keybinding-hints.js";
 

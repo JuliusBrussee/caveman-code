@@ -1,7 +1,7 @@
 {
-	"name": "@cavekit/pi-extension",
+	"name": "@cave/cavekit",
 	"version": "0.1.0",
-	"description": "CaveKit SDD workflow as a native Pi coding agent extension — spec → parallel build → validate → converge",
+	"description": "CaveKit SDD workflow as a native Cave coding agent extension — spec → parallel build → validate → converge",
 	"type": "module",
 	"pi": {
 		"extensions": [
@@ -38,14 +38,14 @@
 	],
 	"license": "MIT",
 	"peerDependencies": {
-		"@cavepi/pi-coding-agent": ">=0.30.0",
-		"@cavepi/pi-ai": ">=0.30.0",
-		"@cavepi/pi-tui": ">=0.30.0"
+		"cave": ">=0.30.0",
+		"@cave/ai": ">=0.30.0",
+		"@cave/tui": ">=0.30.0"
 	},
 	"devDependencies": {
-		"@cavepi/pi-coding-agent": "*",
-		"@cavepi/pi-ai": "*",
-		"@cavepi/pi-tui": "*",
+		"cave": "*",
+		"@cave/ai": "*",
+		"@cave/tui": "*",
 		"@types/node": "^22.10.5",
 		"shx": "^0.4.0",
 		"typescript": "^5.9.2",

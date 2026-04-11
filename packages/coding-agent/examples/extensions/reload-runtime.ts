@@ -5,8 +5,8 @@
  * tool that queues a follow-up command to trigger reload.
  */
 
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
+import type { ExtensionAPI } from "cave";
 
 export default function (pi: ExtensionAPI) {
 	// Command entrypoint for reload.

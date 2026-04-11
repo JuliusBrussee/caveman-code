@@ -1,4 +1,4 @@
-import type { Message } from "@cavepi/pi-ai";
+import type { Message } from "@cave/ai";
 import { describe, expect, it } from "vitest";
 import { serializeConversation } from "../src/core/compaction/utils.js";
 

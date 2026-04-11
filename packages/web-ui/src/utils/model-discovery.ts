@@ -1,4 +1,4 @@
-import type { Model } from "@cavepi/pi-ai";
+import type { Model } from "@cave/ai";
 import { LMStudioClient } from "@lmstudio/sdk";
 import { Ollama } from "ollama/browser";
 

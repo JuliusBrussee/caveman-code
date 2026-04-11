@@ -9,9 +9,9 @@
  * 2. Use /tools to open the tool selector
  */
 
-import type { ExtensionAPI, ExtensionContext, ToolInfo } from "@cavepi/pi-coding-agent";
-import { getSettingsListTheme } from "@cavepi/pi-coding-agent";
-import { Container, type SettingItem, SettingsList } from "@cavepi/pi-tui";
+import { Container, type SettingItem, SettingsList } from "@cave/tui";
+import type { ExtensionAPI, ExtensionContext, ToolInfo } from "cave";
+import { getSettingsListTheme } from "cave";
 
 // State persisted to session
 interface ToolsState {

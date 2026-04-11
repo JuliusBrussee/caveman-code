@@ -16,7 +16,8 @@
  * Then use ctrl+o to toggle between minimal (collapsed) and full (expanded) views.
  */
 
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+import { Text } from "@cave/tui";
+import type { ExtensionAPI } from "cave";
 import {
 	createBashTool,
 	createEditTool,
@@ -25,8 +26,7 @@ import {
 	createLsTool,
 	createReadTool,
 	createWriteTool,
-} from "@cavepi/pi-coding-agent";
-import { Text } from "@cavepi/pi-tui";
+} from "cave";
 import { homedir } from "os";
 
 /**

@@ -1,4 +1,4 @@
-import type { AgentTool } from "@cavepi/pi-agent-core";
+import type { AgentTool } from "@cave/agent";
 import type { Executor } from "../sandbox.js";
 import { attachTool } from "./attach.js";
 import { createBashTool } from "./bash.js";

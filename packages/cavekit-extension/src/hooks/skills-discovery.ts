@@ -12,7 +12,7 @@
 
 import * as path from "node:path";
 import * as url from "node:url";
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+import type { ExtensionAPI } from "cave";
 import type { CaveKitConfig } from "../config/index.js";
 
 /**

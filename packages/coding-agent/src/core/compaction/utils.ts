@@ -2,8 +2,8 @@
  * Shared utilities for compaction and branch summarization.
  */
 
-import type { AgentMessage } from "@cavepi/pi-agent-core";
-import type { Message } from "@cavepi/pi-ai";
+import type { AgentMessage } from "@cave/agent";
+import type { Message } from "@cave/ai";
 
 // ============================================================================
 // File Operation Tracking

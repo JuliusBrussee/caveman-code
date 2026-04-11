@@ -12,10 +12,10 @@
  * - Progress tracking widget during execution
  */
 
-import type { AgentMessage } from "@cavepi/pi-agent-core";
-import type { AssistantMessage, TextContent } from "@cavepi/pi-ai";
-import type { ExtensionAPI, ExtensionContext } from "@cavepi/pi-coding-agent";
-import { Key } from "@cavepi/pi-tui";
+import type { AgentMessage } from "@cave/agent";
+import type { AssistantMessage, TextContent } from "@cave/ai";
+import { Key } from "@cave/tui";
+import type { ExtensionAPI, ExtensionContext } from "cave";
 import { extractTodoItems, isSafeCommand, markCompletedSteps, type TodoItem } from "./utils.js";
 
 // Tools

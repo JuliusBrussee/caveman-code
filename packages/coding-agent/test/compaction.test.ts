@@ -1,6 +1,6 @@
-import type { AgentMessage } from "@cavepi/pi-agent-core";
-import type { AssistantMessage, Usage } from "@cavepi/pi-ai";
-import { getModel } from "@cavepi/pi-ai";
+import type { AgentMessage } from "@cave/agent";
+import type { AssistantMessage, Usage } from "@cave/ai";
+import { getModel } from "@cave/ai";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { beforeEach, describe, expect, it } from "vitest";

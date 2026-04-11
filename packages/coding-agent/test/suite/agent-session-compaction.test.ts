@@ -1,4 +1,4 @@
-import { type AssistantMessage, fauxAssistantMessage, type Model } from "@cavepi/pi-ai";
+import { type AssistantMessage, fauxAssistantMessage, type Model } from "@cave/ai";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createHarness, type Harness } from "./harness.js";
 

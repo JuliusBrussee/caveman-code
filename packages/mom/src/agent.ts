@@ -1,5 +1,5 @@
-import { Agent, type AgentEvent } from "@cavepi/pi-agent-core";
-import { getModel, type ImageContent } from "@cavepi/pi-ai";
+import { Agent, type AgentEvent } from "@cave/agent";
+import { getModel, type ImageContent } from "@cave/ai";
 import {
 	AgentSession,
 	AuthStorage,
@@ -11,7 +11,7 @@ import {
 	type ResourceLoader,
 	SessionManager,
 	type Skill,
-} from "@cavepi/pi-coding-agent";
+} from "cave";
 import { existsSync, readFileSync } from "fs";
 import { mkdir, writeFile } from "fs/promises";
 import { homedir } from "os";

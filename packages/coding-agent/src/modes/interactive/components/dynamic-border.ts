@@ -1,4 +1,4 @@
-import type { Component } from "@cavepi/pi-tui";
+import type { Component } from "@cave/tui";
 import { theme } from "../theme/theme.js";
 
 /**

@@ -1,7 +1,7 @@
-import { complete, getModel } from "@cavepi/pi-ai";
-import type { ExtensionAPI, ExtensionCommandContext } from "@cavepi/pi-coding-agent";
-import { DynamicBorder, getMarkdownTheme } from "@cavepi/pi-coding-agent";
-import { Container, Markdown, matchesKey, Text } from "@cavepi/pi-tui";
+import { complete, getModel } from "@cave/ai";
+import { Container, Markdown, matchesKey, Text } from "@cave/tui";
+import type { ExtensionAPI, ExtensionCommandContext } from "cave";
+import { DynamicBorder, getMarkdownTheme } from "cave";
 
 type ContentBlock = {
 	type?: string;

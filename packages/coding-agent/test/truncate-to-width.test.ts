@@ -1,4 +1,4 @@
-import { truncateToWidth, visibleWidth } from "@cavepi/pi-tui";
+import { truncateToWidth, visibleWidth } from "@cave/tui";
 import { describe, expect, it } from "vitest";
 
 /**

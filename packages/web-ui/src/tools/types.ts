@@ -1,4 +1,4 @@
-import type { ToolResultMessage } from "@cavepi/pi-ai";
+import type { ToolResultMessage } from "@cave/ai";
 import type { TemplateResult } from "lit";
 
 export interface ToolRenderResult {

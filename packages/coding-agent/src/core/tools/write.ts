@@ -1,5 +1,5 @@
-import type { AgentTool } from "@cavepi/pi-agent-core";
-import { Container, Text } from "@cavepi/pi-tui";
+import type { AgentTool } from "@cave/agent";
+import { Container, Text } from "@cave/tui";
 import { type Static, Type } from "@sinclair/typebox";
 import { mkdir as fsMkdir, writeFile as fsWriteFile } from "fs/promises";
 import { dirname } from "path";

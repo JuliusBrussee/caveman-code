@@ -2,8 +2,8 @@
  * List available models with optional fuzzy search
  */
 
-import type { Api, Model } from "@cavepi/pi-ai";
-import { fuzzyFilter } from "@cavepi/pi-tui";
+import type { Api, Model } from "@cave/ai";
+import { fuzzyFilter } from "@cave/tui";
 import type { ModelRegistry } from "../core/model-registry.js";
 
 /**

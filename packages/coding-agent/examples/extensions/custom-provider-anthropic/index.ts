@@ -42,8 +42,8 @@ import {
 	type Tool,
 	type ToolCall,
 	type ToolResultMessage,
-} from "@cavepi/pi-ai";
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+} from "@cave/ai";
+import type { ExtensionAPI } from "cave";
 
 // =============================================================================
 // OAuth Implementation (copied from packages/ai/src/utils/oauth/anthropic.ts)

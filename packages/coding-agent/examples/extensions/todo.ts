@@ -10,10 +10,10 @@
  * correct for that point in history.
  */
 
-import { StringEnum } from "@cavepi/pi-ai";
-import type { ExtensionAPI, ExtensionContext, Theme } from "@cavepi/pi-coding-agent";
-import { matchesKey, Text, truncateToWidth } from "@cavepi/pi-tui";
+import { StringEnum } from "@cave/ai";
+import { matchesKey, Text, truncateToWidth } from "@cave/tui";
 import { Type } from "@sinclair/typebox";
+import type { ExtensionAPI, ExtensionContext, Theme } from "cave";
 
 interface Todo {
 	id: number;

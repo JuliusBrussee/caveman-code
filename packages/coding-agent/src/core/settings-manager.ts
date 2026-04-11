@@ -1,4 +1,4 @@
-import type { Transport } from "@cavepi/pi-ai";
+import type { Transport } from "@cave/ai";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import lockfile from "proper-lockfile";

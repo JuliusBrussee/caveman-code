@@ -1,19 +1,19 @@
 # Packages
 
-TypeScript monorepo under `@cavepi/` and `@cavekit/` scopes.
+TypeScript monorepo under the `@cave/` scope.
 
 ## Package Map
 
 | Dir | Package | Binary | Role |
 |-----|---------|--------|------|
-| `coding-agent/` | `@cavepi/pi-coding-agent` | `cave` | Main coding agent CLI |
-| `ai/` | `@cavepi/pi-ai` | `pi-ai` | Multi-provider LLM unified API |
-| `agent/` | `@cavepi/pi-agent-core` | — | Agent runtime: tool calling, state |
-| `tui/` | `@cavepi/pi-tui` | — | Terminal UI: differential rendering |
-| `web-ui/` | `@cavepi/pi-web-ui` | — | Web components for AI chat |
-| `mom/` | `@cavepi/pi-mom` | `mom` | Slack bot → coding agent delegate |
-| `pods/` | `@cavepi/pi` | `pi-pods` | vLLM deployment on GPU pods |
-| `cavekit-extension/` | `@cavekit/pi-extension` | — | CaveKit SDD: Draft→Architect→Build→Inspect |
+| `coding-agent/` | `cave` | `cave` | Main coding agent CLI |
+| `ai/` | `@cave/ai` | `pi-ai` | Multi-provider LLM unified API |
+| `agent/` | `@cave/agent` | — | Agent runtime: tool calling, state |
+| `tui/` | `@cave/tui` | — | Terminal UI: differential rendering |
+| `web-ui/` | `@cave/web-ui` | — | Web components for AI chat |
+| `mom/` | `@cave/mom` | `mom` | Slack bot → coding agent delegate |
+| `pods/` | `@cave/pods` | `cave-pods` | vLLM deployment on GPU pods |
+| `cavekit-extension/` | `@cave/cavekit` | — | CaveKit SDD: Draft→Architect→Build→Inspect |
 
 ## Conventions
 

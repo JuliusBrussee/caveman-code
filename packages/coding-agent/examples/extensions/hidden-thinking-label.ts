@@ -18,7 +18,7 @@
  *   /thinking-label          Reset to the default label
  */
 
-import type { ExtensionAPI, ExtensionContext } from "@cavepi/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext } from "cave";
 
 const DEFAULT_LABEL = "Pondering...";
 

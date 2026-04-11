@@ -1,5 +1,5 @@
 {
-	"name": "@cavepi/pi-tui",
+	"name": "@cave/tui",
 	"version": "0.65.2",
 	"description": "Terminal User Interface library with differential rendering for efficient text-based applications",
 	"type": "module",

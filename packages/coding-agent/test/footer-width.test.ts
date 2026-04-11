@@ -1,4 +1,4 @@
-import { visibleWidth } from "@cavepi/pi-tui";
+import { visibleWidth } from "@cave/tui";
 import { beforeAll, describe, expect, it } from "vitest";
 import type { AgentSession } from "../src/core/agent-session.js";
 import type { ReadonlyFooterDataProvider } from "../src/core/footer-data-provider.js";

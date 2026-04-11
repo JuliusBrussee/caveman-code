@@ -7,9 +7,9 @@
  * 3. Loads the result into the editor for user to fill in answers
  */
 
-import { complete, type UserMessage } from "@cavepi/pi-ai";
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
-import { BorderedLoader } from "@cavepi/pi-coding-agent";
+import { complete, type UserMessage } from "@cave/ai";
+import type { ExtensionAPI } from "cave";
+import { BorderedLoader } from "cave";
 
 const SYSTEM_PROMPT = `You are a question extractor. Given text from a conversation, extract any questions that need answering and format them for the user to fill in.
 

@@ -19,9 +19,9 @@
  *   /overlay-streaming  - Multiple input panels with simulated streaming (Tab to cycle focus)
  */
 
-import type { ExtensionAPI, ExtensionCommandContext, Theme } from "@cavepi/pi-coding-agent";
-import type { Component, OverlayAnchor, OverlayHandle, OverlayOptions, TUI } from "@cavepi/pi-tui";
-import { matchesKey, truncateToWidth, visibleWidth } from "@cavepi/pi-tui";
+import type { Component, OverlayAnchor, OverlayHandle, OverlayOptions, TUI } from "@cave/tui";
+import { matchesKey, truncateToWidth, visibleWidth } from "@cave/tui";
+import type { ExtensionAPI, ExtensionCommandContext, Theme } from "cave";
 import { spawn } from "child_process";
 
 // Global handle for toggle demo (in real code, use a more elegant pattern)

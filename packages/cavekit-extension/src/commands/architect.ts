@@ -9,7 +9,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+import type { ExtensionAPI } from "cave";
 import type { CaveKitConfig } from "../config/index.js";
 import { parseKitDirectory } from "../parsers/kit-parser.js";
 import { reviewKits } from "../widgets/kit-reviewer.js";

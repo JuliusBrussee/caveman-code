@@ -14,7 +14,7 @@
 import { execSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+import type { ExtensionAPI } from "cave";
 import type { CaveKitConfig } from "../config/index.js";
 import { buildScopedContext } from "../context-builder.js";
 import type { ExecutorTask } from "../wave/executor.js";

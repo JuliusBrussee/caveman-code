@@ -1,4 +1,4 @@
-import type { AssistantMessage, ImageContent } from "@cavepi/pi-ai";
+import type { AssistantMessage, ImageContent } from "@cave/ai";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { runPrintMode } from "../src/modes/print-mode.js";
 

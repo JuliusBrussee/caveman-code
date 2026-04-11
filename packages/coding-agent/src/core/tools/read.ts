@@ -1,6 +1,6 @@
-import type { AgentTool } from "@cavepi/pi-agent-core";
-import type { ImageContent, TextContent } from "@cavepi/pi-ai";
-import { Text } from "@cavepi/pi-tui";
+import type { AgentTool } from "@cave/agent";
+import type { ImageContent, TextContent } from "@cave/ai";
+import { Text } from "@cave/tui";
 import { type Static, Type } from "@sinclair/typebox";
 import { constants } from "fs";
 import { access as fsAccess, readFile as fsReadFile } from "fs/promises";

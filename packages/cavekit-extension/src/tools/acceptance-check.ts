@@ -4,8 +4,8 @@
  * Used by build subagents to self-monitor their own progress.
  */
 
-import { Type } from "@cavepi/pi-ai";
-import { defineTool } from "@cavepi/pi-coding-agent";
+import { Type } from "@cave/ai";
+import { defineTool } from "cave";
 
 export const acceptanceCheckTool = defineTool({
 	name: "acceptance_check",

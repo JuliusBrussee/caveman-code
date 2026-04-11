@@ -9,8 +9,8 @@
  *   # Then /login qwen-cli, or set QWEN_CLI_API_KEY=...
  */
 
-import type { OAuthCredentials, OAuthLoginCallbacks } from "@cavepi/pi-ai";
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+import type { OAuthCredentials, OAuthLoginCallbacks } from "@cave/ai";
+import type { ExtensionAPI } from "cave";
 
 // =============================================================================
 // Constants

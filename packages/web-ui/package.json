@@ -1,7 +1,7 @@
 {
-	"name": "@cavepi/pi-web-ui",
+	"name": "@cave/web-ui",
 	"version": "0.65.2",
-	"description": "Reusable web UI components for AI chat interfaces powered by @cavepi/pi-ai",
+	"description": "Reusable web UI components for AI chat interfaces",
 	"type": "module",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -18,8 +18,8 @@
 	},
 	"dependencies": {
 		"@lmstudio/sdk": "^1.5.0",
-		"@cavepi/pi-ai": "^0.65.2",
-		"@cavepi/pi-tui": "^0.65.2",
+		"@cave/ai": "^0.65.2",
+		"@cave/tui": "^0.65.2",
 		"docx-preview": "^0.3.7",
 		"jszip": "^3.10.1",
 		"lucide": "^0.544.0",

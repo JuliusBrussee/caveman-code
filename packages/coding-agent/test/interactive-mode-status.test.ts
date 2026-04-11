@@ -1,4 +1,4 @@
-import { Container } from "@cavepi/pi-tui";
+import { Container } from "@cave/tui";
 import { beforeAll, describe, expect, test, vi } from "vitest";
 import { InteractiveMode } from "../src/modes/interactive/interactive-mode.js";
 import { initTheme } from "../src/modes/interactive/theme/theme.js";

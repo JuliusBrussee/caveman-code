@@ -1,6 +1,6 @@
 import { createInterface } from "node:readline";
-import type { AgentTool } from "@cavepi/pi-agent-core";
-import { Text } from "@cavepi/pi-tui";
+import type { AgentTool } from "@cave/agent";
+import { Text } from "@cave/tui";
 import { type Static, Type } from "@sinclair/typebox";
 import { spawn } from "child_process";
 import { readFileSync, statSync } from "fs";

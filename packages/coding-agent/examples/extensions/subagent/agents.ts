@@ -4,7 +4,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { getAgentDir, parseFrontmatter } from "@cavepi/pi-coding-agent";
+import { getAgentDir, parseFrontmatter } from "cave";
 
 export type AgentScope = "user" | "project" | "both";
 

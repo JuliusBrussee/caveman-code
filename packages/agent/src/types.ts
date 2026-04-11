@@ -9,7 +9,7 @@ import type {
 	TextContent,
 	Tool,
 	ToolResultMessage,
-} from "@cavepi/pi-ai";
+} from "@cave/ai";
 import type { Static, TSchema } from "@sinclair/typebox";
 
 /**

@@ -9,8 +9,8 @@
  * - ctrl+c, ctrl+d, etc. work in both modes
  */
 
-import { CustomEditor, type ExtensionAPI } from "@cavepi/pi-coding-agent";
-import { matchesKey, truncateToWidth, visibleWidth } from "@cavepi/pi-tui";
+import { matchesKey, truncateToWidth, visibleWidth } from "@cave/tui";
+import { CustomEditor, type ExtensionAPI } from "cave";
 
 // Normal mode key mappings: key -> escape sequence (or null for mode switch)
 const NORMAL_KEYS: Record<string, string | null> = {

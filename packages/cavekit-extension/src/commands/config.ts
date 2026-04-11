@@ -4,7 +4,7 @@
  * Supports interactive selection and direct set: /ck:config preset quality
  */
 
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+import type { ExtensionAPI } from "cave";
 import type { CaveKitConfig } from "../config/index.js";
 import { getConfigWithSources, saveConfig } from "../config/index.js";
 import type { CavemanLevel, ModelPreset, TierGateMode } from "../config/types.js";

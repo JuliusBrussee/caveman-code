@@ -1,5 +1,5 @@
-import { BorderedLoader, DynamicBorder, keyHint } from "@cavepi/pi-coding-agent";
-import type { ExtensionAPI, ExtensionCommandContext, ExtensionContext, Theme } from "@cavepi/pi-coding-agent";
+import { BorderedLoader, DynamicBorder, keyHint } from "cave";
+import type { ExtensionAPI, ExtensionCommandContext, ExtensionContext, Theme } from "cave";
 import {
 	allocateImageId,
 	Container,
@@ -12,7 +12,7 @@ import {
 	Spacer,
 	Text,
 	type TUI,
-} from "@cavepi/pi-tui";
+} from "@cave/tui";
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";

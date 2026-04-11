@@ -1,4 +1,4 @@
-import type { AgentTool } from "@cavepi/pi-agent-core";
+import type { AgentTool } from "@cave/agent";
 import { Type } from "@sinclair/typebox";
 import { basename, resolve as resolvePath } from "path";
 

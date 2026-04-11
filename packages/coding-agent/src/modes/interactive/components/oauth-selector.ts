@@ -1,6 +1,6 @@
-import type { OAuthProviderInterface } from "@cavepi/pi-ai";
-import { getOAuthProviders } from "@cavepi/pi-ai/oauth";
-import { Container, getKeybindings, Spacer, TruncatedText } from "@cavepi/pi-tui";
+import type { OAuthProviderInterface } from "@cave/ai";
+import { getOAuthProviders } from "@cave/ai/oauth";
+import { Container, getKeybindings, Spacer, TruncatedText } from "@cave/tui";
 import type { AuthStorage } from "../../../core/auth-storage.js";
 import { theme } from "../theme/theme.js";
 import { DynamicBorder } from "./dynamic-border.js";

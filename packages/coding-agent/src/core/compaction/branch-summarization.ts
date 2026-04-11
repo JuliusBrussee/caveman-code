@@ -5,9 +5,9 @@
  * a summary of the branch being left so context isn't lost.
  */
 
-import type { AgentMessage } from "@cavepi/pi-agent-core";
-import type { Model } from "@cavepi/pi-ai";
-import { completeSimple } from "@cavepi/pi-ai";
+import type { AgentMessage } from "@cave/agent";
+import type { Model } from "@cave/ai";
+import { completeSimple } from "@cave/ai";
 import {
 	convertToLlm,
 	createBranchSummaryMessage,

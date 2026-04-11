@@ -9,11 +9,11 @@ import { createRequire } from "node:module";
 import * as os from "node:os";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import * as _bundledPiAgentCore from "@cavepi/pi-agent-core";
-import * as _bundledPiAi from "@cavepi/pi-ai";
-import * as _bundledPiAiOauth from "@cavepi/pi-ai/oauth";
-import type { KeyId } from "@cavepi/pi-tui";
-import * as _bundledPiTui from "@cavepi/pi-tui";
+import * as _bundledPiAgentCore from "@cave/agent";
+import * as _bundledPiAi from "@cave/ai";
+import * as _bundledPiAiOauth from "@cave/ai/oauth";
+import type { KeyId } from "@cave/tui";
+import * as _bundledPiTui from "@cave/tui";
 import { createJiti } from "@mariozechner/jiti";
 // Static imports of packages that extensions may use.
 // These MUST be static so Bun bundles them into the compiled binary.
@@ -21,7 +21,7 @@ import { createJiti } from "@mariozechner/jiti";
 import * as _bundledTypebox from "@sinclair/typebox";
 import { CONFIG_DIR_NAME, getAgentDir, isBunBinary } from "../../config.js";
 // NOTE: This import works because loader.ts exports are NOT re-exported from index.ts,
-// avoiding a circular dependency. Extensions can import from @cavepi/pi-coding-agent.
+// avoiding a circular dependency. Extensions can import from cave.
 import * as _bundledPiCodingAgent from "../../index.js";
 import { createEventBus, type EventBus } from "../event-bus.js";
 import type { ExecOptions } from "../exec.js";
@@ -42,11 +42,11 @@ import type {
 /** Modules available to extensions via virtualModules (for compiled Bun binary) */
 const VIRTUAL_MODULES: Record<string, unknown> = {
 	"@sinclair/typebox": _bundledTypebox,
-	"@cavepi/pi-agent-core": _bundledPiAgentCore,
-	"@cavepi/pi-tui": _bundledPiTui,
-	"@cavepi/pi-ai": _bundledPiAi,
-	"@cavepi/pi-ai/oauth": _bundledPiAiOauth,
-	"@cavepi/pi-coding-agent": _bundledPiCodingAgent,
+	"@cave/agent": _bundledPiAgentCore,
+	"@cave/tui": _bundledPiTui,
+	"@cave/ai": _bundledPiAi,
+	"@cave/ai/oauth": _bundledPiAiOauth,
+	cave: _bundledPiCodingAgent,
 };
 
 const require = createRequire(import.meta.url);
@@ -75,11 +75,11 @@ function getAliases(): Record<string, string> {
 	};
 
 	_aliases = {
-		"@cavepi/pi-coding-agent": packageIndex,
-		"@cavepi/pi-agent-core": resolveWorkspaceOrImport("agent/dist/index.js", "@cavepi/pi-agent-core"),
-		"@cavepi/pi-tui": resolveWorkspaceOrImport("tui/dist/index.js", "@cavepi/pi-tui"),
-		"@cavepi/pi-ai": resolveWorkspaceOrImport("ai/dist/index.js", "@cavepi/pi-ai"),
-		"@cavepi/pi-ai/oauth": resolveWorkspaceOrImport("ai/dist/oauth.js", "@cavepi/pi-ai/oauth"),
+		cave: packageIndex,
+		"@cave/agent": resolveWorkspaceOrImport("agent/dist/index.js", "@cave/agent"),
+		"@cave/tui": resolveWorkspaceOrImport("tui/dist/index.js", "@cave/tui"),
+		"@cave/ai": resolveWorkspaceOrImport("ai/dist/index.js", "@cave/ai"),
+		"@cave/ai/oauth": resolveWorkspaceOrImport("ai/dist/oauth.js", "@cave/ai/oauth"),
 		"@sinclair/typebox": typeboxRoot,
 	};
 

@@ -1,4 +1,4 @@
-import type { ImageContent } from "@cavepi/pi-ai";
+import type { ImageContent } from "@cave/ai";
 import type { Args } from "./args.js";
 
 export interface InitialMessageInput {

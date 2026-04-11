@@ -1,6 +1,6 @@
 import { join } from "node:path";
-import { Agent, type AgentMessage, type ThinkingLevel } from "@cavepi/pi-agent-core";
-import { type Message, type Model, streamSimple } from "@cavepi/pi-ai";
+import { Agent, type AgentMessage, type ThinkingLevel } from "@cave/agent";
+import { type Message, type Model, streamSimple } from "@cave/ai";
 import { getAgentDir, getDocsPath } from "../config.js";
 import { AgentSession } from "./agent-session.js";
 import { AuthStorage } from "./auth-storage.js";
@@ -140,7 +140,7 @@ function getDefaultAgentDir(): string {
  * const { session } = await createAgentSession();
  *
  * // With explicit model
- * import { getModel } from '@cavepi/pi-ai';
+ * import { getModel } from '@cave/ai';
  * const { session } = await createAgentSession({
  *   model: getModel('anthropic', 'claude-opus-4-5'),
  *   thinkingLevel: 'high',

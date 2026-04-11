@@ -1,6 +1,6 @@
 import { join } from "node:path";
-import type { ThinkingLevel } from "@cavepi/pi-agent-core";
-import type { Model } from "@cavepi/pi-ai";
+import type { ThinkingLevel } from "@cave/agent";
+import type { Model } from "@cave/ai";
 import { getAgentDir } from "../config.js";
 import { AuthStorage } from "./auth-storage.js";
 import type { SessionStartEvent, ToolDefinition } from "./extensions/index.js";

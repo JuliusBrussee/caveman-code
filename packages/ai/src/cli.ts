@@ -64,7 +64,7 @@ async function main(): Promise<void> {
 
 	if (!command || command === "help" || command === "--help" || command === "-h") {
 		const providerList = PROVIDERS.map((p) => `  ${p.id.padEnd(20)} ${p.name}`).join("\n");
-		console.log(`Usage: npx @cavepi/pi-ai <command> [provider]
+		console.log(`Usage: npx @cave/ai <command> [provider]
 
 Commands:
   login [provider]  Login to an OAuth provider
@@ -74,9 +74,9 @@ Providers:
 ${providerList}
 
 Examples:
-  npx @cavepi/pi-ai login              # interactive provider selection
-  npx @cavepi/pi-ai login anthropic    # login to specific provider
-  npx @cavepi/pi-ai list               # list providers
+  npx @cave/ai login              # interactive provider selection
+  npx @cave/ai login anthropic    # login to specific provider
+  npx @cave/ai list               # list providers
 `);
 		return;
 	}
@@ -113,7 +113,7 @@ Examples:
 
 		if (!PROVIDERS.some((p) => p.id === provider)) {
 			console.error(`Unknown provider: ${provider}`);
-			console.error(`Use 'npx @cavepi/pi-ai list' to see available providers`);
+			console.error(`Use 'npx @cave/ai list' to see available providers`);
 			process.exit(1);
 		}
 
@@ -123,7 +123,7 @@ Examples:
 	}
 
 	console.error(`Unknown command: ${command}`);
-	console.error(`Use 'npx @cavepi/pi-ai --help' for usage`);
+	console.error(`Use 'npx @cave/ai --help' for usage`);
 	process.exit(1);
 }
 

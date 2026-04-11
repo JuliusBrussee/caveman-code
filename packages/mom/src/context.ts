@@ -10,8 +10,8 @@
  * - createMomSettingsManager: Creates a SettingsManager backed by workspace settings.json
  */
 
-import type { UserMessage } from "@cavepi/pi-ai";
-import { type SessionManager, type SessionMessageEntry, SettingsManager } from "@cavepi/pi-coding-agent";
+import type { UserMessage } from "@cave/ai";
+import { type SessionManager, type SessionMessageEntry, SettingsManager } from "cave";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 

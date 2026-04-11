@@ -1,7 +1,7 @@
 import { icon } from "@mariozechner/mini-lit";
 import "@mariozechner/mini-lit/dist/MarkdownBlock.js";
-import type { Agent, AgentMessage, AgentTool } from "@cavepi/pi-agent-core";
-import { StringEnum, type ToolCall } from "@cavepi/pi-ai";
+import type { Agent, AgentMessage, AgentTool } from "@cave/agent";
+import { StringEnum, type ToolCall } from "@cave/ai";
 import { Button } from "@mariozechner/mini-lit/dist/Button.js";
 import { type Static, Type } from "@sinclair/typebox";
 import { html, LitElement, type TemplateResult } from "lit";

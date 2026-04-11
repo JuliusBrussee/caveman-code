@@ -2,7 +2,7 @@
  * Registers all /ck:* slash commands with the Pi ExtensionAPI.
  */
 
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+import type { ExtensionAPI } from "cave";
 import type { CaveKitConfig } from "../config/index.js";
 import { registerArchitectCommand } from "./architect.js";
 import { registerBuildCommand } from "./build.js";

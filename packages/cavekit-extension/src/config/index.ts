@@ -13,7 +13,7 @@
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+import type { ExtensionAPI } from "cave";
 import { type CaveKitConfig, DEFAULT_CONFIG } from "./types.js";
 
 /** The source a config value came from. */

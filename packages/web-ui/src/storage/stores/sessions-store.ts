@@ -1,4 +1,4 @@
-import type { AgentState } from "@cavepi/pi-agent-core";
+import type { AgentState } from "@cave/agent";
 import { Store } from "../store.js";
 import type { SessionData, SessionMetadata, StoreConfig } from "../types.js";
 

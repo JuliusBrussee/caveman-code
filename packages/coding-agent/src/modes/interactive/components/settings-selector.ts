@@ -1,5 +1,5 @@
-import type { ThinkingLevel } from "@cavepi/pi-agent-core";
-import type { Transport } from "@cavepi/pi-ai";
+import type { ThinkingLevel } from "@cave/agent";
+import type { Transport } from "@cave/ai";
 import {
 	Container,
 	getCapabilities,
@@ -10,7 +10,7 @@ import {
 	SettingsList,
 	Spacer,
 	Text,
-} from "@cavepi/pi-tui";
+} from "@cave/tui";
 import { getSelectListTheme, getSettingsListTheme, theme } from "../theme/theme.js";
 import { DynamicBorder } from "./dynamic-border.js";
 

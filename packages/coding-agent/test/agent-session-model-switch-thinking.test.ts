@@ -1,5 +1,5 @@
-import { Agent, type ThinkingLevel } from "@cavepi/pi-agent-core";
-import { getModel } from "@cavepi/pi-ai";
+import { Agent, type ThinkingLevel } from "@cave/agent";
+import { getModel } from "@cave/ai";
 import { describe, expect, it } from "vitest";
 import { AgentSession } from "../src/core/agent-session.js";
 import { AuthStorage } from "../src/core/auth-storage.js";

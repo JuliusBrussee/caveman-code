@@ -1,4 +1,4 @@
-import type { AgentTool } from "@cavepi/pi-agent-core";
+import type { AgentTool } from "@cave/agent";
 import { Type } from "@sinclair/typebox";
 import type { Executor } from "../sandbox.js";
 

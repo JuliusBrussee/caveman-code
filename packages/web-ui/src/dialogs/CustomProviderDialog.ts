@@ -1,4 +1,4 @@
-import type { Model } from "@cavepi/pi-ai";
+import type { Model } from "@cave/ai";
 import { i18n } from "@mariozechner/mini-lit";
 import { Button } from "@mariozechner/mini-lit/dist/Button.js";
 import { DialogBase } from "@mariozechner/mini-lit/dist/DialogBase.js";

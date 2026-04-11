@@ -5,7 +5,7 @@
  * when a task exceeds maxIterations.
  */
 
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+import type { ExtensionAPI } from "cave";
 import type { CaveKitConfig } from "../config/index.js";
 
 export function registerConvergenceMonitor(pi: ExtensionAPI, _config: CaveKitConfig): void {

@@ -2,8 +2,8 @@
  * Model resolution, scoping, and initial selection
  */
 
-import type { ThinkingLevel } from "@cavepi/pi-agent-core";
-import { type Api, type KnownProvider, type Model, modelsAreEqual } from "@cavepi/pi-ai";
+import type { ThinkingLevel } from "@cave/agent";
+import { type Api, type KnownProvider, type Model, modelsAreEqual } from "@cave/ai";
 import chalk from "chalk";
 import { minimatch } from "minimatch";
 import { isValidThinkingLevel } from "../cli/args.js";

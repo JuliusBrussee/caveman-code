@@ -5,7 +5,7 @@
  * AC-2: Per-command detailed help (e.g., /ck:help draft).
  */
 
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+import type { ExtensionAPI } from "cave";
 import type { CaveKitConfig } from "../config/index.js";
 
 const HELP_TEXT = `

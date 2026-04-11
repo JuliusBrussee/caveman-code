@@ -15,7 +15,9 @@
  */
 
 import { mkdtemp, writeFile } from "node:fs/promises";
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+import { Text } from "@cave/tui";
+import { Type } from "@sinclair/typebox";
+import type { ExtensionAPI } from "cave";
 import {
 	DEFAULT_MAX_BYTES,
 	DEFAULT_MAX_LINES,
@@ -23,9 +25,7 @@ import {
 	type TruncationResult,
 	truncateHead,
 	withFileMutationQueue,
-} from "@cavepi/pi-coding-agent";
-import { Text } from "@cavepi/pi-tui";
-import { Type } from "@sinclair/typebox";
+} from "cave";
 import { execSync } from "child_process";
 import { tmpdir } from "os";
 import { join } from "path";

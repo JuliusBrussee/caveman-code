@@ -1,6 +1,6 @@
-import type { TextContent } from "@cavepi/pi-ai";
-import type { Component } from "@cavepi/pi-tui";
-import { Box, Container, Markdown, type MarkdownTheme, Spacer, Text } from "@cavepi/pi-tui";
+import type { TextContent } from "@cave/ai";
+import type { Component } from "@cave/tui";
+import { Box, Container, Markdown, type MarkdownTheme, Spacer, Text } from "@cave/tui";
 import type { MessageRenderer } from "../../../core/extensions/types.js";
 import type { CustomMessage } from "../../../core/messages.js";
 import { getMarkdownTheme, theme } from "../theme/theme.js";

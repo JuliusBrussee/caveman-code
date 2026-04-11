@@ -1,6 +1,6 @@
 import "@mariozechner/mini-lit/dist/ThemeToggle.js";
-import { Agent, type AgentMessage } from "@cavepi/pi-agent-core";
-import { getModel } from "@cavepi/pi-ai";
+import { Agent, type AgentMessage } from "@cave/agent";
+import { getModel } from "@cave/ai";
 import {
 	type AgentState,
 	ApiKeyPromptDialog,
@@ -18,7 +18,7 @@ import {
 	SettingsDialog,
 	SettingsStore,
 	setAppStorage,
-} from "@cavepi/pi-web-ui";
+} from "@cave/web-ui";
 import { html, render } from "lit";
 import { Bell, History, Plus, Settings } from "lucide";
 import "./app.css";

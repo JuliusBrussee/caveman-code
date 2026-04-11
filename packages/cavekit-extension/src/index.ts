@@ -9,7 +9,7 @@
  */
 
 import * as path from "node:path";
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+import type { ExtensionAPI } from "cave";
 import { registerCommands } from "./commands/index.js";
 import { loadConfig } from "./config/index.js";
 import { registerHooks } from "./hooks/index.js";

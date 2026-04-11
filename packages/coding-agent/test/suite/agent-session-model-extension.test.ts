@@ -1,5 +1,5 @@
-import type { AgentTool, ThinkingLevel } from "@cavepi/pi-agent-core";
-import { fauxAssistantMessage, fauxToolCall, type Model } from "@cavepi/pi-ai";
+import type { AgentTool, ThinkingLevel } from "@cave/agent";
+import { fauxAssistantMessage, fauxToolCall, type Model } from "@cave/ai";
 import { Type } from "@sinclair/typebox";
 import { afterEach, describe, expect, it } from "vitest";
 import type { ExtensionAPI } from "../../src/index.js";

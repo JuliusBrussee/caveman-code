@@ -16,8 +16,8 @@ import {
 	registerApiProvider,
 	resetApiProviders,
 	type SimpleStreamOptions,
-} from "@cavepi/pi-ai";
-import { registerOAuthProvider, resetOAuthProviders } from "@cavepi/pi-ai/oauth";
+} from "@cave/ai";
+import { registerOAuthProvider, resetOAuthProviders } from "@cave/ai/oauth";
 import { type Static, Type } from "@sinclair/typebox";
 import AjvModule from "ajv";
 import { existsSync, readFileSync } from "fs";

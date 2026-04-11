@@ -5,9 +5,9 @@
  * and after compaction the session is reloaded.
  */
 
-import type { AgentMessage } from "@cavepi/pi-agent-core";
-import type { AssistantMessage, Model, Usage } from "@cavepi/pi-ai";
-import { completeSimple } from "@cavepi/pi-ai";
+import type { AgentMessage } from "@cave/agent";
+import type { AssistantMessage, Model, Usage } from "@cave/ai";
+import { completeSimple } from "@cave/ai";
 import {
 	convertToLlm,
 	createBranchSummaryMessage,

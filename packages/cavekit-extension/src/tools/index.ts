@@ -3,7 +3,7 @@
  * These tools are available to both the main agent and build subagents.
  */
 
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
+import type { ExtensionAPI } from "cave";
 import type { CaveKitConfig } from "../config/index.js";
 import { acceptanceCheckTool } from "./acceptance-check.js";
 import { buildSiteStatusTool } from "./build-site-status.js";

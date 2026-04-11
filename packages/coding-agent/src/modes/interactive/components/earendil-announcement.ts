@@ -1,4 +1,4 @@
-import { Container, Spacer, Text } from "@cavepi/pi-tui";
+import { Container, Spacer, Text } from "@cave/tui";
 import { theme } from "../theme/theme.js";
 import { DynamicBorder } from "./dynamic-border.js";
 

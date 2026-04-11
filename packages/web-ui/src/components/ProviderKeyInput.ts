@@ -1,4 +1,4 @@
-import { type Context, complete, getModel } from "@cavepi/pi-ai";
+import { type Context, complete, getModel } from "@cave/ai";
 import { i18n } from "@mariozechner/mini-lit";
 import { Badge } from "@mariozechner/mini-lit/dist/Badge.js";
 import { Button } from "@mariozechner/mini-lit/dist/Button.js";

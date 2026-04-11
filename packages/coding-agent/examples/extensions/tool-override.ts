@@ -20,9 +20,9 @@
  *   pi -e ./tool-override.ts
  */
 
-import type { TextContent } from "@cavepi/pi-ai";
-import { type ExtensionAPI, getAgentDir, withFileMutationQueue } from "@cavepi/pi-coding-agent";
+import type { TextContent } from "@cave/ai";
 import { Type } from "@sinclair/typebox";
+import { type ExtensionAPI, getAgentDir, withFileMutationQueue } from "cave";
 import { constants, readFileSync } from "fs";
 import { access, appendFile, readFile } from "fs/promises";
 import { join, resolve } from "path";

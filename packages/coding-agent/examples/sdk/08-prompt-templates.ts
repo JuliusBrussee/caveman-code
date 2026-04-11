@@ -10,7 +10,7 @@ import {
 	DefaultResourceLoader,
 	type PromptTemplate,
 	SessionManager,
-} from "@cavepi/pi-coding-agent";
+} from "cave";
 
 // Define custom templates
 const deployTemplate: PromptTemplate = {

@@ -1,5 +1,5 @@
-import type { AgentTool } from "@cavepi/pi-agent-core";
-import type { ImageContent, TextContent } from "@cavepi/pi-ai";
+import type { AgentTool } from "@cave/agent";
+import type { ImageContent, TextContent } from "@cave/ai";
 import { Type } from "@sinclair/typebox";
 import { extname } from "path";
 import type { Executor } from "../sandbox.js";
