@@ -1,0 +1,800 @@
+[0m[35mpackages/coding-agent/src/config.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { existsSync, readFileSync } from "fs";
+[0m[35mpackages/coding-agent/src/config.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { homedir } from "os";
+[0m[35mpackages/coding-agent/src/config.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { dirname, join, resolve } from "path";
+[0m[35mpackages/coding-agent/src/config.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { fileURLToPath } from "url";
+[0m[35mpackages/coding-agent/src/config.ts[0m:[0m[32m10[0m:const __filename = fileURLToPath([0m[1m[31mimport[0m.meta.url);
+[0m[35mpackages/coding-agent/src/config.ts[0m:[0m[32m15[0m: * Bun binaries have [0m[1m[31mimport[0m.meta.url containing "$bunfs", "~BUN", or "%7EBUN" (Bun's virtual filesystem path)
+[0m[35mpackages/coding-agent/src/config.ts[0m:[0m[32m18[0m:	[0m[1m[31mimport[0m.meta.url.includes("$bunfs") || [0m[1m[31mimport[0m.meta.url.includes("~BUN") || [0m[1m[31mimport[0m.meta.url.includes("%7EBUN");
+[0m[35mpackages/coding-agent/src/package-manager-cli.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m chalk from "chalk";
+[0m[35mpackages/coding-agent/src/package-manager-cli.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { selectConfig } from "./cli/config-selector.js";
+[0m[35mpackages/coding-agent/src/package-manager-cli.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { APP_NAME, getAgentDir } from "./config.js";
+[0m[35mpackages/coding-agent/src/package-manager-cli.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { DefaultPackageManager } from "./core/package-manager.js";
+[0m[35mpackages/coding-agent/src/package-manager-cli.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { SettingsManager } from "./core/settings-manager.js";
+[0m[35mpackages/coding-agent/src/bun/register-bedrock.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { setBedrockProviderModule } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/bun/register-bedrock.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { bedrockProviderModule } from "@cavepi/pi-ai/bedrock-provider";
+[0m[35mpackages/coding-agent/src/bun/cli.ts[0m:[0m[32m5[0m:await [0m[1m[31mimport[0m("./register-bedrock.js");
+[0m[35mpackages/coding-agent/src/bun/cli.ts[0m:[0m[32m6[0m:await [0m[1m[31mimport[0m("../cli.js");
+[0m[35mpackages/coding-agent/src/cli.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m { EnvHttpProxyAgent, setGlobalDispatcher } from "undici";
+[0m[35mpackages/coding-agent/src/cli.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m { main } from "./main.js";
+[0m[35mpackages/coding-agent/src/cli/session-picker.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { ProcessTerminal, setKeybindings, TUI } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/cli/session-picker.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { KeybindingsManager } from "../core/keybindings.js";
+[0m[35mpackages/coding-agent/src/cli/session-picker.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m type { SessionInfo, SessionListProgress } from "../core/session-manager.js";
+[0m[35mpackages/coding-agent/src/cli/session-picker.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { SessionSelectorComponent } from "../modes/interactive/components/session-selector.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { resolve } from "node:path";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { createInterface } from "node:readline";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m { type ImageContent, modelsAreEqual, supportsXhigh } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m { ProcessTerminal, setKeybindings, TUI } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m chalk from "chalk";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m13[0m:[0m[1m[31mimport[0m { type Args, type Mode, parseArgs, printHelp } from "./cli/args.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m14[0m:[0m[1m[31mimport[0m { processFileArguments } from "./cli/file-processor.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m15[0m:[0m[1m[31mimport[0m { buildInitialMessage } from "./cli/initial-message.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m16[0m:[0m[1m[31mimport[0m { listModels } from "./cli/list-models.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m17[0m:[0m[1m[31mimport[0m { selectSession } from "./cli/session-picker.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m18[0m:[0m[1m[31mimport[0m { getAgentDir, getModelsPath, VERSION } from "./config.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m19[0m:[0m[1m[31mimport[0m { type CreateAgentSessionRuntimeFactory, createAgentSessionRuntime } from "./core/agent-session-runtime.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m20[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m25[0m:[0m[1m[31mimport[0m { AuthStorage } from "./core/auth-storage.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m26[0m:[0m[1m[31mimport[0m { exportFromFile } from "./core/export-html/index.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m27[0m:[0m[1m[31mimport[0m { KeybindingsManager } from "./core/keybindings.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m28[0m:[0m[1m[31mimport[0m type { ModelRegistry } from "./core/model-registry.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m29[0m:[0m[1m[31mimport[0m { resolveCliModel, resolveModelScope, type ScopedModel } from "./core/model-resolver.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m30[0m:[0m[1m[31mimport[0m { restoreStdout, takeOverStdout } from "./core/output-guard.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m31[0m:[0m[1m[31mimport[0m type { CreateAgentSessionOptions } from "./core/sdk.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m32[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m38[0m:[0m[1m[31mimport[0m { SessionManager } from "./core/session-manager.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m39[0m:[0m[1m[31mimport[0m { SettingsManager } from "./core/settings-manager.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m40[0m:[0m[1m[31mimport[0m { printTimings, resetTimings, time } from "./core/timings.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m41[0m:[0m[1m[31mimport[0m { allTools } from "./core/tools/index.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m42[0m:[0m[1m[31mimport[0m { runMigrations, showDeprecationWarnings } from "./migrations.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m43[0m:[0m[1m[31mimport[0m { InteractiveMode, runPrintMode, runRpcMode } from "./modes/index.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m44[0m:[0m[1m[31mimport[0m { ExtensionSelectorComponent } from "./modes/interactive/components/extension-selector.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m45[0m:[0m[1m[31mimport[0m { initTheme, stopThemeWatcher } from "./modes/interactive/theme/theme.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m46[0m:[0m[1m[31mimport[0m { handleConfigCommand, handlePackageCommand } from "./package-manager-cli.js";
+[0m[35mpackages/coding-agent/src/main.ts[0m:[0m[32m47[0m:[0m[1m[31mimport[0m { isLocalPath } from "./utils/paths.js";
+[0m[35mpackages/coding-agent/src/cli/list-models.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m type { Api, Model } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/cli/list-models.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { fuzzyFilter } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/cli/list-models.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m type { ModelRegistry } from "../core/model-registry.js";
+[0m[35mpackages/coding-agent/src/cli/initial-message.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { ImageContent } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/cli/initial-message.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m type { Args } from "./args.js";
+[0m[35mpackages/coding-agent/src/cli/file-processor.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { access, readFile, stat } from "node:fs/promises";
+[0m[35mpackages/coding-agent/src/cli/file-processor.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m type { ImageContent } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/cli/file-processor.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m chalk from "chalk";
+[0m[35mpackages/coding-agent/src/cli/file-processor.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { resolve } from "path";
+[0m[35mpackages/coding-agent/src/cli/file-processor.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { resolveReadPath } from "../core/tools/path-utils.js";
+[0m[35mpackages/coding-agent/src/cli/file-processor.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m { formatDimensionNote, resizeImage } from "../utils/image-resize.js";
+[0m[35mpackages/coding-agent/src/cli/file-processor.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m { detectSupportedImageMimeTypeFromFile } from "../utils/mime.js";
+[0m[35mpackages/coding-agent/src/migrations.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m chalk from "chalk";
+[0m[35mpackages/coding-agent/src/migrations.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "fs";
+[0m[35mpackages/coding-agent/src/migrations.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m { dirname, join } from "path";
+[0m[35mpackages/coding-agent/src/migrations.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { CONFIG_DIR_NAME, getAgentDir, getBinDir } from "./config.js";
+[0m[35mpackages/coding-agent/src/migrations.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { migrateKeybindingsConfig } from "./core/keybindings.js";
+[0m[35mpackages/coding-agent/src/utils/tools-manager.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m chalk from "chalk";
+[0m[35mpackages/coding-agent/src/utils/tools-manager.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { spawnSync } from "child_process";
+[0m[35mpackages/coding-agent/src/utils/tools-manager.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m extractZip from "extract-zip";
+[0m[35mpackages/coding-agent/src/utils/tools-manager.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { chmodSync, createWriteStream, existsSync, mkdirSync, readdirSync, renameSync, rmSync } from "fs";
+[0m[35mpackages/coding-agent/src/utils/tools-manager.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { arch, platform } from "os";
+[0m[35mpackages/coding-agent/src/utils/tools-manager.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { join } from "path";
+[0m[35mpackages/coding-agent/src/utils/tools-manager.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m { Readable } from "stream";
+[0m[35mpackages/coding-agent/src/utils/tools-manager.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { pipeline } from "stream/promises";
+[0m[35mpackages/coding-agent/src/utils/tools-manager.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { APP_NAME, getBinDir } from "../config.js";
+[0m[35mpackages/coding-agent/src/cli/args.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m type { ThinkingLevel } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/cli/args.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m chalk from "chalk";
+[0m[35mpackages/coding-agent/src/cli/args.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m { APP_NAME, CONFIG_DIR_NAME, ENV_AGENT_DIR } from "../config.js";
+[0m[35mpackages/coding-agent/src/cli/args.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m type { ExtensionFlag } from "../core/extensions/types.js";
+[0m[35mpackages/coding-agent/src/cli/args.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { allTools, type ToolName } from "../core/tools/index.js";
+[0m[35mpackages/coding-agent/src/cli/config-selector.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { ProcessTerminal, TUI } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/cli/config-selector.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m type { ResolvedPaths } from "../core/package-manager.js";
+[0m[35mpackages/coding-agent/src/cli/config-selector.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m type { SettingsManager } from "../core/settings-manager.js";
+[0m[35mpackages/coding-agent/src/cli/config-selector.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { ConfigSelectorComponent } from "../modes/interactive/components/config-selector.js";
+[0m[35mpackages/coding-agent/src/cli/config-selector.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { initTheme, stopThemeWatcher } from "../modes/interactive/theme/theme.js";
+[0m[35mpackages/coding-agent/src/utils/mime.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { open } from "node:fs/promises";
+[0m[35mpackages/coding-agent/src/utils/mime.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { fileTypeFromBuffer } from "file-type";
+[0m[35mpackages/coding-agent/src/core/resolve-config-value.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { execSync, spawnSync } from "child_process";
+[0m[35mpackages/coding-agent/src/core/resolve-config-value.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m { getShellConfig } from "../utils/shell.js";
+[0m[35mpackages/coding-agent/src/core/messages.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m type { AgentMessage } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/messages.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m type { ImageContent, Message, TextContent } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/utils/git.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m hostedGitInfo from "hosted-git-info";
+[0m[35mpackages/coding-agent/src/core/model-resolver.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m type { ThinkingLevel } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/model-resolver.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { type Api, type KnownProvider, type Model, modelsAreEqual } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/core/model-resolver.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m chalk from "chalk";
+[0m[35mpackages/coding-agent/src/core/model-resolver.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { minimatch } from "minimatch";
+[0m[35mpackages/coding-agent/src/core/model-resolver.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { isValidThinkingLevel } from "../cli/args.js";
+[0m[35mpackages/coding-agent/src/core/model-resolver.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m { DEFAULT_THINKING_LEVEL } from "./defaults.js";
+[0m[35mpackages/coding-agent/src/core/model-resolver.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m type { ModelRegistry } from "./model-registry.js";
+[0m[35mpackages/coding-agent/src/core/settings-manager.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { Transport } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/core/settings-manager.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+[0m[35mpackages/coding-agent/src/core/settings-manager.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { dirname, join } from "path";
+[0m[35mpackages/coding-agent/src/core/settings-manager.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m lockfile from "proper-lockfile";
+[0m[35mpackages/coding-agent/src/core/settings-manager.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { CONFIG_DIR_NAME, getAgentDir } from "../config.js";
+[0m[35mpackages/coding-agent/src/utils/exif-orientation.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { PhotonImageType } from "./photon.js";
+[0m[35mpackages/coding-agent/src/utils/exif-orientation.ts[0m:[0m[32m3[0m:type Photon = typeof [0m[1m[31mimport[0m("@silvia-odwyer/photon-node");
+[0m[35mpackages/coding-agent/src/core/defaults.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { ThinkingLevel } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/utils/frontmatter.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { parse } from "yaml";
+[0m[35mpackages/coding-agent/src/core/tools/file-mutation-queue.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { realpathSync } from "node:fs";
+[0m[35mpackages/coding-agent/src/core/tools/file-mutation-queue.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { resolve } from "node:path";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-mode.ts[0m:[0m[32m14[0m:[0m[1m[31mimport[0m * as crypto from "node:crypto";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-mode.ts[0m:[0m[32m15[0m:[0m[1m[31mimport[0m type { AgentSessionRuntime } from "../../core/agent-session-runtime.js";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-mode.ts[0m:[0m[32m16[0m:[0m[1m[31mimport[0m type {
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-mode.ts[0m:[0m[32m21[0m:[0m[1m[31mimport[0m { takeOverStdout, writeRawStdout } from "../../core/output-guard.js";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-mode.ts[0m:[0m[32m22[0m:[0m[1m[31mimport[0m { type Theme, theme } from "../interactive/theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-mode.ts[0m:[0m[32m23[0m:[0m[1m[31mimport[0m { attachJsonlLineReader, serializeJsonLine } from "./jsonl.js";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-mode.ts[0m:[0m[32m24[0m:[0m[1m[31mimport[0m type {
+[0m[35mpackages/coding-agent/src/core/model-registry.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/core/model-registry.ts[0m:[0m[32m20[0m:[0m[1m[31mimport[0m { registerOAuthProvider, resetOAuthProviders } from "@cavepi/pi-ai/oauth";
+[0m[35mpackages/coding-agent/src/core/model-registry.ts[0m:[0m[32m21[0m:[0m[1m[31mimport[0m { type Static, Type } from "@sinclair/typebox";
+[0m[35mpackages/coding-agent/src/core/model-registry.ts[0m:[0m[32m22[0m:[0m[1m[31mimport[0m AjvModule from "ajv";
+[0m[35mpackages/coding-agent/src/core/model-registry.ts[0m:[0m[32m23[0m:[0m[1m[31mimport[0m { existsSync, readFileSync } from "fs";
+[0m[35mpackages/coding-agent/src/core/model-registry.ts[0m:[0m[32m24[0m:[0m[1m[31mimport[0m { join } from "path";
+[0m[35mpackages/coding-agent/src/core/model-registry.ts[0m:[0m[32m25[0m:[0m[1m[31mimport[0m { getAgentDir } from "../config.js";
+[0m[35mpackages/coding-agent/src/core/model-registry.ts[0m:[0m[32m26[0m:[0m[1m[31mimport[0m type { AuthStorage } from "./auth-storage.js";
+[0m[35mpackages/coding-agent/src/core/model-registry.ts[0m:[0m[32m27[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/core/skills.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { existsSync, readdirSync, readFileSync, realpathSync, statSync } from "fs";
+[0m[35mpackages/coding-agent/src/core/skills.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m ignore from "ignore";
+[0m[35mpackages/coding-agent/src/core/skills.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { homedir } from "os";
+[0m[35mpackages/coding-agent/src/core/skills.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { basename, dirname, isAbsolute, join, relative, resolve, sep } from "path";
+[0m[35mpackages/coding-agent/src/core/skills.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { CONFIG_DIR_NAME, getAgentDir } from "../config.js";
+[0m[35mpackages/coding-agent/src/core/skills.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { parseFrontmatter } from "../utils/frontmatter.js";
+[0m[35mpackages/coding-agent/src/core/skills.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m type { ResourceDiagnostic } from "./diagnostics.js";
+[0m[35mpackages/coding-agent/src/core/skills.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { createSyntheticSourceInfo, type SourceInfo } from "./source-info.js";
+[0m[35mpackages/coding-agent/src/core/session-manager.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { AgentMessage } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/session-manager.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m type { ImageContent, Message, TextContent } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/core/session-manager.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { randomUUID } from "crypto";
+[0m[35mpackages/coding-agent/src/core/session-manager.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/core/session-manager.ts[0m:[0m[32m16[0m:[0m[1m[31mimport[0m { readdir, readFile, stat } from "fs/promises";
+[0m[35mpackages/coding-agent/src/core/session-manager.ts[0m:[0m[32m17[0m:[0m[1m[31mimport[0m { join, resolve } from "path";
+[0m[35mpackages/coding-agent/src/core/session-manager.ts[0m:[0m[32m18[0m:[0m[1m[31mimport[0m { getAgentDir as getDefaultAgentDir, getSessionsDir } from "../config.js";
+[0m[35mpackages/coding-agent/src/core/session-manager.ts[0m:[0m[32m19[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/core/tools/edit-diff.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m * as Diff from "diff";
+[0m[35mpackages/coding-agent/src/core/tools/edit-diff.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m { constants } from "fs";
+[0m[35mpackages/coding-agent/src/core/tools/edit-diff.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { access, readFile } from "fs/promises";
+[0m[35mpackages/coding-agent/src/core/tools/edit-diff.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { resolveToCwd } from "./path-utils.js";
+[0m[35mpackages/coding-agent/src/core/system-prompt.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { getDocsPath, getExamplesPath, getReadmePath } from "../config.js";
+[0m[35mpackages/coding-agent/src/core/system-prompt.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { formatSkillsForPrompt, type Skill } from "./skills.js";
+[0m[35mpackages/coding-agent/src/core/rtk.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { execFileSync } from "node:child_process";
+[0m[35mpackages/coding-agent/src/core/rtk.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m type { BashSpawnContext, BashSpawnHook } from "./tools/bash.js";
+[0m[35mpackages/coding-agent/src/core/tools/render-utils.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m * as os from "node:os";
+[0m[35mpackages/coding-agent/src/core/tools/render-utils.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m type { ImageContent, TextContent } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/core/tools/render-utils.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { getCapabilities, getImageDimensions, imageFallback } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/core/tools/render-utils.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m stripAnsi from "strip-ansi";
+[0m[35mpackages/coding-agent/src/core/tools/render-utils.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { sanitizeBinaryOutput } from "../../utils/shell.js";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-types.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m type { AgentMessage, ThinkingLevel } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-types.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m type { ImageContent, Model } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-types.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m type { SessionStats } from "../../core/agent-session.js";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-types.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m type { BashResult } from "../../core/bash-executor.js";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-types.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m type { CompactionResult } from "../../core/compaction/index.js";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-types.ts[0m:[0m[32m13[0m:[0m[1m[31mimport[0m type { SourceInfo } from "../../core/source-info.js";
+[0m[35mpackages/coding-agent/src/utils/shell.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { existsSync } from "node:fs";
+[0m[35mpackages/coding-agent/src/utils/shell.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { delimiter } from "node:path";
+[0m[35mpackages/coding-agent/src/utils/shell.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { spawn, spawnSync } from "child_process";
+[0m[35mpackages/coding-agent/src/utils/shell.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { getBinDir, getSettingsPath } from "../config.js";
+[0m[35mpackages/coding-agent/src/utils/shell.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { SettingsManager } from "../core/settings-manager.js";
+[0m[35mpackages/coding-agent/src/core/package-manager.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { spawn, spawnSync } from "node:child_process";
+[0m[35mpackages/coding-agent/src/core/package-manager.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { createHash } from "node:crypto";
+[0m[35mpackages/coding-agent/src/core/package-manager.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+[0m[35mpackages/coding-agent/src/core/package-manager.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { homedir, tmpdir } from "node:os";
+[0m[35mpackages/coding-agent/src/core/package-manager.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { basename, dirname, join, relative, resolve, sep } from "node:path";
+[0m[35mpackages/coding-agent/src/core/package-manager.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m ignore from "ignore";
+[0m[35mpackages/coding-agent/src/core/package-manager.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m { minimatch } from "minimatch";
+[0m[35mpackages/coding-agent/src/core/package-manager.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { CONFIG_DIR_NAME } from "../config.js";
+[0m[35mpackages/coding-agent/src/core/package-manager.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { type GitSource, parseGitUrl } from "../utils/git.js";
+[0m[35mpackages/coding-agent/src/core/package-manager.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m { isLocalPath } from "../utils/paths.js";
+[0m[35mpackages/coding-agent/src/core/package-manager.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m { isStdoutTakenOver } from "./output-guard.js";
+[0m[35mpackages/coding-agent/src/core/package-manager.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m type { PackageSource, SettingsManager } from "./settings-manager.js";
+[0m[35mpackages/coding-agent/src/core/agent-session-services.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { join } from "node:path";
+[0m[35mpackages/coding-agent/src/core/agent-session-services.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m type { ThinkingLevel } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/agent-session-services.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m type { Model } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/core/agent-session-services.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { getAgentDir } from "../config.js";
+[0m[35mpackages/coding-agent/src/core/agent-session-services.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { AuthStorage } from "./auth-storage.js";
+[0m[35mpackages/coding-agent/src/core/agent-session-services.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m type { SessionStartEvent, ToolDefinition } from "./extensions/index.js";
+[0m[35mpackages/coding-agent/src/core/agent-session-services.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m { ModelRegistry } from "./model-registry.js";
+[0m[35mpackages/coding-agent/src/core/agent-session-services.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { DefaultResourceLoader, type DefaultResourceLoaderOptions, type ResourceLoader } from "./resource-loader.js";
+[0m[35mpackages/coding-agent/src/core/agent-session-services.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { type CreateAgentSessionResult, createAgentSession } from "./sdk.js";
+[0m[35mpackages/coding-agent/src/core/agent-session-services.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m type { SessionManager } from "./session-manager.js";
+[0m[35mpackages/coding-agent/src/core/agent-session-services.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m { SettingsManager } from "./settings-manager.js";
+[0m[35mpackages/coding-agent/src/core/agent-session-services.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m type { Tool } from "./tools/index.js";
+[0m[35mpackages/coding-agent/src/utils/child-process.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { ChildProcess } from "node:child_process";
+[0m[35mpackages/coding-agent/src/modes/rpc/jsonl.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { Readable } from "node:stream";
+[0m[35mpackages/coding-agent/src/modes/rpc/jsonl.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { StringDecoder } from "node:string_decoder";
+[0m[35mpackages/coding-agent/src/core/extensions/runner.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m type { AgentMessage } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/extensions/runner.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m type { ImageContent, Model } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/core/extensions/runner.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m type { KeyId } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/core/extensions/runner.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { type Theme, theme } from "../../modes/interactive/theme/theme.js";
+[0m[35mpackages/coding-agent/src/core/extensions/runner.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m type { ResourceDiagnostic } from "../diagnostics.js";
+[0m[35mpackages/coding-agent/src/core/extensions/runner.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m type { KeybindingsConfig } from "../keybindings.js";
+[0m[35mpackages/coding-agent/src/core/extensions/runner.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m type { ModelRegistry } from "../model-registry.js";
+[0m[35mpackages/coding-agent/src/core/extensions/runner.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m type { SessionManager } from "../session-manager.js";
+[0m[35mpackages/coding-agent/src/core/extensions/runner.ts[0m:[0m[32m13[0m:[0m[1m[31mimport[0m type {
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m16[0m:[0m[1m[31mimport[0m { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m17[0m:[0m[1m[31mimport[0m { basename, dirname, join, resolve } from "node:path";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m18[0m:[0m[1m[31mimport[0m type { Agent, AgentEvent, AgentMessage, AgentState, AgentTool, ThinkingLevel } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m19[0m:[0m[1m[31mimport[0m type { AssistantMessage, ImageContent, Message, Model, TextContent } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m20[0m:[0m[1m[31mimport[0m { isContextOverflow, modelsAreEqual, resetApiProviders, supportsXhigh } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m21[0m:[0m[1m[31mimport[0m { getDocsPath } from "../config.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m22[0m:[0m[1m[31mimport[0m { theme } from "../modes/interactive/theme/theme.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m23[0m:[0m[1m[31mimport[0m { stripFrontmatter } from "../utils/frontmatter.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m24[0m:[0m[1m[31mimport[0m { sleep } from "../utils/sleep.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m25[0m:[0m[1m[31mimport[0m { type BashResult, executeBashWithOperations } from "./bash-executor.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m26[0m:[0m[1m[31mimport[0m { compressCaveToolContentBlocks } from "./cave-tool-compression.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m27[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m37[0m:[0m[1m[31mimport[0m { DEFAULT_THINKING_LEVEL } from "./defaults.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m38[0m:[0m[1m[31mimport[0m { exportSessionToHtml, type ToolHtmlRenderer } from "./export-html/index.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m39[0m:[0m[1m[31mimport[0m { createToolHtmlRenderer } from "./export-html/tool-renderer.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m40[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m64[0m:[0m[1m[31mimport[0m type { BashExecutionMessage, CustomMessage } from "./messages.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m65[0m:[0m[1m[31mimport[0m type { ModelRegistry } from "./model-registry.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m66[0m:[0m[1m[31mimport[0m { expandPromptTemplate, type PromptTemplate } from "./prompt-templates.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m67[0m:[0m[1m[31mimport[0m type { ResourceExtensionPaths, ResourceLoader } from "./resource-loader.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m68[0m:[0m[1m[31mimport[0m { createRtkSpawnHook, getRtkStatus } from "./rtk.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m69[0m:[0m[1m[31mimport[0m type { BranchSummaryEntry, CompactionEntry, SessionManager } from "./session-manager.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m70[0m:[0m[1m[31mimport[0m { CURRENT_SESSION_VERSION, getLatestCompactionEntry, type SessionHeader } from "./session-manager.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m71[0m:[0m[1m[31mimport[0m type { SettingsManager } from "./settings-manager.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m72[0m:[0m[1m[31mimport[0m type { SlashCommandInfo } from "./slash-commands.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m73[0m:[0m[1m[31mimport[0m { createSyntheticSourceInfo, type SourceInfo } from "./source-info.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m74[0m:[0m[1m[31mimport[0m { buildSystemPrompt } from "./system-prompt.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m75[0m:[0m[1m[31mimport[0m { type BashOperations, createLocalBashOperations } from "./tools/bash.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m76[0m:[0m[1m[31mimport[0m { createAllToolDefinitions } from "./tools/index.js";
+[0m[35mpackages/coding-agent/src/core/agent-session.ts[0m:[0m[32m77[0m:[0m[1m[31mimport[0m { createToolDefinitionFromAgentTool, wrapToolDefinition } from "./tools/tool-definition-wrapper.js";
+[0m[35mpackages/coding-agent/src/core/keybindings.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/core/keybindings.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { existsSync, readFileSync } from "fs";
+[0m[35mpackages/coding-agent/src/core/keybindings.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m { join } from "path";
+[0m[35mpackages/coding-agent/src/core/keybindings.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m { getAgentDir } from "../config.js";
+[0m[35mpackages/coding-agent/src/core/tools/write.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { AgentTool } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/tools/write.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { Container, Text } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/core/tools/write.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { type Static, Type } from "@sinclair/typebox";
+[0m[35mpackages/coding-agent/src/core/tools/write.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { mkdir as fsMkdir, writeFile as fsWriteFile } from "fs/promises";
+[0m[35mpackages/coding-agent/src/core/tools/write.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { dirname } from "path";
+[0m[35mpackages/coding-agent/src/core/tools/write.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { keyHint } from "../../modes/interactive/components/keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/core/tools/write.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m { getLanguageFromPath, highlightCode } from "../../modes/interactive/theme/theme.js";
+[0m[35mpackages/coding-agent/src/core/tools/write.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m type { ToolDefinition, ToolRenderResultOptions } from "../extensions/types.js";
+[0m[35mpackages/coding-agent/src/core/tools/write.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { withFileMutationQueue } from "./file-mutation-queue.js";
+[0m[35mpackages/coding-agent/src/core/tools/write.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m { resolveToCwd } from "./path-utils.js";
+[0m[35mpackages/coding-agent/src/core/tools/write.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m { invalidArgText, normalizeDisplayText, replaceTabs, shortenPath, str } from "./render-utils.js";
+[0m[35mpackages/coding-agent/src/core/tools/write.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m { wrapToolDefinition } from "./tool-definition-wrapper.js";
+[0m[35mpackages/coding-agent/src/core/tools/write.ts[0m:[0m[32m134[0m:	theme: typeof [0m[1m[31mimport[0m("../../modes/interactive/theme/theme.js").theme,
+[0m[35mpackages/coding-agent/src/core/tools/write.ts[0m:[0m[32m166[0m:	theme: typeof [0m[1m[31mimport[0m("../../modes/interactive/theme/theme.js").theme,
+[0m[35mpackages/coding-agent/src/core/sdk.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { join } from "node:path";
+[0m[35mpackages/coding-agent/src/core/sdk.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { Agent, type AgentMessage, type ThinkingLevel } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/sdk.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { type Message, type Model, streamSimple } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/core/sdk.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { getAgentDir, getDocsPath } from "../config.js";
+[0m[35mpackages/coding-agent/src/core/sdk.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { AgentSession } from "./agent-session.js";
+[0m[35mpackages/coding-agent/src/core/sdk.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { AuthStorage } from "./auth-storage.js";
+[0m[35mpackages/coding-agent/src/core/sdk.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m { DEFAULT_THINKING_LEVEL } from "./defaults.js";
+[0m[35mpackages/coding-agent/src/core/sdk.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m type { ExtensionRunner, LoadExtensionsResult, SessionStartEvent, ToolDefinition } from "./extensions/index.js";
+[0m[35mpackages/coding-agent/src/core/sdk.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { convertToLlm } from "./messages.js";
+[0m[35mpackages/coding-agent/src/core/sdk.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m { ModelRegistry } from "./model-registry.js";
+[0m[35mpackages/coding-agent/src/core/sdk.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m { findInitialModel } from "./model-resolver.js";
+[0m[35mpackages/coding-agent/src/core/sdk.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m type { ResourceLoader } from "./resource-loader.js";
+[0m[35mpackages/coding-agent/src/core/sdk.ts[0m:[0m[32m13[0m:[0m[1m[31mimport[0m { DefaultResourceLoader } from "./resource-loader.js";
+[0m[35mpackages/coding-agent/src/core/sdk.ts[0m:[0m[32m14[0m:[0m[1m[31mimport[0m { getDefaultSessionDir, SessionManager } from "./session-manager.js";
+[0m[35mpackages/coding-agent/src/core/sdk.ts[0m:[0m[32m15[0m:[0m[1m[31mimport[0m { SettingsManager } from "./settings-manager.js";
+[0m[35mpackages/coding-agent/src/core/sdk.ts[0m:[0m[32m16[0m:[0m[1m[31mimport[0m { time } from "./timings.js";
+[0m[35mpackages/coding-agent/src/core/sdk.ts[0m:[0m[32m17[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/core/sdk.ts[0m:[0m[32m143[0m: * [0m[1m[31mimport[0m { getModel } from '@cavepi/pi-ai';
+[0m[35mpackages/coding-agent/src/utils/image-resize.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { ImageContent } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/utils/image-resize.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { applyExifOrientation } from "./exif-orientation.js";
+[0m[35mpackages/coding-agent/src/utils/image-resize.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { loadPhoton } from "./photon.js";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-client.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m { type ChildProcess, spawn } from "node:child_process";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-client.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m type { AgentEvent, AgentMessage, ThinkingLevel } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-client.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m type { ImageContent } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-client.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m type { SessionStats } from "../../core/agent-session.js";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-client.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m type { BashResult } from "../../core/bash-executor.js";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-client.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m type { CompactionResult } from "../../core/compaction/index.js";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-client.ts[0m:[0m[32m13[0m:[0m[1m[31mimport[0m { attachJsonlLineReader, serializeJsonLine } from "./jsonl.js";
+[0m[35mpackages/coding-agent/src/modes/rpc/rpc-client.ts[0m:[0m[32m14[0m:[0m[1m[31mimport[0m type { RpcCommand, RpcResponse, RpcSessionState, RpcSlashCommand } from "./rpc-types.js";
+[0m[35mpackages/coding-agent/src/core/extensions/wrapper.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m type { AgentTool } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/extensions/wrapper.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { wrapToolDefinition } from "../tools/tool-definition-wrapper.js";
+[0m[35mpackages/coding-agent/src/core/extensions/wrapper.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m type { ExtensionRunner } from "./runner.js";
+[0m[35mpackages/coding-agent/src/core/extensions/wrapper.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m type { RegisteredTool } from "./types.js";
+[0m[35mpackages/coding-agent/src/core/tools/index.ts[0m:[0m[32m85[0m:[0m[1m[31mimport[0m type { AgentTool } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/tools/index.ts[0m:[0m[32m86[0m:[0m[1m[31mimport[0m type { ToolDefinition } from "../extensions/types.js";
+[0m[35mpackages/coding-agent/src/core/tools/index.ts[0m:[0m[32m87[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/core/tools/index.ts[0m:[0m[32m94[0m:[0m[1m[31mimport[0m { createEditTool, createEditToolDefinition, editTool, editToolDefinition } from "./edit.js";
+[0m[35mpackages/coding-agent/src/core/tools/index.ts[0m:[0m[32m95[0m:[0m[1m[31mimport[0m { createFindTool, createFindToolDefinition, findTool, findToolDefinition } from "./find.js";
+[0m[35mpackages/coding-agent/src/core/tools/index.ts[0m:[0m[32m96[0m:[0m[1m[31mimport[0m { createGrepTool, createGrepToolDefinition, grepTool, grepToolDefinition } from "./grep.js";
+[0m[35mpackages/coding-agent/src/core/tools/index.ts[0m:[0m[32m97[0m:[0m[1m[31mimport[0m { createLsTool, createLsToolDefinition, lsTool, lsToolDefinition } from "./ls.js";
+[0m[35mpackages/coding-agent/src/core/tools/index.ts[0m:[0m[32m98[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/core/tools/index.ts[0m:[0m[32m105[0m:[0m[1m[31mimport[0m { createWriteTool, createWriteToolDefinition, writeTool, writeToolDefinition } from "./write.js";
+[0m[35mpackages/coding-agent/src/core/event-bus.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { EventEmitter } from "node:events";
+[0m[35mpackages/coding-agent/src/core/exec.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { spawn } from "node:child_process";
+[0m[35mpackages/coding-agent/src/core/exec.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { waitForChildProcess } from "../utils/child-process.js";
+[0m[35mpackages/coding-agent/src/utils/changelog.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { existsSync, readFileSync } from "fs";
+[0m[35mpackages/coding-agent/src/core/tools/tool-definition-wrapper.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { AgentTool } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/tools/tool-definition-wrapper.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m type { ExtensionContext, ToolDefinition } from "../extensions/types.js";
+[0m[35mpackages/coding-agent/src/utils/image-convert.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { applyExifOrientation } from "./exif-orientation.js";
+[0m[35mpackages/coding-agent/src/utils/image-convert.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { loadPhoton } from "./photon.js";
+[0m[35mpackages/coding-agent/src/core/footer-data-provider.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { type ExecFileException, execFile, spawnSync } from "child_process";
+[0m[35mpackages/coding-agent/src/core/footer-data-provider.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { existsSync, type FSWatcher, readFileSync, statSync, unwatchFile, watch, watchFile } from "fs";
+[0m[35mpackages/coding-agent/src/core/footer-data-provider.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { dirname, join, resolve } from "path";
+[0m[35mpackages/coding-agent/src/modes/interactive/theme/theme.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m * as fs from "node:fs";
+[0m[35mpackages/coding-agent/src/modes/interactive/theme/theme.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m * as path from "node:path";
+[0m[35mpackages/coding-agent/src/modes/interactive/theme/theme.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m type { EditorTheme, MarkdownTheme, SelectListTheme } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/theme/theme.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { type Static, Type } from "@sinclair/typebox";
+[0m[35mpackages/coding-agent/src/modes/interactive/theme/theme.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { TypeCompiler } from "@sinclair/typebox/compiler";
+[0m[35mpackages/coding-agent/src/modes/interactive/theme/theme.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m chalk from "chalk";
+[0m[35mpackages/coding-agent/src/modes/interactive/theme/theme.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m { highlight, supportsLanguage } from "cli-highlight";
+[0m[35mpackages/coding-agent/src/modes/interactive/theme/theme.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { getCustomThemesDir, getThemesDir } from "../../../config.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/theme/theme.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m type { SourceInfo } from "../../../core/source-info.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/theme/theme.ts[0m:[0m[32m1134[0m:export function getSettingsListTheme(): [0m[1m[31mimport[0m("@cavepi/pi-tui").SettingsListTheme {
+[0m[35mpackages/coding-agent/src/core/tools/bash.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { randomBytes } from "node:crypto";
+[0m[35mpackages/coding-agent/src/core/tools/bash.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { createWriteStream, existsSync } from "node:fs";
+[0m[35mpackages/coding-agent/src/core/tools/bash.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { tmpdir } from "node:os";
+[0m[35mpackages/coding-agent/src/core/tools/bash.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { join } from "node:path";
+[0m[35mpackages/coding-agent/src/core/tools/bash.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m type { AgentTool } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/tools/bash.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { Container, Text, truncateToWidth } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/core/tools/bash.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m { type Static, Type } from "@sinclair/typebox";
+[0m[35mpackages/coding-agent/src/core/tools/bash.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { spawn } from "child_process";
+[0m[35mpackages/coding-agent/src/core/tools/bash.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { keyHint } from "../../modes/interactive/components/keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/core/tools/bash.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m { truncateToVisualLines } from "../../modes/interactive/components/visual-truncate.js";
+[0m[35mpackages/coding-agent/src/core/tools/bash.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m { theme } from "../../modes/interactive/theme/theme.js";
+[0m[35mpackages/coding-agent/src/core/tools/bash.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m { waitForChildProcess } from "../../utils/child-process.js";
+[0m[35mpackages/coding-agent/src/core/tools/bash.ts[0m:[0m[32m13[0m:[0m[1m[31mimport[0m { getShellConfig, getShellEnv, killProcessTree } from "../../utils/shell.js";
+[0m[35mpackages/coding-agent/src/core/tools/bash.ts[0m:[0m[32m14[0m:[0m[1m[31mimport[0m type { ToolDefinition, ToolRenderResultOptions } from "../extensions/types.js";
+[0m[35mpackages/coding-agent/src/core/tools/bash.ts[0m:[0m[32m15[0m:[0m[1m[31mimport[0m { getTextOutput, invalidArgText, str } from "./render-utils.js";
+[0m[35mpackages/coding-agent/src/core/tools/bash.ts[0m:[0m[32m16[0m:[0m[1m[31mimport[0m { wrapToolDefinition } from "./tool-definition-wrapper.js";
+[0m[35mpackages/coding-agent/src/core/tools/bash.ts[0m:[0m[32m17[0m:[0m[1m[31mimport[0m { DEFAULT_MAX_BYTES, DEFAULT_MAX_LINES, formatSize, type TruncationResult, truncateTail } from "./truncate.js";
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m type { AgentMessage, AgentToolResult, AgentToolUpdateCallback, ThinkingLevel } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m type {
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m25[0m:[0m[1m[31mimport[0m type {
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m35[0m:[0m[1m[31mimport[0m type { Static, TSchema } from "@sinclair/typebox";
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m36[0m:[0m[1m[31mimport[0m type { Theme } from "../../modes/interactive/theme/theme.js";
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m37[0m:[0m[1m[31mimport[0m type { BashResult } from "../bash-executor.js";
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m38[0m:[0m[1m[31mimport[0m type { CompactionPreparation, CompactionResult } from "../compaction/index.js";
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m39[0m:[0m[1m[31mimport[0m type { EventBus } from "../event-bus.js";
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m40[0m:[0m[1m[31mimport[0m type { ExecOptions, ExecResult } from "../exec.js";
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m41[0m:[0m[1m[31mimport[0m type { ReadonlyFooterDataProvider } from "../footer-data-provider.js";
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m42[0m:[0m[1m[31mimport[0m type { KeybindingsManager } from "../keybindings.js";
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m43[0m:[0m[1m[31mimport[0m type { CustomMessage } from "../messages.js";
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m44[0m:[0m[1m[31mimport[0m type { ModelRegistry } from "../model-registry.js";
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m45[0m:[0m[1m[31mimport[0m type {
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m52[0m:[0m[1m[31mimport[0m type { SlashCommandInfo } from "../slash-commands.js";
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m53[0m:[0m[1m[31mimport[0m type { SourceInfo } from "../source-info.js";
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m54[0m:[0m[1m[31mimport[0m type { BashOperations } from "../tools/bash.js";
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m55[0m:[0m[1m[31mimport[0m type { EditToolDetails } from "../tools/edit.js";
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m56[0m:[0m[1m[31mimport[0m type {
+[0m[35mpackages/coding-agent/src/core/extensions/types.ts[0m:[0m[32m197[0m:	 * [0m[1m[31mimport[0m { CustomEditor } from "@cavepi/pi-coding-agent";
+[0m[35mpackages/coding-agent/src/utils/photon.ts[0m:[0m[32m16[0m:[0m[1m[31mimport[0m type { PathOrFileDescriptor } from "fs";
+[0m[35mpackages/coding-agent/src/utils/photon.ts[0m:[0m[32m17[0m:[0m[1m[31mimport[0m { createRequire } from "module";
+[0m[35mpackages/coding-agent/src/utils/photon.ts[0m:[0m[32m18[0m:[0m[1m[31mimport[0m * as path from "path";
+[0m[35mpackages/coding-agent/src/utils/photon.ts[0m:[0m[32m19[0m:[0m[1m[31mimport[0m { fileURLToPath } from "url";
+[0m[35mpackages/coding-agent/src/utils/photon.ts[0m:[0m[32m21[0m:const require = createRequire([0m[1m[31mimport[0m.meta.url);
+[0m[35mpackages/coding-agent/src/utils/photon.ts[0m:[0m[32m22[0m:const fs = require("fs") as typeof [0m[1m[31mimport[0m("fs");
+[0m[35mpackages/coding-agent/src/utils/photon.ts[0m:[0m[32m32[0m:let photonModule: typeof [0m[1m[31mimport[0m("@silvia-odwyer/photon-node") | null = null;
+[0m[35mpackages/coding-agent/src/utils/photon.ts[0m:[0m[32m33[0m:let loadPromise: Promise<typeof [0m[1m[31mimport[0m("@silvia-odwyer/photon-node") | null> | null = null;
+[0m[35mpackages/coding-agent/src/utils/photon.ts[0m:[0m[32m116[0m:export async function loadPhoton(): Promise<typeof [0m[1m[31mimport[0m("@silvia-odwyer/photon-node") | null> {
+[0m[35mpackages/coding-agent/src/utils/photon.ts[0m:[0m[32m128[0m:			photonModule = await [0m[1m[31mimport[0m("@silvia-odwyer/photon-node");
+[0m[35mpackages/coding-agent/src/utils/clipboard-image.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { spawnSync } from "child_process";
+[0m[35mpackages/coding-agent/src/utils/clipboard-image.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { randomUUID } from "crypto";
+[0m[35mpackages/coding-agent/src/utils/clipboard-image.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { readFileSync, unlinkSync } from "fs";
+[0m[35mpackages/coding-agent/src/utils/clipboard-image.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { tmpdir } from "os";
+[0m[35mpackages/coding-agent/src/utils/clipboard-image.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { join } from "path";
+[0m[35mpackages/coding-agent/src/utils/clipboard-image.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m { clipboard } from "./clipboard-native.js";
+[0m[35mpackages/coding-agent/src/utils/clipboard-image.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { loadPhoton } from "./photon.js";
+[0m[35mpackages/coding-agent/src/utils/clipboard-native.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { createRequire } from "module";
+[0m[35mpackages/coding-agent/src/utils/clipboard-native.ts[0m:[0m[32m9[0m:const require = createRequire([0m[1m[31mimport[0m.meta.url);
+[0m[35mpackages/coding-agent/src/core/tools/edit.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { AgentTool } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/tools/edit.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { Container, Text } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/core/tools/edit.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { type Static, Type } from "@sinclair/typebox";
+[0m[35mpackages/coding-agent/src/core/tools/edit.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { constants } from "fs";
+[0m[35mpackages/coding-agent/src/core/tools/edit.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { access as fsAccess, readFile as fsReadFile, writeFile as fsWriteFile } from "fs/promises";
+[0m[35mpackages/coding-agent/src/core/tools/edit.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { renderDiff } from "../../modes/interactive/components/diff.js";
+[0m[35mpackages/coding-agent/src/core/tools/edit.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m type { ToolDefinition } from "../extensions/types.js";
+[0m[35mpackages/coding-agent/src/core/tools/edit.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/core/tools/edit.ts[0m:[0m[32m17[0m:[0m[1m[31mimport[0m { withFileMutationQueue } from "./file-mutation-queue.js";
+[0m[35mpackages/coding-agent/src/core/tools/edit.ts[0m:[0m[32m18[0m:[0m[1m[31mimport[0m { resolveToCwd } from "./path-utils.js";
+[0m[35mpackages/coding-agent/src/core/tools/edit.ts[0m:[0m[32m19[0m:[0m[1m[31mimport[0m { invalidArgText, shortenPath, str } from "./render-utils.js";
+[0m[35mpackages/coding-agent/src/core/tools/edit.ts[0m:[0m[32m20[0m:[0m[1m[31mimport[0m { wrapToolDefinition } from "./tool-definition-wrapper.js";
+[0m[35mpackages/coding-agent/src/core/tools/edit.ts[0m:[0m[32m116[0m:	theme: typeof [0m[1m[31mimport[0m("../../modes/interactive/theme/theme.js").theme,
+[0m[35mpackages/coding-agent/src/core/tools/edit.ts[0m:[0m[32m131[0m:	theme: typeof [0m[1m[31mimport[0m("../../modes/interactive/theme/theme.js").theme,
+[0m[35mpackages/coding-agent/src/utils/clipboard.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { execSync, spawn } from "child_process";
+[0m[35mpackages/coding-agent/src/utils/clipboard.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { platform } from "os";
+[0m[35mpackages/coding-agent/src/utils/clipboard.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { isWaylandSession } from "./clipboard-image.js";
+[0m[35mpackages/coding-agent/src/utils/clipboard.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { clipboard } from "./clipboard-native.js";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m * as fs from "node:fs";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { createRequire } from "node:module";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m * as os from "node:os";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m * as path from "node:path";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m { fileURLToPath } from "node:url";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m * as _bundledPiAgentCore from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m13[0m:[0m[1m[31mimport[0m * as _bundledPiAi from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m14[0m:[0m[1m[31mimport[0m * as _bundledPiAiOauth from "@cavepi/pi-ai/oauth";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m15[0m:[0m[1m[31mimport[0m type { KeyId } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m16[0m:[0m[1m[31mimport[0m * as _bundledPiTui from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m17[0m:[0m[1m[31mimport[0m { createJiti } from "@mariozechner/jiti";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m18[0m:// Static [0m[1m[31mimport[0ms of packages that extensions may use.
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m21[0m:[0m[1m[31mimport[0m * as _bundledTypebox from "@sinclair/typebox";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m22[0m:[0m[1m[31mimport[0m { CONFIG_DIR_NAME, getAgentDir, isBunBinary } from "../../config.js";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m23[0m:// NOTE: This [0m[1m[31mimport[0m works because loader.ts exports are NOT re-exported from index.ts,
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m24[0m:// avoiding a circular dependency. Extensions can [0m[1m[31mimport[0m from @cavepi/pi-coding-agent.
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m25[0m:[0m[1m[31mimport[0m * as _bundledPiCodingAgent from "../../index.js";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m26[0m:[0m[1m[31mimport[0m { createEventBus, type EventBus } from "../event-bus.js";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m27[0m:[0m[1m[31mimport[0m type { ExecOptions } from "../exec.js";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m28[0m:[0m[1m[31mimport[0m { execCommand } from "../exec.js";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m29[0m:[0m[1m[31mimport[0m { createSyntheticSourceInfo } from "../source-info.js";
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m30[0m:[0m[1m[31mimport[0m type {
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m52[0m:const require = createRequire([0m[1m[31mimport[0m.meta.url);
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m62[0m:	const __dirname = path.dirname(fileURLToPath([0m[1m[31mimport[0m.meta.url));
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m74[0m:		return fileURLToPath([0m[1m[31mimport[0m.meta.resolve(specifier));
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m195[0m:				handler: (ctx: [0m[1m[31mimport[0m("./types.js").ExtensionContext) => Promise<void> | void;
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m293[0m:	const jiti = createJiti([0m[1m[31mimport[0m.meta.url, {
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m296[0m:		// Also disable tryNative so jiti handles ALL [0m[1m[31mimport[0ms (not just the entry point)
+[0m[35mpackages/coding-agent/src/core/extensions/loader.ts[0m:[0m[32m301[0m:	const module = await jiti.[0m[1m[31mimport[0m(extensionPath, { default: true });
+[0m[35mpackages/coding-agent/src/modes/print-mode.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m type { AssistantMessage, ImageContent } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/modes/print-mode.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m type { AgentSessionRuntime } from "../core/agent-session-runtime.js";
+[0m[35mpackages/coding-agent/src/modes/print-mode.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m { flushRawStdout, writeRawStdout } from "../core/output-guard.js";
+[0m[35mpackages/coding-agent/src/core/tools/grep.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { createInterface } from "node:readline";
+[0m[35mpackages/coding-agent/src/core/tools/grep.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m type { AgentTool } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/tools/grep.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { Text } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/core/tools/grep.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { type Static, Type } from "@sinclair/typebox";
+[0m[35mpackages/coding-agent/src/core/tools/grep.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { spawn } from "child_process";
+[0m[35mpackages/coding-agent/src/core/tools/grep.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { readFileSync, statSync } from "fs";
+[0m[35mpackages/coding-agent/src/core/tools/grep.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m path from "path";
+[0m[35mpackages/coding-agent/src/core/tools/grep.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { keyHint } from "../../modes/interactive/components/keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/core/tools/grep.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { ensureTool } from "../../utils/tools-manager.js";
+[0m[35mpackages/coding-agent/src/core/tools/grep.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m type { ToolDefinition, ToolRenderResultOptions } from "../extensions/types.js";
+[0m[35mpackages/coding-agent/src/core/tools/grep.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m { resolveToCwd } from "./path-utils.js";
+[0m[35mpackages/coding-agent/src/core/tools/grep.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m { getTextOutput, invalidArgText, shortenPath, str } from "./render-utils.js";
+[0m[35mpackages/coding-agent/src/core/tools/grep.ts[0m:[0m[32m13[0m:[0m[1m[31mimport[0m { wrapToolDefinition } from "./tool-definition-wrapper.js";
+[0m[35mpackages/coding-agent/src/core/tools/grep.ts[0m:[0m[32m14[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/core/tools/grep.ts[0m:[0m[32m69[0m:	theme: typeof [0m[1m[31mimport[0m("../../modes/interactive/theme/theme.js").theme,
+[0m[35mpackages/coding-agent/src/core/tools/grep.ts[0m:[0m[32m93[0m:	theme: typeof [0m[1m[31mimport[0m("../../modes/interactive/theme/theme.js").theme,
+[0m[35mpackages/coding-agent/src/core/tools/ls.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { AgentTool } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/tools/ls.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { Text } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/core/tools/ls.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { type Static, Type } from "@sinclair/typebox";
+[0m[35mpackages/coding-agent/src/core/tools/ls.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { existsSync, readdirSync, statSync } from "fs";
+[0m[35mpackages/coding-agent/src/core/tools/ls.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m nodePath from "path";
+[0m[35mpackages/coding-agent/src/core/tools/ls.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { keyHint } from "../../modes/interactive/components/keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/core/tools/ls.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m type { ToolDefinition, ToolRenderResultOptions } from "../extensions/types.js";
+[0m[35mpackages/coding-agent/src/core/tools/ls.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { resolveToCwd } from "./path-utils.js";
+[0m[35mpackages/coding-agent/src/core/tools/ls.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { getTextOutput, invalidArgText, shortenPath, str } from "./render-utils.js";
+[0m[35mpackages/coding-agent/src/core/tools/ls.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m { wrapToolDefinition } from "./tool-definition-wrapper.js";
+[0m[35mpackages/coding-agent/src/core/tools/ls.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m { DEFAULT_MAX_BYTES, formatSize, type TruncationResult, truncateHead } from "./truncate.js";
+[0m[35mpackages/coding-agent/src/core/tools/ls.ts[0m:[0m[32m53[0m:	theme: typeof [0m[1m[31mimport[0m("../../modes/interactive/theme/theme.js").theme,
+[0m[35mpackages/coding-agent/src/core/tools/ls.ts[0m:[0m[32m72[0m:	theme: typeof [0m[1m[31mimport[0m("../../modes/interactive/theme/theme.js").theme,
+[0m[35mpackages/coding-agent/src/core/resource-loader.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+[0m[35mpackages/coding-agent/src/core/resource-loader.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { homedir } from "node:os";
+[0m[35mpackages/coding-agent/src/core/resource-loader.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { join, resolve, sep } from "node:path";
+[0m[35mpackages/coding-agent/src/core/resource-loader.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m chalk from "chalk";
+[0m[35mpackages/coding-agent/src/core/resource-loader.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { CONFIG_DIR_NAME, getAgentDir } from "../config.js";
+[0m[35mpackages/coding-agent/src/core/resource-loader.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { loadThemeFromPath, type Theme } from "../modes/interactive/theme/theme.js";
+[0m[35mpackages/coding-agent/src/core/resource-loader.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m type { ResourceDiagnostic } from "./diagnostics.js";
+[0m[35mpackages/coding-agent/src/core/resource-loader.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m { isLocalPath } from "../utils/paths.js";
+[0m[35mpackages/coding-agent/src/core/resource-loader.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m { createEventBus, type EventBus } from "./event-bus.js";
+[0m[35mpackages/coding-agent/src/core/resource-loader.ts[0m:[0m[32m13[0m:[0m[1m[31mimport[0m { createExtensionRuntime, loadExtensionFromFactory, loadExtensions } from "./extensions/loader.js";
+[0m[35mpackages/coding-agent/src/core/resource-loader.ts[0m:[0m[32m14[0m:[0m[1m[31mimport[0m type { Extension, ExtensionFactory, ExtensionRuntime, LoadExtensionsResult } from "./extensions/types.js";
+[0m[35mpackages/coding-agent/src/core/resource-loader.ts[0m:[0m[32m15[0m:[0m[1m[31mimport[0m { DefaultPackageManager, type PathMetadata } from "./package-manager.js";
+[0m[35mpackages/coding-agent/src/core/resource-loader.ts[0m:[0m[32m16[0m:[0m[1m[31mimport[0m type { PromptTemplate } from "./prompt-templates.js";
+[0m[35mpackages/coding-agent/src/core/resource-loader.ts[0m:[0m[32m17[0m:[0m[1m[31mimport[0m { loadPromptTemplates } from "./prompt-templates.js";
+[0m[35mpackages/coding-agent/src/core/resource-loader.ts[0m:[0m[32m18[0m:[0m[1m[31mimport[0m { SettingsManager } from "./settings-manager.js";
+[0m[35mpackages/coding-agent/src/core/resource-loader.ts[0m:[0m[32m19[0m:[0m[1m[31mimport[0m type { Skill } from "./skills.js";
+[0m[35mpackages/coding-agent/src/core/resource-loader.ts[0m:[0m[32m20[0m:[0m[1m[31mimport[0m { loadSkills } from "./skills.js";
+[0m[35mpackages/coding-agent/src/core/resource-loader.ts[0m:[0m[32m21[0m:[0m[1m[31mimport[0m { createSourceInfo, type SourceInfo } from "./source-info.js";
+[0m[35mpackages/coding-agent/src/core/prompt-templates.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { existsSync, readdirSync, readFileSync, statSync } from "fs";
+[0m[35mpackages/coding-agent/src/core/prompt-templates.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { homedir } from "os";
+[0m[35mpackages/coding-agent/src/core/prompt-templates.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { basename, dirname, isAbsolute, join, resolve, sep } from "path";
+[0m[35mpackages/coding-agent/src/core/prompt-templates.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { CONFIG_DIR_NAME, getPromptsDir } from "../config.js";
+[0m[35mpackages/coding-agent/src/core/prompt-templates.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { parseFrontmatter } from "../utils/frontmatter.js";
+[0m[35mpackages/coding-agent/src/core/prompt-templates.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { createSyntheticSourceInfo, type SourceInfo } from "./source-info.js";
+[0m[35mpackages/coding-agent/src/core/session-cwd.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { existsSync } from "node:fs";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m * as crypto from "node:crypto";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m * as fs from "node:fs";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m * as os from "node:os";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m * as path from "node:path";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m type { AgentMessage } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m type { AssistantMessage, ImageContent, Message, Model, OAuthProviderId } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m type {
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m23[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m39[0m:[0m[1m[31mimport[0m { spawn, spawnSync } from "child_process";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m40[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m49[0m:[0m[1m[31mimport[0m { type AgentSession, type AgentSessionEvent, parseSkillBlock } from "../../core/agent-session.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m50[0m:[0m[1m[31mimport[0m type { AgentSessionRuntime } from "../../core/agent-session-runtime.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m51[0m:[0m[1m[31mimport[0m type {
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m58[0m:[0m[1m[31mimport[0m { FooterDataProvider, type ReadonlyFooterDataProvider } from "../../core/footer-data-provider.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m59[0m:[0m[1m[31mimport[0m { type AppKeybinding, KeybindingsManager } from "../../core/keybindings.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m60[0m:[0m[1m[31mimport[0m { createCompactionSummaryMessage } from "../../core/messages.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m61[0m:[0m[1m[31mimport[0m { findExactModelReferenceMatch, resolveModelScope } from "../../core/model-resolver.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m62[0m:[0m[1m[31mimport[0m { DefaultPackageManager } from "../../core/package-manager.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m63[0m:[0m[1m[31mimport[0m type { ResourceDiagnostic } from "../../core/resource-loader.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m64[0m:[0m[1m[31mimport[0m { formatMissingSessionCwdPrompt, MissingSessionCwdError } from "../../core/session-cwd.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m65[0m:[0m[1m[31mimport[0m { type SessionContext, SessionManager } from "../../core/session-manager.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m66[0m:[0m[1m[31mimport[0m { BUILTIN_SLASH_COMMANDS } from "../../core/slash-commands.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m67[0m:[0m[1m[31mimport[0m type { SourceInfo } from "../../core/source-info.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m68[0m:[0m[1m[31mimport[0m type { TruncationResult } from "../../core/tools/truncate.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m69[0m:[0m[1m[31mimport[0m { getChangelogPath, getNewEntries, parseChangelog } from "../../utils/changelog.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m70[0m:[0m[1m[31mimport[0m { copyToClipboard } from "../../utils/clipboard.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m71[0m:[0m[1m[31mimport[0m { extensionForImageMimeType, readClipboardImage } from "../../utils/clipboard-image.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m72[0m:[0m[1m[31mimport[0m { parseGitUrl } from "../../utils/git.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m73[0m:[0m[1m[31mimport[0m { ensureTool } from "../../utils/tools-manager.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m74[0m:[0m[1m[31mimport[0m { ActionBarComponent } from "./components/action-bar.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m75[0m:[0m[1m[31mimport[0m { ArminComponent } from "./components/armin.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m76[0m:[0m[1m[31mimport[0m { AssistantMessageComponent } from "./components/assistant-message.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m77[0m:[0m[1m[31mimport[0m { BashExecutionComponent } from "./components/bash-execution.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m78[0m:[0m[1m[31mimport[0m { BorderedLoader } from "./components/bordered-loader.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m79[0m:[0m[1m[31mimport[0m { BranchSummaryMessageComponent } from "./components/branch-summary-message.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m80[0m:[0m[1m[31mimport[0m { CompactionSummaryMessageComponent } from "./components/compaction-summary-message.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m81[0m:[0m[1m[31mimport[0m { CustomEditor } from "./components/custom-editor.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m82[0m:[0m[1m[31mimport[0m { CustomMessageComponent } from "./components/custom-message.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m83[0m:[0m[1m[31mimport[0m { DaxnutsComponent } from "./components/daxnuts.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m84[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./components/dynamic-border.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m85[0m:[0m[1m[31mimport[0m { ExtensionEditorComponent } from "./components/extension-editor.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m86[0m:[0m[1m[31mimport[0m { ExtensionInputComponent } from "./components/extension-input.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m87[0m:[0m[1m[31mimport[0m { ExtensionSelectorComponent } from "./components/extension-selector.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m88[0m:[0m[1m[31mimport[0m { FooterComponent } from "./components/footer.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m89[0m:[0m[1m[31mimport[0m { keyHint, keyText, rawKeyHint } from "./components/keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m90[0m:[0m[1m[31mimport[0m { LoginDialogComponent } from "./components/login-dialog.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m91[0m:[0m[1m[31mimport[0m { ModelSelectorComponent } from "./components/model-selector.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m92[0m:[0m[1m[31mimport[0m { OAuthSelectorComponent } from "./components/oauth-selector.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m93[0m:[0m[1m[31mimport[0m { ScopedModelsSelectorComponent } from "./components/scoped-models-selector.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m94[0m:[0m[1m[31mimport[0m { SessionSelectorComponent } from "./components/session-selector.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m95[0m:[0m[1m[31mimport[0m { SettingsSelectorComponent } from "./components/settings-selector.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m96[0m:[0m[1m[31mimport[0m { SkillInvocationMessageComponent } from "./components/skill-invocation-message.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m97[0m:[0m[1m[31mimport[0m { ToolExecutionComponent } from "./components/tool-execution.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m98[0m:[0m[1m[31mimport[0m { TreeSelectorComponent } from "./components/tree-selector.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m99[0m:[0m[1m[31mimport[0m { UserMessageComponent } from "./components/user-message.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m100[0m:[0m[1m[31mimport[0m { UserMessageSelectorComponent } from "./components/user-message-selector.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m101[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m2151[0m:			if (text.startsWith("/[0m[1m[31mimport[0m")) {
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m4162[0m:			this.showError("Usage: /[0m[1m[31mimport[0m <path.jsonl>");
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m4179[0m:			const result = await this.runtimeHost.[0m[1m[31mimport[0mFromJsonl(inputPath);
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m4186[0m:			this.showStatus(`Session [0m[1m[31mimport[0med from: ${inputPath}`);
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m4194[0m:				const result = await this.runtimeHost.[0m[1m[31mimport[0mFromJsonl(inputPath, selectedCwd);
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m4201[0m:				this.showStatus(`Session [0m[1m[31mimport[0med from: ${inputPath}`);
+[0m[35mpackages/coding-agent/src/modes/interactive/interactive-mode.ts[0m:[0m[32m4204[0m:			await this.handleFatalRuntimeError("Failed to [0m[1m[31mimport[0m session", error);
+[0m[35mpackages/coding-agent/src/core/auth-storage.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { getEnvApiKey, type OAuthCredentials, type OAuthLoginCallbacks, type OAuthProviderId } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/core/auth-storage.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m { getOAuthApiKey, getOAuthProvider, getOAuthProviders } from "@cavepi/pi-ai/oauth";
+[0m[35mpackages/coding-agent/src/core/auth-storage.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+[0m[35mpackages/coding-agent/src/core/auth-storage.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m { dirname, join } from "path";
+[0m[35mpackages/coding-agent/src/core/auth-storage.ts[0m:[0m[32m13[0m:[0m[1m[31mimport[0m lockfile from "proper-lockfile";
+[0m[35mpackages/coding-agent/src/core/auth-storage.ts[0m:[0m[32m14[0m:[0m[1m[31mimport[0m { getAgentDir } from "../config.js";
+[0m[35mpackages/coding-agent/src/core/auth-storage.ts[0m:[0m[32m15[0m:[0m[1m[31mimport[0m { resolveConfigValue } from "./resolve-config-value.js";
+[0m[35mpackages/coding-agent/src/core/bash-executor.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { randomBytes } from "node:crypto";
+[0m[35mpackages/coding-agent/src/core/bash-executor.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m { createWriteStream, type WriteStream } from "node:fs";
+[0m[35mpackages/coding-agent/src/core/bash-executor.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m { tmpdir } from "node:os";
+[0m[35mpackages/coding-agent/src/core/bash-executor.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m { join } from "node:path";
+[0m[35mpackages/coding-agent/src/core/bash-executor.ts[0m:[0m[32m13[0m:[0m[1m[31mimport[0m stripAnsi from "strip-ansi";
+[0m[35mpackages/coding-agent/src/core/bash-executor.ts[0m:[0m[32m14[0m:[0m[1m[31mimport[0m { sanitizeBinaryOutput } from "../utils/shell.js";
+[0m[35mpackages/coding-agent/src/core/bash-executor.ts[0m:[0m[32m15[0m:[0m[1m[31mimport[0m { type BashOperations, createLocalBashOperations } from "./tools/bash.js";
+[0m[35mpackages/coding-agent/src/core/bash-executor.ts[0m:[0m[32m16[0m:[0m[1m[31mimport[0m { DEFAULT_MAX_BYTES, truncateTail } from "./tools/truncate.js";
+[0m[35mpackages/coding-agent/src/core/tools/path-utils.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { accessSync, constants } from "node:fs";
+[0m[35mpackages/coding-agent/src/core/tools/path-utils.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m * as os from "node:os";
+[0m[35mpackages/coding-agent/src/core/tools/path-utils.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { isAbsolute, resolve as resolvePath } from "node:path";
+[0m[35mpackages/coding-agent/src/core/agent-session-runtime.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { copyFileSync, existsSync, mkdirSync } from "node:fs";
+[0m[35mpackages/coding-agent/src/core/agent-session-runtime.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { basename, join, resolve } from "node:path";
+[0m[35mpackages/coding-agent/src/core/agent-session-runtime.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m type { AgentSession } from "./agent-session.js";
+[0m[35mpackages/coding-agent/src/core/agent-session-runtime.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m type { AgentSessionRuntimeDiagnostic, AgentSessionServices } from "./agent-session-services.js";
+[0m[35mpackages/coding-agent/src/core/agent-session-runtime.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m type { SessionStartEvent } from "./extensions/index.js";
+[0m[35mpackages/coding-agent/src/core/agent-session-runtime.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { emitSessionShutdownEvent } from "./extensions/runner.js";
+[0m[35mpackages/coding-agent/src/core/agent-session-runtime.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m type { CreateAgentSessionResult } from "./sdk.js";
+[0m[35mpackages/coding-agent/src/core/agent-session-runtime.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { assertSessionCwdExists } from "./session-cwd.js";
+[0m[35mpackages/coding-agent/src/core/agent-session-runtime.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { SessionManager } from "./session-manager.js";
+[0m[35mpackages/coding-agent/src/core/agent-session-runtime.ts[0m:[0m[32m251[0m:	async [0m[1m[31mimport[0mFromJsonl(inputPath: string, cwdOverride?: string): Promise<{ cancelled: boolean }> {
+[0m[35mpackages/coding-agent/src/core/agent-session-runtime.ts[0m:[0m[32m297[0m: * later /new, /resume, /fork, and [0m[1m[31mimport[0m flows.
+[0m[35mpackages/coding-agent/src/core/tools/find.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { AgentTool } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/tools/find.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { Text } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/core/tools/find.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { type Static, Type } from "@sinclair/typebox";
+[0m[35mpackages/coding-agent/src/core/tools/find.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { spawnSync } from "child_process";
+[0m[35mpackages/coding-agent/src/core/tools/find.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { existsSync } from "fs";
+[0m[35mpackages/coding-agent/src/core/tools/find.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { globSync } from "glob";
+[0m[35mpackages/coding-agent/src/core/tools/find.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m path from "path";
+[0m[35mpackages/coding-agent/src/core/tools/find.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { keyHint } from "../../modes/interactive/components/keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/core/tools/find.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { ensureTool } from "../../utils/tools-manager.js";
+[0m[35mpackages/coding-agent/src/core/tools/find.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m type { ToolDefinition, ToolRenderResultOptions } from "../extensions/types.js";
+[0m[35mpackages/coding-agent/src/core/tools/find.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m { resolveToCwd } from "./path-utils.js";
+[0m[35mpackages/coding-agent/src/core/tools/find.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m { getTextOutput, invalidArgText, shortenPath, str } from "./render-utils.js";
+[0m[35mpackages/coding-agent/src/core/tools/find.ts[0m:[0m[32m13[0m:[0m[1m[31mimport[0m { wrapToolDefinition } from "./tool-definition-wrapper.js";
+[0m[35mpackages/coding-agent/src/core/tools/find.ts[0m:[0m[32m14[0m:[0m[1m[31mimport[0m { DEFAULT_MAX_BYTES, formatSize, type TruncationResult, truncateHead } from "./truncate.js";
+[0m[35mpackages/coding-agent/src/core/tools/find.ts[0m:[0m[32m61[0m:	theme: typeof [0m[1m[31mimport[0m("../../modes/interactive/theme/theme.js").theme,
+[0m[35mpackages/coding-agent/src/core/tools/find.ts[0m:[0m[32m85[0m:	theme: typeof [0m[1m[31mimport[0m("../../modes/interactive/theme/theme.js").theme,
+[0m[35mpackages/coding-agent/src/core/slash-commands.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { SourceInfo } from "./source-info.js";
+[0m[35mpackages/coding-agent/src/core/slash-commands.ts[0m:[0m[32m22[0m:	{ name: "[0m[1m[31mimport[0m", description: "Import and resume a session from a JSONL file" },
+[0m[35mpackages/coding-agent/src/modes/interactive/components/custom-message.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { TextContent } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/custom-message.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m type { Component } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/custom-message.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { Box, Container, Markdown, type MarkdownTheme, Spacer, Text } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/custom-message.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m type { MessageRenderer } from "../../../core/extensions/types.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/custom-message.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m type { CustomMessage } from "../../../core/messages.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/custom-message.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { getMarkdownTheme, theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/settings-selector.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { ThinkingLevel } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/settings-selector.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m type { Transport } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/settings-selector.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/modes/interactive/components/settings-selector.ts[0m:[0m[32m14[0m:[0m[1m[31mimport[0m { getSelectListTheme, getSettingsListTheme, theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/settings-selector.ts[0m:[0m[32m15[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./dynamic-border.js";
+[0m[35mpackages/coding-agent/src/core/source-info.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { PathMetadata } from "./package-manager.js";
+[0m[35mpackages/coding-agent/src/core/compaction/branch-summarization.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m type { AgentMessage } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/compaction/branch-summarization.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m type { Model } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/core/compaction/branch-summarization.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m { completeSimple } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/core/compaction/branch-summarization.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/core/compaction/branch-summarization.ts[0m:[0m[32m17[0m:[0m[1m[31mimport[0m type { ReadonlySessionManager, SessionEntry } from "../session-manager.js";
+[0m[35mpackages/coding-agent/src/core/compaction/branch-summarization.ts[0m:[0m[32m18[0m:[0m[1m[31mimport[0m { estimateTokens } from "./compaction.js";
+[0m[35mpackages/coding-agent/src/core/compaction/branch-summarization.ts[0m:[0m[32m19[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/core/compaction/branch-summarization.ts[0m:[0m[32m223[0m:			// If this is a summary entry, try to fit it anyway as it's [0m[1m[31mimport[0mant context
+[0m[35mpackages/coding-agent/src/core/tools/read.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { AgentTool } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/tools/read.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m type { ImageContent, TextContent } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/core/tools/read.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { Text } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/core/tools/read.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { type Static, Type } from "@sinclair/typebox";
+[0m[35mpackages/coding-agent/src/core/tools/read.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { constants } from "fs";
+[0m[35mpackages/coding-agent/src/core/tools/read.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { access as fsAccess, readFile as fsReadFile } from "fs/promises";
+[0m[35mpackages/coding-agent/src/core/tools/read.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m { keyHint } from "../../modes/interactive/components/keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/core/tools/read.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { getLanguageFromPath, highlightCode } from "../../modes/interactive/theme/theme.js";
+[0m[35mpackages/coding-agent/src/core/tools/read.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { formatDimensionNote, resizeImage } from "../../utils/image-resize.js";
+[0m[35mpackages/coding-agent/src/core/tools/read.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m { detectSupportedImageMimeTypeFromFile } from "../../utils/mime.js";
+[0m[35mpackages/coding-agent/src/core/tools/read.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m type { ToolDefinition, ToolRenderResultOptions } from "../extensions/types.js";
+[0m[35mpackages/coding-agent/src/core/tools/read.ts[0m:[0m[32m12[0m:[0m[1m[31mimport[0m { resolveReadPath } from "./path-utils.js";
+[0m[35mpackages/coding-agent/src/core/tools/read.ts[0m:[0m[32m13[0m:[0m[1m[31mimport[0m { getTextOutput, invalidArgText, replaceTabs, shortenPath, str } from "./render-utils.js";
+[0m[35mpackages/coding-agent/src/core/tools/read.ts[0m:[0m[32m14[0m:[0m[1m[31mimport[0m { wrapToolDefinition } from "./tool-definition-wrapper.js";
+[0m[35mpackages/coding-agent/src/core/tools/read.ts[0m:[0m[32m15[0m:[0m[1m[31mimport[0m { DEFAULT_MAX_BYTES, DEFAULT_MAX_LINES, formatSize, type TruncationResult, truncateHead } from "./truncate.js";
+[0m[35mpackages/coding-agent/src/core/tools/read.ts[0m:[0m[32m57[0m:	theme: typeof [0m[1m[31mimport[0m("../../modes/interactive/theme/theme.js").theme,
+[0m[35mpackages/coding-agent/src/core/tools/read.ts[0m:[0m[32m85[0m:	theme: typeof [0m[1m[31mimport[0m("../../modes/interactive/theme/theme.js").theme,
+[0m[35mpackages/coding-agent/src/core/export-html/index.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { AgentState } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/export-html/index.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { existsSync, readFileSync, writeFileSync } from "fs";
+[0m[35mpackages/coding-agent/src/core/export-html/index.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { basename, join } from "path";
+[0m[35mpackages/coding-agent/src/core/export-html/index.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { APP_NAME, getExportTemplateDir } from "../../config.js";
+[0m[35mpackages/coding-agent/src/core/export-html/index.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { getResolvedThemeColors, getThemeExportColors } from "../../modes/interactive/theme/theme.js";
+[0m[35mpackages/coding-agent/src/core/export-html/index.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m type { ToolDefinition } from "../extensions/types.js";
+[0m[35mpackages/coding-agent/src/core/export-html/index.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m type { SessionEntry } from "../session-manager.js";
+[0m[35mpackages/coding-agent/src/core/export-html/index.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { SessionManager } from "../session-manager.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/diff.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m * as Diff from "diff";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/diff.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/core/compaction/compaction.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m type { AgentMessage } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/compaction/compaction.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m type { AssistantMessage, Model, Usage } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/core/compaction/compaction.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m { completeSimple } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/core/compaction/compaction.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/core/compaction/compaction.ts[0m:[0m[32m17[0m:[0m[1m[31mimport[0m { buildSessionContext, type CompactionEntry, type SessionEntry } from "../session-manager.js";
+[0m[35mpackages/coding-agent/src/core/compaction/compaction.ts[0m:[0m[32m18[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/core/compaction/compaction.ts[0m:[0m[32m522[0m:- [Preserve [0m[1m[31mimport[0mant context, add new if needed]
+[0m[35mpackages/coding-agent/src/core/compaction/utils.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m type { AgentMessage } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/core/compaction/utils.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m type { Message } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/scoped-models-selector.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { Model } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/scoped-models-selector.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/modes/interactive/components/scoped-models-selector.ts[0m:[0m[32m13[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/scoped-models-selector.ts[0m:[0m[32m14[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./dynamic-border.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/config-selector.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { basename, dirname, join, relative } from "node:path";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/config-selector.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/modes/interactive/components/config-selector.ts[0m:[0m[32m17[0m:[0m[1m[31mimport[0m { CONFIG_DIR_NAME } from "../../../config.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/config-selector.ts[0m:[0m[32m18[0m:[0m[1m[31mimport[0m type { PathMetadata, ResolvedPaths, ResolvedResource } from "../../../core/package-manager.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/config-selector.ts[0m:[0m[32m19[0m:[0m[1m[31mimport[0m type { PackageSource, SettingsManager } from "../../../core/settings-manager.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/config-selector.ts[0m:[0m[32m20[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/config-selector.ts[0m:[0m[32m21[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./dynamic-border.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/config-selector.ts[0m:[0m[32m22[0m:[0m[1m[31mimport[0m { rawKeyHint } from "./keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/user-message-selector.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { type Component, Container, getKeybindings, Spacer, Text, truncateToWidth } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/user-message-selector.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/user-message-selector.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./dynamic-border.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/theme-selector.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { Container, type SelectItem, SelectList, type SelectListLayoutOptions } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/theme-selector.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { getAvailableThemes, getSelectListTheme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/theme-selector.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./dynamic-border.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/thinking-selector.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { ThinkingLevel } from "@cavepi/pi-agent-core";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/thinking-selector.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { Container, type SelectItem, SelectList, type SelectListLayoutOptions } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/thinking-selector.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { getSelectListTheme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/thinking-selector.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./dynamic-border.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/oauth-selector.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { OAuthProviderInterface } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/oauth-selector.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { getOAuthProviders } from "@cavepi/pi-ai/oauth";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/oauth-selector.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { Container, getKeybindings, Spacer, TruncatedText } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/oauth-selector.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m type { AuthStorage } from "../../../core/auth-storage.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/oauth-selector.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/oauth-selector.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./dynamic-border.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-editor.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { spawnSync } from "node:child_process";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-editor.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m * as fs from "node:fs";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-editor.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m * as os from "node:os";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-editor.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m * as path from "node:path";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-editor.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-editor.ts[0m:[0m[32m20[0m:[0m[1m[31mimport[0m type { KeybindingsManager } from "../../../core/keybindings.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-editor.ts[0m:[0m[32m21[0m:[0m[1m[31mimport[0m { getEditorTheme, theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-editor.ts[0m:[0m[32m22[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./dynamic-border.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-editor.ts[0m:[0m[32m23[0m:[0m[1m[31mimport[0m { keyHint } from "./keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/bordered-loader.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { CancellableLoader, Container, Loader, Spacer, Text, type TUI } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/bordered-loader.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m type { Theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/bordered-loader.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./dynamic-border.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/bordered-loader.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { keyHint } from "./keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/session-selector.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { spawnSync } from "node:child_process";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/session-selector.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { existsSync } from "node:fs";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/session-selector.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { unlink } from "node:fs/promises";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/session-selector.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m * as os from "node:os";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/session-selector.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/modes/interactive/components/session-selector.ts[0m:[0m[32m16[0m:[0m[1m[31mimport[0m { KeybindingsManager } from "../../../core/keybindings.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/session-selector.ts[0m:[0m[32m17[0m:[0m[1m[31mimport[0m type { SessionInfo, SessionListProgress } from "../../../core/session-manager.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/session-selector.ts[0m:[0m[32m18[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/session-selector.ts[0m:[0m[32m19[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./dynamic-border.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/session-selector.ts[0m:[0m[32m20[0m:[0m[1m[31mimport[0m { keyHint, keyText } from "./keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/session-selector.ts[0m:[0m[32m21[0m:[0m[1m[31mimport[0m { filterAndSortSessions, hasSessionName, type NameFilter, type SortMode } from "./session-selector-search.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/earendil-announcement.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { Container, Spacer, Text } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/earendil-announcement.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/earendil-announcement.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./dynamic-border.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/user-message.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { Container, Markdown, type MarkdownTheme, Spacer } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/user-message.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { getMarkdownTheme, theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/countdown-timer.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m type { TUI } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-selector.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { Container, getKeybindings, Spacer, Text, type TUI } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-selector.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-selector.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { CountdownTimer } from "./countdown-timer.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-selector.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./dynamic-border.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-selector.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m { keyHint, rawKeyHint } from "./keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/visual-truncate.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { Text } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/core/export-html/vendor/highlight.min.js[0m:[0m[32m1011[0m:				begin: "![0m[1m[31mimport[0mant",
+[0m[35mpackages/coding-agent/src/core/export-html/vendor/highlight.min.js[0m:[0m[32m1651[0m:			"[0m[1m[31mimport[0m",
+[0m[35mpackages/coding-agent/src/core/export-html/vendor/highlight.min.js[0m:[0m[32m1887[0m:					((v = [...Ne, "super", "[0m[1m[31mimport[0m"]), n.concat("(?!", v.join("|"), ")")),
+[0m[35mpackages/coding-agent/src/core/export-html/vendor/highlight.min.js[0m:[0m[32m2065[0m:			"[0m[1m[31mimport[0m",
+[0m[35mpackages/coding-agent/src/core/export-html/vendor/highlight.min.js[0m:[0m[32m2920[0m:						"[0m[1m[31mimport[0m",
+[0m[35mpackages/coding-agent/src/core/export-html/vendor/highlight.min.js[0m:[0m[32m3661[0m:					"[0m[1m[31mimport[0m",
+[0m[35mpackages/coding-agent/src/core/export-html/vendor/highlight.min.js[0m:[0m[32m3864[0m:						"[0m[1m[31mimport[0m",
+[0m[35mpackages/coding-agent/src/core/export-html/vendor/highlight.min.js[0m:[0m[32m3933[0m:						begin: /[0m[1m[31mimport[0m java\.[a-z]+\./,
+[0m[35mpackages/coding-agent/src/core/export-html/vendor/highlight.min.js[0m:[0m[32m3934[0m:						keywords: "[0m[1m[31mimport[0m",
+[0m[35mpackages/coding-agent/src/core/export-html/vendor/highlight.min.js[0m:[0m[32m4017[0m:						"abstract as val var vararg get set class object open private protected public noinline crossinline dynamic final enum if else do while for when throw try catch finally [0m[1m[31mimport[0m package is in fun override companion reified inline lateinit init interface annotation data sealed internal infix operator out by constructor super tailrec where const inner suspend typealias external expect actual",
+[0m[35mpackages/coding-agent/src/core/export-html/vendor/highlight.min.js[0m:[0m[32m4212[0m:					begin: "@([0m[1m[31mimport[0m|media|charset|font-face|(-[a-z]+-)?keyframes|supports|document|namespace|page|viewport|host)\\b",
+[0m[35mpackages/coding-agent/src/core/export-html/vendor/highlight.min.js[0m:[0m[32m4257[0m:						{ begin: "![0m[1m[31mimport[0mant" },
+[0m[35mpackages/coding-agent/src/core/export-html/vendor/highlight.min.js[0m:[0m[32m4546[0m:						"@[0m[1m[31mimport[0m",
+[0m[35mpackages/coding-agent/src/core/export-html/vendor/highlight.min.js[0m:[0m[32m5256[0m:					"[0m[1m[31mimport[0m",
+[0m[35mpackages/coding-agent/src/core/export-html/vendor/highlight.min.js[0m:[0m[32m5276[0m:						"__[0m[1m[31mimport[0m__",
+[0m[35mpackages/coding-agent/src/core/export-html/vendor/highlight.min.js[0m:[0m[32m6963[0m:					{ beginKeywords: "[0m[1m[31mimport[0m", end: /$/, contains: [...a], relevance: 0 },
+[0m[35mpackages/coding-agent/src/core/export-html/vendor/highlight.min.js[0m:[0m[32m7062[0m:						"addhandler alias aggregate ansi as async assembly auto binary by byref byval call case catch class compare const continue custom declare default delegate dim distinct do each equals else elseif end enum erase error event exit explicit finally for friend from function get global goto group handles if implements [0m[1m[31mimport[0ms in inherits interface into iterator join key let lib loop me mid module mustinherit mustoverride mybase myclass namespace narrowing new next notinheritable notoverridable of off on operator option optional order overloads overridable overrides paramarray partial preserve private property protected public raiseevent readonly redim removehandler resume return select set shadows shared skip static step stop structure strict sub synclock take text then throw to try unicode until using when where while widening with withevents writeonly yield",
+[0m[35mpackages/coding-agent/src/core/export-html/vendor/highlight.min.js[0m:[0m[32m7140[0m:							"[0m[1m[31mimport[0m",
+[0m[35mpackages/coding-agent/src/modes/interactive/components/login-dialog.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { getOAuthProviders } from "@cavepi/pi-ai/oauth";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/login-dialog.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { Container, type Focusable, getKeybindings, Input, Spacer, Text, type TUI } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/login-dialog.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { exec } from "child_process";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/login-dialog.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/login-dialog.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./dynamic-border.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/login-dialog.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { keyHint } from "./keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/show-images-selector.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { Container, type SelectItem, SelectList, type SelectListLayoutOptions } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/show-images-selector.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { getSelectListTheme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/show-images-selector.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./dynamic-border.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/session-selector-search.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { fuzzyMatch } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/session-selector-search.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m type { SessionInfo } from "../../../core/session-manager.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/model-selector.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { type Model, modelsAreEqual } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/model-selector.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { Container, type Focusable, fuzzyFilter, getKeybindings, Input, Spacer, Text, type TUI } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/model-selector.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m type { ModelRegistry } from "../../../core/model-registry.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/model-selector.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m type { SettingsManager } from "../../../core/settings-manager.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/model-selector.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/model-selector.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./dynamic-border.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/model-selector.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m { keyHint } from "./keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/action-bar.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { type Component, truncateToWidth, visibleWidth } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/action-bar.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/action-bar.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { keyText } from "./keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/skill-invocation-message.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { Box, Markdown, type MarkdownTheme, Text } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/skill-invocation-message.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m type { ParsedSkillBlock } from "../../../core/agent-session.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/skill-invocation-message.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { getMarkdownTheme, theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/skill-invocation-message.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { keyText } from "./keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/tree-selector.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/modes/interactive/components/tree-selector.ts[0m:[0m[32m13[0m:[0m[1m[31mimport[0m type { SessionTreeNode } from "../../../core/session-manager.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/tree-selector.ts[0m:[0m[32m14[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/tree-selector.ts[0m:[0m[32m15[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./dynamic-border.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/tree-selector.ts[0m:[0m[32m16[0m:[0m[1m[31mimport[0m { keyHint, keyText } from "./keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/daxnuts.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m type { Component, TUI } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/daxnuts.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/bash-execution.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { Container, Loader, Spacer, Text, type TUI } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/bash-execution.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m stripAnsi from "strip-ansi";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/bash-execution.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m {
+[0m[35mpackages/coding-agent/src/modes/interactive/components/bash-execution.ts[0m:[0m[32m13[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/bash-execution.ts[0m:[0m[32m14[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./dynamic-border.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/bash-execution.ts[0m:[0m[32m15[0m:[0m[1m[31mimport[0m { keyHint, keyText } from "./keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/bash-execution.ts[0m:[0m[32m16[0m:[0m[1m[31mimport[0m { truncateToVisualLines } from "./visual-truncate.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/compaction-summary-message.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { Box, Markdown, type MarkdownTheme, Spacer, Text } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/compaction-summary-message.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m type { CompactionSummaryMessage } from "../../../core/messages.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/compaction-summary-message.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { getMarkdownTheme, theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/compaction-summary-message.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { keyText } from "./keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/core/export-html/template.css[0m:[0m[32m998[0m:      #sidebar, #sidebar-resizer, #sidebar-toggle { display: none ![0m[1m[31mimport[0mant; }
+[0m[35mpackages/coding-agent/src/modes/interactive/components/custom-editor.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { Editor, type EditorOptions, type EditorTheme, type TUI } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/custom-editor.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m type { AppKeybinding, KeybindingsManager } from "../../../core/keybindings.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/branch-summary-message.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { Box, Markdown, type MarkdownTheme, Spacer, Text } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/branch-summary-message.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m type { BranchSummaryMessage } from "../../../core/messages.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/branch-summary-message.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { getMarkdownTheme, theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/branch-summary-message.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { keyText } from "./keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/assistant-message.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { AssistantMessage } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/assistant-message.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { Container, Markdown, type MarkdownTheme, Spacer, Text } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/assistant-message.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { getMarkdownTheme, theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/dynamic-border.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m type { Component } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/dynamic-border.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/armin.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m type { Component, TUI } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/armin.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/keybinding-hints.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { getKeybindings, type Keybinding, type KeyId } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/keybinding-hints.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-input.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { Container, type Focusable, getKeybindings, Input, Spacer, Text, type TUI } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-input.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-input.ts[0m:[0m[32m7[0m:[0m[1m[31mimport[0m { CountdownTimer } from "./countdown-timer.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-input.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m { DynamicBorder } from "./dynamic-border.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/extension-input.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m { keyHint } from "./keybinding-hints.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/tool-execution.ts[0m:[0m[32m1[0m:[0m[1m[31mimport[0m { Box, type Component, Container, getCapabilities, Image, Spacer, Text, type TUI } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/tool-execution.ts[0m:[0m[32m2[0m:[0m[1m[31mimport[0m type { ToolDefinition, ToolRenderContext } from "../../../core/extensions/types.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/tool-execution.ts[0m:[0m[32m3[0m:[0m[1m[31mimport[0m { allToolDefinitions } from "../../../core/tools/index.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/tool-execution.ts[0m:[0m[32m4[0m:[0m[1m[31mimport[0m { getTextOutput as getRenderedTextOutput } from "../../../core/tools/render-utils.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/tool-execution.ts[0m:[0m[32m5[0m:[0m[1m[31mimport[0m { convertToPng } from "../../../utils/image-convert.js";
+[0m[35mpackages/coding-agent/src/modes/interactive/components/tool-execution.ts[0m:[0m[32m6[0m:[0m[1m[31mimport[0m { theme } from "../theme/theme.js";
+[0m[35mpackages/coding-agent/src/core/export-html/tool-renderer.ts[0m:[0m[32m8[0m:[0m[1m[31mimport[0m type { ImageContent, TextContent } from "@cavepi/pi-ai";
+[0m[35mpackages/coding-agent/src/core/export-html/tool-renderer.ts[0m:[0m[32m9[0m:[0m[1m[31mimport[0m type { Component } from "@cavepi/pi-tui";
+[0m[35mpackages/coding-agent/src/core/export-html/tool-renderer.ts[0m:[0m[32m10[0m:[0m[1m[31mimport[0m type { Theme } from "../../modes/interactive/theme/theme.js";
+[0m[35mpackages/coding-agent/src/core/export-html/tool-renderer.ts[0m:[0m[32m11[0m:[0m[1m[31mimport[0m type { ToolDefinition, ToolRenderContext } from "../extensions/types.js";

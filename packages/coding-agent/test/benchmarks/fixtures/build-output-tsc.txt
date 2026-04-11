@@ -1,0 +1,18 @@
+[96mpackages/tui/src/utils.ts[0m:[93m32[0m:[93m100[0m - [91merror[0m[90m TS1501: [0mThis regular expression flag is only available when targeting 'es2024' or later.
+
+[7m32[0m const zeroWidthRegex = /^(?:\p{Default_Ignorable_Code_Point}|\p{Control}|\p{Mark}|\p{Surrogate})+$/v;
+[7m  [0m [91m                                                                                                   ~[0m
+
+[96mpackages/tui/src/utils.ts[0m:[93m33[0m:[93m113[0m - [91merror[0m[90m TS1501: [0mThis regular expression flag is only available when targeting 'es2024' or later.
+
+[7m33[0m const leadingNonPrintingRegex = /^[\p{Default_Ignorable_Code_Point}\p{Control}\p{Format}\p{Mark}\p{Surrogate}]+/v;
+[7m  [0m [91m                                                                                                                ~[0m
+
+[96mpackages/tui/src/utils.ts[0m:[93m34[0m:[93m40[0m - [91merror[0m[90m TS1501: [0mThis regular expression flag is only available when targeting 'es2024' or later.
+
+[7m34[0m const rgiEmojiRegex = /^\p{RGI_Emoji}$/v;
+[7m  [0m [91m                                       ~[0m
+
+
+Found 3 errors in the same file, starting at: packages/tui/src/utils.ts[90m:32[0m
+

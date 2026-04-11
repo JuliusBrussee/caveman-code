@@ -1,0 +1,600 @@
+total 8
+drwxr-xr-x@ 11 julb  staff   352 Apr  9 00:10 agent
+drwxr-xr-x@ 14 julb  staff   448 Apr  9 00:10 ai
+drwxr-xr-x@  8 julb  staff   256 Apr  8 23:37 cavekit-extension
+-rw-r--r--@  1 julb  staff  1024 Apr 10 00:05 CLAUDE.md
+drwxr-xr-x@ 16 julb  staff   512 Apr 11 11:36 coding-agent
+drwxr-xr-x@  8 julb  staff   256 Apr  9 01:00 markdown-preview
+drwxr-xr-x@ 14 julb  staff   448 Apr  9 00:10 mom
+drwxr-xr-x@  9 julb  staff   288 Apr  9 00:10 pods
+drwxr-xr-x@ 11 julb  staff   352 Apr  9 00:10 tui
+drwxr-xr-x@ 11 julb  staff   352 Apr  8 23:37 web-ui
+
+packages/agent:
+total 80
+-rw-r--r--@  1 julb  staff  10442 Apr  8 12:40 CHANGELOG.md
+drwxr-xr-x@ 22 julb  staff    704 Apr  8 12:48 dist
+drwxr-xr-x@  6 julb  staff    192 Apr  8 15:48 node_modules
+-rw-r--r--@  1 julb  staff    983 Apr  9 00:10 package.json
+-rw-r--r--@  1 julb  staff  13633 Apr  8 12:40 README.md
+drwxr-xr-x@  7 julb  staff    224 Apr  8 13:42 src
+drwxr-xr-x@  6 julb  staff    192 Apr  8 13:42 test
+-rw-r--r--@  1 julb  staff    209 Apr  8 12:40 tsconfig.build.json
+-rw-r--r--@  1 julb  staff    184 Apr  8 12:40 vitest.config.ts
+
+packages/agent/dist:
+total 552
+-rw-r--r--@ 1 julb  staff   1683 Apr  9 01:07 agent-loop.d.ts
+-rw-r--r--@ 1 julb  staff  19465 Apr  9 01:07 agent-loop.d.ts.map
+-rw-r--r--@ 1 julb  staff  15991 Apr  9 01:07 agent-loop.js
+-rw-r--r--@ 1 julb  staff  32558 Apr  9 01:07 agent-loop.js.map
+-rw-r--r--@ 1 julb  staff   5621 Apr  9 01:07 agent.d.ts
+-rw-r--r--@ 1 julb  staff  21450 Apr  9 01:07 agent.d.ts.map
+-rw-r--r--@ 1 julb  staff  14464 Apr  9 01:07 agent.js
+-rw-r--r--@ 1 julb  staff  29863 Apr  9 01:07 agent.js.map
+-rw-r--r--@ 1 julb  staff    152 Apr  9 01:07 index.d.ts
+-rw-r--r--@ 1 julb  staff    403 Apr  9 01:07 index.d.ts.map
+-rw-r--r--@ 1 julb  staff    210 Apr  9 01:07 index.js
+-rw-r--r--@ 1 julb  staff    447 Apr  9 01:07 index.js.map
+-rw-r--r--@ 1 julb  staff   2545 Apr  9 01:07 proxy.d.ts
+-rw-r--r--@ 1 julb  staff  12793 Apr  9 01:07 proxy.d.ts.map
+-rw-r--r--@ 1 julb  staff  10364 Apr  9 01:07 proxy.js
+-rw-r--r--@ 1 julb  staff  18921 Apr  9 01:07 proxy.js.map
+-rw-r--r--@ 1 julb  staff  12940 Apr  9 01:07 types.d.ts
+-rw-r--r--@ 1 julb  staff  18239 Apr  9 01:07 types.d.ts.map
+-rw-r--r--@ 1 julb  staff     44 Apr  9 01:07 types.js
+-rw-r--r--@ 1 julb  staff  13379 Apr  9 01:07 types.js.map
+
+packages/agent/node_modules:
+total 0
+drwxr-xr-x@  3 julb  staff    96 Apr  8 12:47 @types
+drwxr-xr-x@ 47 julb  staff  1504 Apr  8 12:47 undici-types
+
+packages/agent/node_modules/@types:
+total 0
+drwxr-xr-x@ 64 julb  staff  2048 Apr  8 12:48 node
+
+packages/agent/node_modules/@types/node:
+total 4832
+drwxr-xr-x@  3 julb  staff      96 Apr  8 12:48 assert
+-rw-r--r--@  1 julb  staff   46664 Apr  8 12:48 assert.d.ts
+-rw-r--r--@  1 julb  staff   26208 Apr  8 12:48 async_hooks.d.ts
+-rw-r--r--@  1 julb  staff   22839 Apr  8 12:48 buffer.buffer.d.ts
+-rw-r--r--@  1 julb  staff   88244 Apr  8 12:48 buffer.d.ts
+-rw-r--r--@  1 julb  staff   66808 Apr  8 12:48 child_process.d.ts
+-rw-r--r--@  1 julb  staff   27926 Apr  8 12:48 cluster.d.ts
+drwxr-xr-x@  3 julb  staff      96 Apr  8 12:48 compatibility
+-rw-r--r--@  1 julb  staff   21366 Apr  8 12:48 console.d.ts
+-rw-r--r--@  1 julb  staff     816 Apr  8 12:48 constants.d.ts
+-rw-r--r--@  1 julb  staff  225899 Apr  8 12:48 crypto.d.ts
+-rw-r--r--@  1 julb  staff   28114 Apr  8 12:48 dgram.d.ts
+-rw-r--r--@  1 julb  staff   25048 Apr  8 12:48 diagnostics_channel.d.ts
+drwxr-xr-x@  3 julb  staff      96 Apr  8 12:48 dns
+-rw-r--r--@  1 julb  staff   37036 Apr  8 12:48 dns.d.ts
+-rw-r--r--@  1 julb  staff    7812 Apr  8 12:48 domain.d.ts
+-rw-r--r--@  1 julb  staff   44252 Apr  8 12:48 events.d.ts
+drwxr-xr-x@  3 julb  staff      96 Apr  8 12:48 fs
+-rw-r--r--@  1 julb  staff  201224 Apr  8 12:48 fs.d.ts
+-rw-r--r--@  1 julb  staff    5907 Apr  8 12:48 globals.d.ts
+-rw-r--r--@  1 julb  staff    2029 Apr  8 12:48 globals.typedarray.d.ts
+-rw-r--r--@  1 julb  staff   96542 Apr  8 12:48 http.d.ts
+-rw-r--r--@  1 julb  staff  132111 Apr  8 12:48 http2.d.ts
+-rw-r--r--@  1 julb  staff   26256 Apr  8 12:48 https.d.ts
+-rw-r--r--@  1 julb  staff    4377 Apr  8 12:48 index.d.ts
+-rw-r--r--@  1 julb  staff   12288 Apr  8 12:48 inspector.d.ts
+-rw-r--r--@  1 julb  staff  215115 Apr  8 12:48 inspector.generated.d.ts
+-rw-r--r--@  1 julb  staff    1141 Apr  8 12:48 LICENSE
+-rw-r--r--@  1 julb  staff   41229 Apr  8 12:48 module.d.ts
+-rw-r--r--@  1 julb  staff   49066 Apr  8 12:48 net.d.ts
+-rw-r--r--@  1 julb  staff   19433 Apr  8 12:48 os.d.ts
+-rw-r--r--@  1 julb  staff    4510 Apr  8 12:48 package.json
+-rw-r--r--@  1 julb  staff    8333 Apr  8 12:48 path.d.ts
+-rw-r--r--@  1 julb  staff   41743 Apr  8 12:48 perf_hooks.d.ts
+-rw-r--r--@  1 julb  staff  107511 Apr  8 12:48 process.d.ts
+-rw-r--r--@  1 julb  staff    5479 Apr  8 12:48 punycode.d.ts
+-rw-r--r--@  1 julb  staff    7125 Apr  8 12:48 querystring.d.ts
+drwxr-xr-x@  3 julb  staff      96 Apr  8 12:48 readline
+-rw-r--r--@  1 julb  staff   25878 Apr  8 12:48 readline.d.ts
+-rw-r--r--@  1 julb  staff    1586 Apr  8 12:48 README.md
+-rw-r--r--@  1 julb  staff   19901 Apr  8 12:48 repl.d.ts
+-rw-r--r--@  1 julb  staff    6638 Apr  8 12:48 sea.d.ts
+-rw-r--r--@  1 julb  staff   46563 Apr  8 12:48 sqlite.d.ts
+drwxr-xr-x@  5 julb  staff     160 Apr  8 12:48 stream
+-rw-r--r--@  1 julb  staff   87641 Apr  8 12:48 stream.d.ts
+-rw-r--r--@  1 julb  staff    2809 Apr  8 12:48 string_decoder.d.ts
+-rw-r--r--@  1 julb  staff  110520 Apr  8 12:48 test.d.ts
+drwxr-xr-x@  3 julb  staff      96 Apr  8 12:48 timers
+-rw-r--r--@  1 julb  staff   14570 Apr  8 12:48 timers.d.ts
+-rw-r--r--@  1 julb  staff   60652 Apr  8 12:48 tls.d.ts
+-rw-r--r--@  1 julb  staff    8926 Apr  8 12:48 trace_events.d.ts
+drwxr-xr-x@  6 julb  staff     192 Apr  8 12:48 ts5.6
+drwxr-xr-x@  4 julb  staff     128 Apr  8 12:48 ts5.7
+-rw-r--r--@  1 julb  staff   10053 Apr  8 12:48 tty.d.ts
+-rw-r--r--@  1 julb  staff   45851 Apr  8 12:48 url.d.ts
+-rw-r--r--@  1 julb  staff   91407 Apr  8 12:48 util.d.ts
+-rw-r--r--@  1 julb  staff   40433 Apr  8 12:48 v8.d.ts
+-rw-r--r--@  1 julb  staff   55223 Apr  8 12:48 vm.d.ts
+-rw-r--r--@  1 julb  staff    9120 Apr  8 12:48 wasi.d.ts
+drwxr-xr-x@ 10 julb  staff     320 Apr  8 12:48 web-globals
+-rw-r--r--@  1 julb  staff   41901 Apr  8 12:48 worker_threads.d.ts
+-rw-r--r--@  1 julb  staff   27864 Apr  8 12:48 zlib.d.ts
+
+packages/agent/node_modules/@types/node/assert:
+total 8
+-rw-r--r--@ 1 julb  staff  3003 Apr  8 12:48 strict.d.ts
+
+packages/agent/node_modules/@types/node/compatibility:
+total 8
+-rw-r--r--@ 1 julb  staff  1303 Apr  8 12:48 iterators.d.ts
+
+packages/agent/node_modules/@types/node/dns:
+total 48
+-rw-r--r--@ 1 julb  staff  21107 Apr  8 12:48 promises.d.ts
+
+packages/agent/node_modules/@types/node/fs:
+total 112
+-rw-r--r--@ 1 julb  staff  57251 Apr  8 12:48 promises.d.ts
+
+packages/agent/node_modules/@types/node/readline:
+total 16
+-rw-r--r--@ 1 julb  staff  6439 Apr  8 12:48 promises.d.ts
+
+packages/agent/node_modules/@types/node/stream:
+total 72
+-rw-r--r--@ 1 julb  staff   1619 Apr  8 12:48 consumers.d.ts
+-rw-r--r--@ 1 julb  staff   2971 Apr  8 12:48 promises.d.ts
+-rw-r--r--@ 1 julb  staff  27400 Apr  8 12:48 web.d.ts
+
+packages/agent/node_modules/@types/node/timers:
+total 8
+-rw-r--r--@ 1 julb  staff  3780 Apr  8 12:48 promises.d.ts
+
+packages/agent/node_modules/@types/node/ts5.6:
+total 72
+-rw-r--r--@ 1 julb  staff  22077 Apr  8 12:48 buffer.buffer.d.ts
+drwxr-xr-x@ 3 julb  staff     96 Apr  8 12:48 compatibility
+-rw-r--r--@ 1 julb  staff   1238 Apr  8 12:48 globals.typedarray.d.ts
+-rw-r--r--@ 1 julb  staff   4666 Apr  8 12:48 index.d.ts
+
+packages/agent/node_modules/@types/node/ts5.6/compatibility:
+total 8
+-rw-r--r--@ 1 julb  staff  3811 Apr  8 12:48 float16array.d.ts
+
+packages/agent/node_modules/@types/node/ts5.7:
+total 16
+drwxr-xr-x@ 3 julb  staff    96 Apr  8 12:48 compatibility
+-rw-r--r--@ 1 julb  staff  4653 Apr  8 12:48 index.d.ts
+
+packages/agent/node_modules/@types/node/ts5.7/compatibility:
+total 8
+-rw-r--r--@ 1 julb  staff  3872 Apr  8 12:48 float16array.d.ts
+
+packages/agent/node_modules/@types/node/web-globals:
+total 64
+-rw-r--r--@ 1 julb  staff  1145 Apr  8 12:48 abortcontroller.d.ts
+-rw-r--r--@ 1 julb  staff  1037 Apr  8 12:48 crypto.d.ts
+-rw-r--r--@ 1 julb  staff  2565 Apr  8 12:48 domexception.d.ts
+-rw-r--r--@ 1 julb  staff  2871 Apr  8 12:48 events.d.ts
+-rw-r--r--@ 1 julb  staff  3112 Apr  8 12:48 fetch.d.ts
+-rw-r--r--@ 1 julb  staff   891 Apr  8 12:48 navigator.d.ts
+-rw-r--r--@ 1 julb  staff   724 Apr  8 12:48 storage.d.ts
+-rw-r--r--@ 1 julb  staff   774 Apr  8 12:48 streams.d.ts
+
+packages/agent/node_modules/undici-types:
+total 456
+-rw-r--r--@ 1 julb  staff   1162 Apr  8 12:47 agent.d.ts
+-rw-r--r--@ 1 julb  staff   1599 Apr  8 12:47 api.d.ts
+-rw-r--r--@ 1 julb  staff    957 Apr  8 12:47 balanced-pool.d.ts
+-rw-r--r--@ 1 julb  staff   4120 Apr  8 12:47 cache-interceptor.d.ts
+-rw-r--r--@ 1 julb  staff   1251 Apr  8 12:47 cache.d.ts
+-rw-r--r--@ 1 julb  staff    456 Apr  8 12:47 client-stats.d.ts
+-rw-r--r--@ 1 julb  staff   5003 Apr  8 12:47 client.d.ts
+-rw-r--r--@ 1 julb  staff   1029 Apr  8 12:47 connector.d.ts
+-rw-r--r--@ 1 julb  staff    561 Apr  8 12:47 content-type.d.ts
+-rw-r--r--@ 1 julb  staff    696 Apr  8 12:47 cookies.d.ts
+-rw-r--r--@ 1 julb  staff   1766 Apr  8 12:47 diagnostics-channel.d.ts
+-rw-r--r--@ 1 julb  staff  15586 Apr  8 12:47 dispatcher.d.ts
+-rw-r--r--@ 1 julb  staff    732 Apr  8 12:47 env-http-proxy-agent.d.ts
+-rw-r--r--@ 1 julb  staff   4439 Apr  8 12:47 errors.d.ts
+-rw-r--r--@ 1 julb  staff   1794 Apr  8 12:47 eventsource.d.ts
+-rw-r--r--@ 1 julb  staff   5651 Apr  8 12:47 fetch.d.ts
+-rw-r--r--@ 1 julb  staff   5004 Apr  8 12:47 formdata.d.ts
+-rw-r--r--@ 1 julb  staff    275 Apr  8 12:47 global-dispatcher.d.ts
+-rw-r--r--@ 1 julb  staff    176 Apr  8 12:47 global-origin.d.ts
+-rw-r--r--@ 1 julb  staff   3701 Apr  8 12:47 h2c-client.d.ts
+-rw-r--r--@ 1 julb  staff    451 Apr  8 12:47 handlers.d.ts
+-rw-r--r--@ 1 julb  staff   3336 Apr  8 12:47 header.d.ts
+-rw-r--r--@ 1 julb  staff   4004 Apr  8 12:47 index.d.ts
+-rw-r--r--@ 1 julb  staff   1988 Apr  8 12:47 interceptors.d.ts
+-rw-r--r--@ 1 julb  staff   1090 Apr  8 12:47 LICENSE
+-rw-r--r--@ 1 julb  staff   3448 Apr  8 12:47 mock-agent.d.ts
+-rw-r--r--@ 1 julb  staff   5558 Apr  8 12:47 mock-call-history.d.ts
+-rw-r--r--@ 1 julb  staff   1065 Apr  8 12:47 mock-client.d.ts
+-rw-r--r--@ 1 julb  staff    336 Apr  8 12:47 mock-errors.d.ts
+-rw-r--r--@ 1 julb  staff   3931 Apr  8 12:47 mock-interceptor.d.ts
+-rw-r--r--@ 1 julb  staff   1037 Apr  8 12:47 mock-pool.d.ts
+-rw-r--r--@ 1 julb  staff   1193 Apr  8 12:47 package.json
+-rw-r--r--@ 1 julb  staff    599 Apr  8 12:47 patch.d.ts
+-rw-r--r--@ 1 julb  staff    663 Apr  8 12:47 pool-stats.d.ts
+-rw-r--r--@ 1 julb  staff   1485 Apr  8 12:47 pool.d.ts
+-rw-r--r--@ 1 julb  staff    806 Apr  8 12:47 proxy-agent.d.ts
+-rw-r--r--@ 1 julb  staff   1900 Apr  8 12:47 readable.d.ts
+-rw-r--r--@ 1 julb  staff    455 Apr  8 12:47 README.md
+-rw-r--r--@ 1 julb  staff    233 Apr  8 12:47 retry-agent.d.ts
+-rw-r--r--@ 1 julb  staff   3262 Apr  8 12:47 retry-handler.d.ts
+-rw-r--r--@ 1 julb  staff   3048 Apr  8 12:47 snapshot-agent.d.ts
+-rw-r--r--@ 1 julb  staff    623 Apr  8 12:47 util.d.ts
+-rw-r--r--@ 1 julb  staff    245 Apr  8 12:47 utility.d.ts
+-rw-r--r--@ 1 julb  staff   8725 Apr  8 12:47 webidl.d.ts
+-rw-r--r--@ 1 julb  staff   4692 Apr  8 12:47 websocket.d.ts
+
+packages/agent/src:
+total 136
+-rw-r--r--@ 1 julb  staff  16538 Apr  8 13:42 agent-loop.ts
+-rw-r--r--@ 1 julb  staff  16303 Apr  8 13:42 agent.ts
+-rw-r--r--@ 1 julb  staff    177 Apr  8 12:40 index.ts
+-rw-r--r--@ 1 julb  staff   9671 Apr  8 13:42 proxy.ts
+-rw-r--r--@ 1 julb  staff  12631 Apr  8 13:42 types.ts
+
+packages/agent/test:
+total 112
+-rw-r--r--@ 1 julb  staff  22401 Apr  8 13:42 agent-loop.test.ts
+-rw-r--r--@ 1 julb  staff  13626 Apr  8 13:42 agent.test.ts
+-rw-r--r--@ 1 julb  staff  12522 Apr  8 13:42 e2e.test.ts
+drwxr-xr-x@ 4 julb  staff    128 Apr  8 12:40 utils
+
+packages/agent/test/utils:
+total 16
+-rw-r--r--@ 1 julb  staff  1059 Apr  8 12:40 calculate.ts
+-rw-r--r--@ 1 julb  staff  1507 Apr  8 12:40 get-current-time.ts
+
+packages/ai:
+total 272
+-rw-r--r--@  1 julb  staff     44 Apr  8 12:40 bedrock-provider.d.ts
+-rw-r--r--@  1 julb  staff     44 Apr  8 12:40 bedrock-provider.js
+-rw-r--r--@  1 julb  staff  62700 Apr  8 12:40 CHANGELOG.md
+drwxr-xr-x@ 44 julb  staff   1408 Apr  8 12:48 dist
+drwxr-xr-x@  6 julb  staff    192 Apr  8 15:55 node_modules
+-rw-r--r--@  1 julb  staff   3022 Apr  9 00:10 package.json
+-rw-r--r--@  1 julb  staff  49605 Apr  8 12:40 README.md
+drwxr-xr-x@  4 julb  staff    128 Apr  8 23:37 scripts
+drwxr-xr-x@ 14 julb  staff    448 Apr  8 13:42 src
+drwxr-xr-x@ 51 julb  staff   1632 Apr  8 12:40 test
+-rw-r--r--@  1 julb  staff    209 Apr  8 23:37 tsconfig.build.json
+-rw-r--r--@  1 julb  staff    184 Apr  8 23:37 vitest.config.ts
+
+packages/ai/dist:
+total 4496
+-rw-r--r--@  1 julb  staff    1233 Apr  9 01:07 api-registry.d.ts
+-rw-r--r--@  1 julb  staff    3913 Apr  9 01:07 api-registry.d.ts.map
+-rw-r--r--@  1 julb  staff    1444 Apr  9 01:07 api-registry.js
+-rw-r--r--@  1 julb  staff    4424 Apr  9 01:07 api-registry.js.map
+-rw-r--r--@  1 julb  staff     365 Apr  9 01:07 bedrock-provider.d.ts
+-rw-r--r--@  1 julb  staff     357 Apr  9 01:07 bedrock-provider.d.ts.map
+-rw-r--r--@  1 julb  staff     214 Apr  9 01:07 bedrock-provider.js
+-rw-r--r--@  1 julb  staff     441 Apr  9 01:07 bedrock-provider.js.map
+-rw-r--r--@  1 julb  staff      64 Apr  9 01:07 cli.d.ts
+-rw-r--r--@  1 julb  staff    4303 Apr  9 01:07 cli.d.ts.map
+-rwxr-xr-x@  1 julb  staff    4038 Apr  9 01:07 cli.js
+-rw-r--r--@  1 julb  staff    8609 Apr  9 01:07 cli.js.map
+-rw-r--r--@  1 julb  staff     413 Apr  9 01:07 env-api-keys.d.ts
+-rw-r--r--@  1 julb  staff    5755 Apr  9 01:07 env-api-keys.d.ts.map
+-rw-r--r--@  1 julb  staff    4832 Apr  9 01:07 env-api-keys.js
+-rw-r--r--@  1 julb  staff    8878 Apr  9 01:07 env-api-keys.js.map
+-rw-r--r--@  1 julb  staff    1540 Apr  9 01:07 index.d.ts
+-rw-r--r--@  1 julb  staff    2678 Apr  9 01:07 index.d.ts.map
+-rw-r--r--@  1 julb  staff     518 Apr  9 01:07 index.js
+-rw-r--r--@  1 julb  staff    2042 Apr  9 01:07 index.js.map
+-rw-r--r--@  1 julb  staff    1473 Apr  9 01:07 models.d.ts
+-rw-r--r--@  1 julb  staff    4303 Apr  9 01:07 models.d.ts.map
+-rw-r--r--@  1 julb  staff  430374 Apr  9 01:07 models.generated.d.ts
+-rw-r--r--@  1 julb  staff  449990 Apr  9 01:07 models.generated.d.ts.map
+-rw-r--r--@  1 julb  staff  463070 Apr  9 01:07 models.generated.js
+-rw-r--r--@  1 julb  staff  723989 Apr  9 01:07 models.generated.js.map
+-rw-r--r--@  1 julb  staff    2045 Apr  9 01:07 models.js
+-rw-r--r--@  1 julb  staff    5338 Apr  9 01:07 models.js.map
+-rw-r--r--@  1 julb  staff      75 Apr  9 01:07 oauth.d.ts
+-rw-r--r--@  1 julb  staff     190 Apr  9 01:07 oauth.d.ts.map
+-rw-r--r--@  1 julb  staff      73 Apr  9 01:07 oauth.js
+-rw-r--r--@  1 julb  staff     188 Apr  9 01:07 oauth.js.map
+drwxr-xr-x@ 70 julb  staff    2240 Apr  8 12:48 providers
+-rw-r--r--@  1 julb  staff     883 Apr  9 01:07 stream.d.ts
+-rw-r--r--@  1 julb  staff    2492 Apr  9 01:07 stream.d.ts.map
+-rw-r--r--@  1 julb  staff     975 Apr  9 01:07 stream.js
+-rw-r--r--@  1 julb  staff    2785 Apr  9 01:07 stream.js.map
+-rw-r--r--@  1 julb  staff   11684 Apr  9 01:07 types.d.ts
+-rw-r--r--@  1 julb  staff   20211 Apr  9 01:07 types.d.ts.map
+-rw-r--r--@  1 julb  staff      44 Apr  9 01:07 types.js
+-rw-r--r--@  1 julb  staff   13093 Apr  9 01:07 types.js.map
+drwxr-xr-x@ 31 julb  staff     992 Apr  8 12:48 utils
+
+packages/ai/dist/providers:
+total 2632
+-rw-r--r--@ 1 julb  staff   1052 Apr  9 01:07 amazon-bedrock.d.ts
+-rw-r--r--@ 1 julb  staff  30329 Apr  9 01:07 amazon-bedrock.d.ts.map
+-rw-r--r--@ 1 julb  staff  28653 Apr  9 01:07 amazon-bedrock.js
+-rw-r--r--@ 1 julb  staff  51734 Apr  9 01:07 amazon-bedrock.js.map
+-rw-r--r--@ 1 julb  staff   1776 Apr  9 01:07 anthropic.d.ts
+-rw-r--r--@ 1 julb  staff  32680 Apr  9 01:07 anthropic.d.ts.map
+-rw-r--r--@ 1 julb  staff  31602 Apr  9 01:07 anthropic.js
+-rw-r--r--@ 1 julb  staff  56490 Apr  9 01:07 anthropic.js.map
+-rw-r--r--@ 1 julb  staff    765 Apr  9 01:07 azure-openai-responses.d.ts
+-rw-r--r--@ 1 julb  staff   9081 Apr  9 01:07 azure-openai-responses.d.ts.map
+-rw-r--r--@ 1 julb  staff   7092 Apr  9 01:07 azure-openai-responses.js
+-rw-r--r--@ 1 julb  staff  15127 Apr  9 01:07 azure-openai-responses.js.map
+-rw-r--r--@ 1 julb  staff   2106 Apr  9 01:07 faux.d.ts
+-rw-r--r--@ 1 julb  staff  18925 Apr  9 01:07 faux.d.ts.map
+-rw-r--r--@ 1 julb  staff  14238 Apr  9 01:07 faux.js
+-rw-r--r--@ 1 julb  staff  31880 Apr  9 01:07 faux.js.map
+-rw-r--r--@ 1 julb  staff    397 Apr  9 01:07 github-copilot-headers.d.ts
+-rw-r--r--@ 1 julb  staff   1770 Apr  9 01:07 github-copilot-headers.d.ts.map
+-rw-r--r--@ 1 julb  staff   1133 Apr  9 01:07 github-copilot-headers.js
+-rw-r--r--@ 1 julb  staff   2511 Apr  9 01:07 github-copilot-headers.js.map
+-rw-r--r--@ 1 julb  staff   3048 Apr  9 01:07 google-gemini-cli.d.ts
+-rw-r--r--@ 1 julb  staff  37556 Apr  9 01:07 google-gemini-cli.d.ts.map
+-rw-r--r--@ 1 julb  staff  37242 Apr  9 01:07 google-gemini-cli.js
+-rw-r--r--@ 1 julb  staff  61002 Apr  9 01:07 google-gemini-cli.js.map
+-rw-r--r--@ 1 julb  staff   3260 Apr  9 01:07 google-shared.d.ts
+-rw-r--r--@ 1 julb  staff  14388 Apr  9 01:07 google-shared.d.ts.map
+-rw-r--r--@ 1 julb  staff  13689 Apr  9 01:07 google-shared.js
+-rw-r--r--@ 1 julb  staff  22076 Apr  9 01:07 google-shared.js.map
+-rw-r--r--@ 1 julb  staff    661 Apr  9 01:07 google-vertex.d.ts
+-rw-r--r--@ 1 julb  staff  18945 Apr  9 01:07 google-vertex.d.ts.map
+-rw-r--r--@ 1 julb  staff  18201 Apr  9 01:07 google-vertex.js
+-rw-r--r--@ 1 julb  staff  32594 Apr  9 01:07 google-vertex.js.map
+-rw-r--r--@ 1 julb  staff    599 Apr  9 01:07 google.d.ts
+-rw-r--r--@ 1 julb  staff  16977 Apr  9 01:07 google.d.ts.map
+-rw-r--r--@ 1 julb  staff  16643 Apr  9 01:07 google.js
+-rw-r--r--@ 1 julb  staff  29291 Apr  9 01:07 google.js.map
+-rw-r--r--@ 1 julb  staff    753 Apr  9 01:07 mistral.d.ts
+-rw-r--r--@ 1 julb  staff  21348 Apr  9 01:07 mistral.d.ts.map
+-rw-r--r--@ 1 julb  staff  20020 Apr  9 01:07 mistral.js
+-rw-r--r--@ 1 julb  staff  39351 Apr  9 01:07 mistral.js.map
+-rw-r--r--@ 1 julb  staff    653 Apr  9 01:07 openai-codex-responses.d.ts
+-rw-r--r--@ 1 julb  staff  32514 Apr  9 01:07 openai-codex-responses.d.ts.map
+-rw-r--r--@ 1 julb  staff  28541 Apr  9 01:07 openai-codex-responses.js
+-rw-r--r--@ 1 julb  staff  58801 Apr  9 01:07 openai-codex-responses.js.map
+-rw-r--r--@ 1 julb  staff    932 Apr  9 01:07 openai-completions.d.ts
+-rw-r--r--@ 1 julb  staff  35162 Apr  9 01:07 openai-completions.d.ts.map
+-rw-r--r--@ 1 julb  staff  34777 Apr  9 01:07 openai-completions.js
+-rw-r--r--@ 1 julb  staff  60604 Apr  9 01:07 openai-completions.js.map
+-rw-r--r--@ 1 julb  staff   1356 Apr  9 01:07 openai-responses-shared.d.ts
+-rw-r--r--@ 1 julb  staff  21754 Apr  9 01:07 openai-responses-shared.d.ts.map
+-rw-r--r--@ 1 julb  staff  20855 Apr  9 01:07 openai-responses-shared.js
+-rw-r--r--@ 1 julb  staff  37836 Apr  9 01:07 openai-responses-shared.js.map
+-rw-r--r--@ 1 julb  staff    757 Apr  9 01:07 openai-responses.d.ts
+-rw-r--r--@ 1 julb  staff   9011 Apr  9 01:07 openai-responses.d.ts.map
+-rw-r--r--@ 1 julb  staff   7260 Apr  9 01:07 openai-responses.js
+-rw-r--r--@ 1 julb  staff  15066 Apr  9 01:07 openai-responses.js.map
+-rw-r--r--@ 1 julb  staff   3262 Apr  9 01:07 register-builtins.d.ts
+-rw-r--r--@ 1 julb  staff  18477 Apr  9 01:07 register-builtins.d.ts.map
+-rw-r--r--@ 1 julb  staff  10136 Apr  9 01:07 register-builtins.js
+-rw-r--r--@ 1 julb  staff  24680 Apr  9 01:07 register-builtins.js.map
+-rw-r--r--@ 1 julb  staff    622 Apr  9 01:07 simple-options.d.ts
+-rw-r--r--@ 1 julb  staff   2262 Apr  9 01:07 simple-options.d.ts.map
+-rw-r--r--@ 1 julb  staff   1309 Apr  9 01:07 simple-options.js
+-rw-r--r--@ 1 julb  staff   2968 Apr  9 01:07 simple-options.js.map
+-rw-r--r--@ 1 julb  staff    559 Apr  9 01:07 transform-messages.d.ts
+-rw-r--r--@ 1 julb  staff   6940 Apr  9 01:07 transform-messages.d.ts.map
+-rw-r--r--@ 1 julb  staff   7020 Apr  9 01:07 transform-messages.js
+-rw-r--r--@ 1 julb  staff  11174 Apr  9 01:07 transform-messages.js.map
+
+packages/ai/dist/utils:
+total 272
+-rw-r--r--@  1 julb  staff   880 Apr  9 01:07 event-stream.d.ts
+-rw-r--r--@  1 julb  staff  3447 Apr  9 01:07 event-stream.d.ts.map
+-rw-r--r--@  1 julb  staff  2469 Apr  9 01:07 event-stream.js
+-rw-r--r--@  1 julb  staff  4964 Apr  9 01:07 event-stream.js.map
+-rw-r--r--@  1 julb  staff   145 Apr  9 01:07 hash.d.ts
+-rw-r--r--@  1 julb  staff   764 Apr  9 01:07 hash.d.ts.map
+-rw-r--r--@  1 julb  staff   595 Apr  9 01:07 hash.js
+-rw-r--r--@  1 julb  staff  1564 Apr  9 01:07 hash.js.map
+-rw-r--r--@  1 julb  staff   393 Apr  9 01:07 json-parse.d.ts
+-rw-r--r--@  1 julb  staff  1110 Apr  9 01:07 json-parse.d.ts.map
+-rw-r--r--@  1 julb  staff   889 Apr  9 01:07 json-parse.js
+-rw-r--r--@  1 julb  staff  1512 Apr  9 01:07 json-parse.js.map
+drwxr-xr-x@ 38 julb  staff  1216 Apr  8 12:48 oauth
+-rw-r--r--@  1 julb  staff  2633 Apr  9 01:07 overflow.d.ts
+-rw-r--r--@  1 julb  staff  7530 Apr  9 01:07 overflow.d.ts.map
+-rw-r--r--@  1 julb  staff  6955 Apr  9 01:07 overflow.js
+-rw-r--r--@  1 julb  staff  8796 Apr  9 01:07 overflow.js.map
+-rw-r--r--@  1 julb  staff   951 Apr  9 01:07 sanitize-unicode.d.ts
+-rw-r--r--@  1 julb  staff  1451 Apr  9 01:07 sanitize-unicode.d.ts.map
+-rw-r--r--@  1 julb  staff  1204 Apr  9 01:07 sanitize-unicode.js
+-rw-r--r--@  1 julb  staff  1526 Apr  9 01:07 sanitize-unicode.js.map
+-rw-r--r--@  1 julb  staff   641 Apr  9 01:07 typebox-helpers.d.ts
+-rw-r--r--@  1 julb  staff  1293 Apr  9 01:07 typebox-helpers.d.ts.map
+-rw-r--r--@  1 julb  staff   734 Apr  9 01:07 typebox-helpers.js
+-rw-r--r--@  1 julb  staff  1370 Apr  9 01:07 typebox-helpers.js.map
+-rw-r--r--@  1 julb  staff   834 Apr  9 01:07 validation.d.ts
+-rw-r--r--@  1 julb  staff  3521 Apr  9 01:07 validation.d.ts.map
+-rw-r--r--@  1 julb  staff  3017 Apr  9 01:07 validation.js
+-rw-r--r--@  1 julb  staff  5396 Apr  9 01:07 validation.js.map
+
+packages/ai/dist/utils/oauth:
+total 808
+-rw-r--r--@ 1 julb  staff    914 Apr  9 01:07 anthropic.d.ts
+-rw-r--r--@ 1 julb  staff  13671 Apr  9 01:07 anthropic.d.ts.map
+-rw-r--r--@ 1 julb  staff  12167 Apr  9 01:07 anthropic.js
+-rw-r--r--@ 1 julb  staff  23642 Apr  9 01:07 anthropic.js.map
+-rw-r--r--@ 1 julb  staff   1252 Apr  9 01:07 github-copilot.d.ts
+-rw-r--r--@ 1 julb  staff  13776 Apr  9 01:07 github-copilot.d.ts.map
+-rw-r--r--@ 1 julb  staff  11125 Apr  9 01:07 github-copilot.js
+-rw-r--r--@ 1 julb  staff  22085 Apr  9 01:07 github-copilot.js.map
+-rw-r--r--@ 1 julb  staff   1226 Apr  9 01:07 google-antigravity.d.ts
+-rw-r--r--@ 1 julb  staff  15436 Apr  9 01:07 google-antigravity.d.ts.map
+-rw-r--r--@ 1 julb  staff  14210 Apr  9 01:07 google-antigravity.js
+-rw-r--r--@ 1 julb  staff  25243 Apr  9 01:07 google-antigravity.js.map
+-rw-r--r--@ 1 julb  staff   1213 Apr  9 01:07 google-gemini-cli.d.ts
+-rw-r--r--@ 1 julb  staff  19977 Apr  9 01:07 google-gemini-cli.d.ts.map
+-rw-r--r--@ 1 julb  staff  18117 Apr  9 01:07 google-gemini-cli.js
+-rw-r--r--@ 1 julb  staff  33011 Apr  9 01:07 google-gemini-cli.js.map
+-rw-r--r--@ 1 julb  staff   2591 Apr  9 01:07 index.d.ts
+-rw-r--r--@ 1 julb  staff   6522 Apr  9 01:07 index.d.ts.map
+-rw-r--r--@ 1 julb  staff   4648 Apr  9 01:07 index.js
+-rw-r--r--@ 1 julb  staff   8399 Apr  9 01:07 index.js.map
+-rw-r--r--@ 1 julb  staff    190 Apr  9 01:07 oauth-page.d.ts
+-rw-r--r--@ 1 julb  staff   3620 Apr  9 01:07 oauth-page.d.ts.map
+-rw-r--r--@ 1 julb  staff   3114 Apr  9 01:07 oauth-page.js
+-rw-r--r--@ 1 julb  staff   4566 Apr  9 01:07 oauth-page.js.map
+-rw-r--r--@ 1 julb  staff   1533 Apr  9 01:07 openai-codex.d.ts
+-rw-r--r--@ 1 julb  staff  15364 Apr  9 01:07 openai-codex.d.ts.map
+-rw-r--r--@ 1 julb  staff  13709 Apr  9 01:07 openai-codex.js
+-rw-r--r--@ 1 julb  staff  26453 Apr  9 01:07 openai-codex.js.map
+-rw-r--r--@ 1 julb  staff    335 Apr  9 01:07 pkce.d.ts
+-rw-r--r--@ 1 julb  staff   1322 Apr  9 01:07 pkce.d.ts.map
+-rw-r--r--@ 1 julb  staff   1003 Apr  9 01:07 pkce.js
+-rw-r--r--@ 1 julb  staff   2045 Apr  9 01:07 pkce.js.map
+-rw-r--r--@ 1 julb  staff   1731 Apr  9 01:07 types.d.ts
+-rw-r--r--@ 1 julb  staff   3262 Apr  9 01:07 types.d.ts.map
+-rw-r--r--@ 1 julb  staff     44 Apr  9 01:07 types.js
+-rw-r--r--@ 1 julb  staff   1854 Apr  9 01:07 types.js.map
+
+packages/ai/node_modules:
+total 0
+drwxr-xr-x@  3 julb  staff    96 Apr  8 12:47 @types
+drwxr-xr-x@ 47 julb  staff  1504 Apr  8 12:47 undici-types
+
+packages/ai/node_modules/@types:
+total 0
+drwxr-xr-x@ 64 julb  staff  2048 Apr  8 12:48 node
+
+packages/ai/node_modules/@types/node:
+total 4832
+drwxr-xr-x@  3 julb  staff      96 Apr  8 12:48 assert
+-rw-r--r--@  1 julb  staff   46664 Apr  8 12:48 assert.d.ts
+-rw-r--r--@  1 julb  staff   26208 Apr  8 12:48 async_hooks.d.ts
+-rw-r--r--@  1 julb  staff   22839 Apr  8 12:48 buffer.buffer.d.ts
+-rw-r--r--@  1 julb  staff   88244 Apr  8 12:48 buffer.d.ts
+-rw-r--r--@  1 julb  staff   66808 Apr  8 12:48 child_process.d.ts
+-rw-r--r--@  1 julb  staff   27926 Apr  8 12:48 cluster.d.ts
+drwxr-xr-x@  3 julb  staff      96 Apr  8 12:48 compatibility
+-rw-r--r--@  1 julb  staff   21366 Apr  8 12:48 console.d.ts
+-rw-r--r--@  1 julb  staff     816 Apr  8 12:48 constants.d.ts
+-rw-r--r--@  1 julb  staff  225899 Apr  8 12:48 crypto.d.ts
+-rw-r--r--@  1 julb  staff   28114 Apr  8 12:48 dgram.d.ts
+-rw-r--r--@  1 julb  staff   25048 Apr  8 12:48 diagnostics_channel.d.ts
+drwxr-xr-x@  3 julb  staff      96 Apr  8 12:48 dns
+-rw-r--r--@  1 julb  staff   37036 Apr  8 12:48 dns.d.ts
+-rw-r--r--@  1 julb  staff    7812 Apr  8 12:48 domain.d.ts
+-rw-r--r--@  1 julb  staff   44252 Apr  8 12:48 events.d.ts
+drwxr-xr-x@  3 julb  staff      96 Apr  8 12:48 fs
+-rw-r--r--@  1 julb  staff  201224 Apr  8 12:48 fs.d.ts
+-rw-r--r--@  1 julb  staff    5907 Apr  8 12:48 globals.d.ts
+-rw-r--r--@  1 julb  staff    2029 Apr  8 12:48 globals.typedarray.d.ts
+-rw-r--r--@  1 julb  staff   96542 Apr  8 12:48 http.d.ts
+-rw-r--r--@  1 julb  staff  132111 Apr  8 12:48 http2.d.ts
+-rw-r--r--@  1 julb  staff   26256 Apr  8 12:48 https.d.ts
+-rw-r--r--@  1 julb  staff    4377 Apr  8 12:48 index.d.ts
+-rw-r--r--@  1 julb  staff   12288 Apr  8 12:48 inspector.d.ts
+-rw-r--r--@  1 julb  staff  215115 Apr  8 12:48 inspector.generated.d.ts
+-rw-r--r--@  1 julb  staff    1141 Apr  8 12:48 LICENSE
+-rw-r--r--@  1 julb  staff   41229 Apr  8 12:48 module.d.ts
+-rw-r--r--@  1 julb  staff   49066 Apr  8 12:48 net.d.ts
+-rw-r--r--@  1 julb  staff   19433 Apr  8 12:48 os.d.ts
+-rw-r--r--@  1 julb  staff    4510 Apr  8 12:48 package.json
+-rw-r--r--@  1 julb  staff    8333 Apr  8 12:48 path.d.ts
+-rw-r--r--@  1 julb  staff   41743 Apr  8 12:48 perf_hooks.d.ts
+-rw-r--r--@  1 julb  staff  107511 Apr  8 12:48 process.d.ts
+-rw-r--r--@  1 julb  staff    5479 Apr  8 12:48 punycode.d.ts
+-rw-r--r--@  1 julb  staff    7125 Apr  8 12:48 querystring.d.ts
+drwxr-xr-x@  3 julb  staff      96 Apr  8 12:48 readline
+-rw-r--r--@  1 julb  staff   25878 Apr  8 12:48 readline.d.ts
+-rw-r--r--@  1 julb  staff    1586 Apr  8 12:48 README.md
+-rw-r--r--@  1 julb  staff   19901 Apr  8 12:48 repl.d.ts
+-rw-r--r--@  1 julb  staff    6638 Apr  8 12:48 sea.d.ts
+-rw-r--r--@  1 julb  staff   46563 Apr  8 12:48 sqlite.d.ts
+drwxr-xr-x@  5 julb  staff     160 Apr  8 12:48 stream
+-rw-r--r--@  1 julb  staff   87641 Apr  8 12:48 stream.d.ts
+-rw-r--r--@  1 julb  staff    2809 Apr  8 12:48 string_decoder.d.ts
+-rw-r--r--@  1 julb  staff  110520 Apr  8 12:48 test.d.ts
+drwxr-xr-x@  3 julb  staff      96 Apr  8 12:48 timers
+-rw-r--r--@  1 julb  staff   14570 Apr  8 12:48 timers.d.ts
+-rw-r--r--@  1 julb  staff   60652 Apr  8 12:48 tls.d.ts
+-rw-r--r--@  1 julb  staff    8926 Apr  8 12:48 trace_events.d.ts
+drwxr-xr-x@  6 julb  staff     192 Apr  8 12:48 ts5.6
+drwxr-xr-x@  4 julb  staff     128 Apr  8 12:48 ts5.7
+-rw-r--r--@  1 julb  staff   10053 Apr  8 12:48 tty.d.ts
+-rw-r--r--@  1 julb  staff   45851 Apr  8 12:48 url.d.ts
+-rw-r--r--@  1 julb  staff   91407 Apr  8 12:48 util.d.ts
+-rw-r--r--@  1 julb  staff   40433 Apr  8 12:48 v8.d.ts
+-rw-r--r--@  1 julb  staff   55223 Apr  8 12:48 vm.d.ts
+-rw-r--r--@  1 julb  staff    9120 Apr  8 12:48 wasi.d.ts
+drwxr-xr-x@ 10 julb  staff     320 Apr  8 12:48 web-globals
+-rw-r--r--@  1 julb  staff   41901 Apr  8 12:48 worker_threads.d.ts
+-rw-r--r--@  1 julb  staff   27864 Apr  8 12:48 zlib.d.ts
+
+packages/ai/node_modules/@types/node/assert:
+total 8
+-rw-r--r--@ 1 julb  staff  3003 Apr  8 12:48 strict.d.ts
+
+packages/ai/node_modules/@types/node/compatibility:
+total 8
+-rw-r--r--@ 1 julb  staff  1303 Apr  8 12:48 iterators.d.ts
+
+packages/ai/node_modules/@types/node/dns:
+total 48
+-rw-r--r--@ 1 julb  staff  21107 Apr  8 12:48 promises.d.ts
+
+packages/ai/node_modules/@types/node/fs:
+total 112
+-rw-r--r--@ 1 julb  staff  57251 Apr  8 12:48 promises.d.ts
+
+packages/ai/node_modules/@types/node/readline:
+total 16
+-rw-r--r--@ 1 julb  staff  6439 Apr  8 12:48 promises.d.ts
+
+packages/ai/node_modules/@types/node/stream:
+total 72
+-rw-r--r--@ 1 julb  staff   1619 Apr  8 12:48 consumers.d.ts
+-rw-r--r--@ 1 julb  staff   2971 Apr  8 12:48 promises.d.ts
+-rw-r--r--@ 1 julb  staff  27400 Apr  8 12:48 web.d.ts
+
+packages/ai/node_modules/@types/node/timers:
+total 8
+-rw-r--r--@ 1 julb  staff  3780 Apr  8 12:48 promises.d.ts
+
+packages/ai/node_modules/@types/node/ts5.6:
+total 72
+-rw-r--r--@ 1 julb  staff  22077 Apr  8 12:48 buffer.buffer.d.ts
+drwxr-xr-x@ 3 julb  staff     96 Apr  8 12:48 compatibility
+-rw-r--r--@ 1 julb  staff   1238 Apr  8 12:48 globals.typedarray.d.ts
+-rw-r--r--@ 1 julb  staff   4666 Apr  8 12:48 index.d.ts
+
+packages/ai/node_modules/@types/node/ts5.6/compatibility:
+total 8
+-rw-r--r--@ 1 julb  staff  3811 Apr  8 12:48 float16array.d.ts
+
+packages/ai/node_modules/@types/node/ts5.7:
+total 16
+drwxr-xr-x@ 3 julb  staff    96 Apr  8 12:48 compatibility
+-rw-r--r--@ 1 julb  staff  4653 Apr  8 12:48 index.d.ts
+
+packages/ai/node_modules/@types/node/ts5.7/compatibility:
+total 8
+-rw-r--r--@ 1 julb  staff  3872 Apr  8 12:48 float16array.d.ts
+
+packages/ai/node_modules/@types/node/web-globals:
+total 64
+-rw-r--r--@ 1 julb  staff  1145 Apr  8 12:48 abortcontroller.d.ts
+-rw-r--r--@ 1 julb  staff  1037 Apr  8 12:48 crypto.d.ts
+-rw-r--r--@ 1 julb  staff  2565 Apr  8 12:48 domexception.d.ts
+-rw-r--r--@ 1 julb  staff  2871 Apr  8 12:48 events.d.ts
+-rw-r--r--@ 1 julb  staff  3112 Apr  8 12:48 fetch.d.ts
+-rw-r--r--@ 1 julb  staff   891 Apr  8 12:48 navigator.d.ts
+-rw-r--r--@ 1 julb  staff   724 Apr  8 12:48 storage.d.ts
+-rw-r--r--@ 1 julb  staff   774 Apr  8 12:48 streams.d.ts
+
+packages/ai/node_modules/undici-types:
+total 456
+-rw-r--r--@ 1 julb  staff   1162 Apr  8 12:47 agent.d.ts
+-rw-r--r--@ 1 julb  staff   1599 Apr  8 12:47 api.d.ts
+-rw-r--r--@ 1 julb  staff    957 Apr  8 12:47 balanced-pool.d.ts
+-rw-r--r--@ 1 julb  staff   4120 Apr  8 12:47 cache-interceptor.d.ts
+-rw-r--r--@ 1 julb  staff   1251 Apr  8 12:47 cache.d.ts
+-rw-r--r--@ 1 julb  staff    456 Apr  8 12:47 client-stats.d.ts
+-rw-r--r--@ 1 julb  staff   5003 Apr  8 12:47 client.d.ts
+-rw-r--r--@ 1 julb  staff   1029 Apr  8 12:47 connector.d.ts
+-rw-r--r--@ 1 julb  staff    561 Apr  8 12:47 content-type.d.ts
+-rw-r--r--@ 1 julb  staff    696 Apr  8 12:47 cookies.d.ts
+-rw-r--r--@ 1 julb  staff   1766 Apr  8 12:47 diagnostics-channel.d.ts

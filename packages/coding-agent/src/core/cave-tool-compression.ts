@@ -24,6 +24,84 @@ const HEAD_LINES = 200;
 const TAIL_LINES = 100;
 
 // ============================================================================
+// Per-Tool Output Budgets (Flint Chipper)
+// ============================================================================
+
+interface ToolBudget {
+	maxLines: number;
+	headLines: number;
+	tailLines: number;
+}
+
+const DEFAULT_TOOL_BUDGETS: Record<string, ToolBudget> = {
+	bash: { maxLines: 80, headLines: 50, tailLines: 30 },
+	read: { maxLines: 300, headLines: 200, tailLines: 100 },
+	grep: { maxLines: 120, headLines: 80, tailLines: 40 },
+	find: { maxLines: 60, headLines: 40, tailLines: 20 },
+	ls: { maxLines: 60, headLines: 40, tailLines: 20 },
+};
+
+const FALLBACK_BUDGET: ToolBudget = { maxLines: 150, headLines: 100, tailLines: 50 };
+
+/**
+ * Get the output budget for a specific tool.
+ * Custom budgets can override defaults.
+ */
+export function getToolBudget(toolName: string, customBudgets?: Record<string, ToolBudget>): ToolBudget {
+	return customBudgets?.[toolName] ?? DEFAULT_TOOL_BUDGETS[toolName] ?? FALLBACK_BUDGET;
+}
+
+/**
+ * Truncate text using per-tool budget (head+tail preservation).
+ * Runs BEFORE the general cave compression pipeline.
+ */
+export function truncateWithToolBudget(
+	text: string,
+	toolName: string,
+	customBudgets?: Record<string, ToolBudget>,
+): string {
+	const budget = getToolBudget(toolName, customBudgets);
+	const lines = text.split("\n");
+	if (lines.length <= budget.maxLines) {
+		return text;
+	}
+	const omitted = lines.length - budget.headLines - budget.tailLines;
+	const head = lines.slice(0, budget.headLines);
+	const tail = lines.slice(lines.length - budget.tailLines);
+	return [
+		...head,
+		"",
+		`[... ${omitted} lines omitted (${toolName} budget: ${budget.maxLines}) ...]`,
+		"",
+		...tail,
+	].join("\n");
+}
+
+/**
+ * Apply per-tool budget truncation to content blocks.
+ * Runs before compressCaveToolContentBlocks for compound compression.
+ */
+export function applyToolBudgetToContentBlocks(
+	content: Array<{ type: string; text?: string; [key: string]: unknown }>,
+	toolName: string,
+	customBudgets?: Record<string, ToolBudget>,
+): Array<{ type: string; text?: string; [key: string]: unknown }> {
+	let changed = false;
+	const result = content.map((block) => {
+		if (block.type !== "text" || typeof block.text !== "string") {
+			return block;
+		}
+		const truncated = truncateWithToolBudget(block.text, toolName, customBudgets);
+		if (truncated === block.text) {
+			return block;
+		}
+		changed = true;
+		return { ...block, text: truncated };
+	});
+	return changed ? result : content;
+}
+
+// ============================================================================
 // ANSI stripping
 // ============================================================================
 
@@ -116,4 +194,67 @@ export function compressCaveToolContentBlocks(
 		return { ...block, text: compressed };
 	});
 	return changed ? result : content;
+}
+
+// ============================================================================
+// Read Deduplication (Cave Painting Diff)
+// ============================================================================
+
+interface ReadCacheEntry {
+	/** Lightweight fingerprint: length + first 256 chars */
+	fingerprint: string;
+	/** Sequential read index when this file was first read */
+	readIndex: number;
+}
+
+/**
+ * Computes a lightweight fingerprint from text content.
+ * Uses content length + first 256 chars — fast and sufficient for dedup.
+ */
+function fingerprintContent(text: string): string {
+	return `${text.length}:${text.slice(0, 256)}`;
+}
+
+/**
+ * Session-scoped cache for read result deduplication.
+ * When the LLM re-reads an unchanged file, replaces full content with a one-line stub,
+ * saving significant context tokens on repeated reads.
+ *
+ * Invalidated on write/edit to the same path.
+ */
+export class ReadDeduplicationCache {
+	private cache = new Map<string, ReadCacheEntry>();
+	private readCount = 0;
+
+	/** Reset cache (call on session start or new branch). */
+	reset(): void {
+		this.cache.clear();
+		this.readCount = 0;
+	}
+
+	/**
+	 * Check a read result against the cache.
+	 * Returns a stub string if content is unchanged, or undefined if new/changed.
+	 * Side effect: updates the cache with the current content on first/changed read.
+	 */
+	checkRead(filePath: string, content: string): string | undefined {
+		const fingerprint = fingerprintContent(content);
+		const existing = this.cache.get(filePath);
+
+		if (existing && existing.fingerprint === fingerprint) {
+			return `[File unchanged since read #${existing.readIndex}. Content identical to prior read. Reference that context.]`;
+		}
+
+		// New or changed — update cache
+		this.readCount++;
+		this.cache.set(filePath, { fingerprint, readIndex: this.readCount });
+		return undefined;
+	}
+
+	/**
+	 * Invalidate cache entry when a file is written or edited.
+	 */
+	invalidate(filePath: string): void {
+		this.cache.delete(filePath);
+	}
 }

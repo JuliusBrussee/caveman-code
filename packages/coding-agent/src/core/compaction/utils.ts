@@ -168,3 +168,10 @@ export function serializeConversation(messages: Message[]): string {
 export const SUMMARIZATION_SYSTEM_PROMPT = `You are a context summarization assistant. Your task is to read a conversation between a user and an AI coding assistant, then produce a structured summary following the exact format specified.
 
 Do NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.`;
+
+/**
+ * Cave mode system prompt for compaction summaries.
+ * Terse instructions that produce 20%+ shorter summaries while preserving
+ * all technical substance (file paths, function names, error messages, decisions).
+ */
+export const CAVE_SUMMARIZATION_SYSTEM_PROMPT = `Terse context summarizer. No articles. Fragments over sentences. Preserve: file paths, function names, error messages, decisions. Required sections: Goal, Progress, Next Steps, Critical Context. Omit empty sections. No filler.`;

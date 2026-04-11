@@ -23,7 +23,12 @@ import { theme } from "../modes/interactive/theme/theme.js";
 import { stripFrontmatter } from "../utils/frontmatter.js";
 import { sleep } from "../utils/sleep.js";
 import { type BashResult, executeBashWithOperations } from "./bash-executor.js";
-import { compressCaveToolContentBlocks } from "./cave-tool-compression.js";
+import { applyStructuredCompressionToContentBlocks } from "./cave-structured-compression.js";
+import {
+	applyToolBudgetToContentBlocks,
+	compressCaveToolContentBlocks,
+	ReadDeduplicationCache,
+} from "./cave-tool-compression.js";
 import {
 	type CompactionResult,
 	calculateContextTokens,
@@ -295,6 +300,9 @@ export class AgentSession {
 	private _sessionCaveModeIntensity: "lite" | "full" | "ultra" | null = null;
 	private _sessionCaveModeDisabled = false;
 
+	// Read deduplication cache (Cave Painting Diff)
+	private _readDeduplicationCache = new ReadDeduplicationCache();
+
 	constructor(config: AgentSessionConfig) {
 		this.agent = config.agent;
 		this.sessionManager = config.sessionManager;
@@ -384,16 +392,67 @@ export class AgentSession {
 		};
 
 		this.agent.afterToolCall = async ({ toolCall, args, result, isError }) => {
+			const caveEnabled =
+				this.settingsManager.getCaveModeToolCompression() && this.settingsManager.getCaveModeEnabled();
+
+			// Cave Painting Diff: read dedup and write/edit invalidation
+			if (!isError && caveEnabled) {
+				if (toolCall.name === "read") {
+					const filePath = (args as { path?: string }).path;
+					if (filePath) {
+						const contentBlocks = result.content as Array<{ type: string; text?: string }>;
+						const fullText = contentBlocks
+							.filter((b) => b.type === "text" && typeof b.text === "string")
+							.map((b) => b.text as string)
+							.join("");
+						const stub = this._readDeduplicationCache.checkRead(filePath, fullText);
+						if (stub) {
+							// Replace full content with dedup stub — skip further compression
+							const stubContent = [{ type: "text" as const, text: stub }] as typeof result.content;
+							const runner = this._extensionRunner;
+							if (!runner?.hasHandlers("tool_result")) {
+								return { content: stubContent, details: result.details };
+							}
+							const hookResult = await runner.emitToolResult({
+								type: "tool_result",
+								toolName: toolCall.name,
+								toolCallId: toolCall.id,
+								input: args as Record<string, unknown>,
+								content: stubContent,
+								details: result.details,
+								isError,
+							});
+							if (!hookResult) return undefined;
+							return { content: hookResult.content, details: hookResult.details };
+						}
+					}
+				} else if (toolCall.name === "write" || toolCall.name === "edit") {
+					const filePath = (args as { path?: string }).path;
+					if (filePath) {
+						this._readDeduplicationCache.invalidate(filePath);
+					}
+				}
+			}
+
 			// Cave mode tool result compression (runs before extension hooks, never on errors)
 			let processedContent = result.content;
-			if (
-				!isError &&
-				this.settingsManager.getCaveModeToolCompression() &&
-				this.settingsManager.getCaveModeEnabled()
-			) {
+			if (!isError && caveEnabled) {
 				try {
+					// Per-tool budget truncation (Flint Chipper) runs first
+					processedContent = applyToolBudgetToContentBlocks(
+						processedContent as Array<{ type: string; text?: string; [key: string]: unknown }>,
+						toolCall.name,
+					) as typeof result.content;
+					// Structured output compression (Stone Tablet) runs second
+					const commandHint = toolCall.name === "bash" ? (args as { command?: string }).command : undefined;
+					processedContent = applyStructuredCompressionToContentBlocks(
+						processedContent as Array<{ type: string; text?: string; [key: string]: unknown }>,
+						toolCall.name,
+						commandHint,
+					) as typeof result.content;
+					// General cave compression runs last
 					processedContent = compressCaveToolContentBlocks(
-						result.content as Array<{ type: string; text?: string; [key: string]: unknown }>,
+						processedContent as Array<{ type: string; text?: string; [key: string]: unknown }>,
 					) as typeof result.content;
 				} catch {
 					// Fallback: use original unmodified output if compression encounters an error
@@ -898,11 +957,22 @@ export class AgentSession {
 		return Array.from(unique);
 	}
 
+	// Tools that always show prompt snippets/guidelines in system prompt.
+	// In cave mode, other tools are "lazy" — they still work (schemas sent via API)
+	// but their snippets and guidelines are suppressed from the system prompt.
+	private static readonly ALWAYS_ON_TOOLS = new Set(["bash", "read", "edit", "write"]);
+
 	private _rebuildSystemPrompt(toolNames: string[]): string {
 		const validToolNames = toolNames.filter((name) => this._toolRegistry.has(name));
 		const toolSnippets: Record<string, string> = {};
 		const promptGuidelines: string[] = [];
+		const caveModeEnabled = this._sessionCaveModeDisabled ? false : this.settingsManager.getCaveModeEnabled();
+
 		for (const name of validToolNames) {
+			// In cave mode, suppress snippets/guidelines for lazy (non-always-on) tools
+			if (caveModeEnabled && !AgentSession.ALWAYS_ON_TOOLS.has(name)) {
+				continue;
+			}
 			const snippet = this._toolPromptSnippets.get(name);
 			if (snippet) {
 				toolSnippets[name] = snippet;
@@ -922,9 +992,6 @@ export class AgentSession {
 		const loadedContextFiles = this._resourceLoader.getAgentsFiles().agentsFiles;
 
 		const caveModeSettings = this.settingsManager.getCaveModeSettings();
-		// Session overrides: _sessionCaveModeDisabled turns off cave mode for session;
-		// _sessionCaveModeIntensity overrides the persisted intensity for the session.
-		const caveModeEnabled = this._sessionCaveModeDisabled ? false : caveModeSettings.enabled;
 		return buildSystemPrompt({
 			cwd: this._cwd,
 			skills: loadedSkills,

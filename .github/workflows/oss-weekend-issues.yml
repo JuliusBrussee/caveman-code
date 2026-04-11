@@ -86,7 +86,7 @@ jobs:
             }
 
             const reopenDate = weekendState.reopensOnText || weekendState.reopensOn || 'after the weekend';
-            const discordUrl = weekendState.discordUrl || 'https://discord.com/invite/3cU7Bz4UPx';
+            const discordUrl = weekendState.discordUrl || 'https://discord.com/invite/nKXTsAcmbT';
             const reason = typeof weekendState.reason === 'string' && weekendState.reason.trim() ? weekendState.reason.trim() : null;
             const message = [
               `Hi @${issueAuthor}, thanks for opening an issue.`,

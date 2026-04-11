@@ -1,0 +1,500 @@
+
+ RUN  v3.2.4 /Users/julb/Desktop/GitHub/caveman-cli
+
+▶ Markdown component
+  ▶ Nested lists
+    ✔ should render simple nested list (11.624917ms)
+    ✔ should render deeply nested list (0.422958ms)
+    ✔ should render ordered nested list (0.576542ms)
+    ✔ should render mixed ordered and unordered nested lists (0.227333ms)
+    ✔ should maintain numbering when code blocks are not indented (LLM output) (0.473708ms)
+  ✔ Nested lists (13.832625ms)
+  ▶ Tables
+    ✔ should render simple table (1.391375ms)
+    ✔ should render row dividers between data rows (0.229375ms)
+    ✔ should keep column width at least the longest word (0.46ms)
+    ✔ should render table with alignment (0.3055ms)
+    ✔ should handle tables with varying column widths (0.342584ms)
+    ✔ should wrap table cells when table exceeds available width (0.330083ms)
+    ✔ should wrap long cell content to multiple lines (0.18625ms)
+    ✔ should wrap long unbroken tokens inside table cells (not only at line start) (0.548292ms)
+    ✔ should wrap styled inline code inside table cells without breaking borders (0.233583ms)
+    ✔ should handle extremely narrow width gracefully (0.121875ms)
+    ✔ should render table correctly when it fits naturally (0.135792ms)
+    ✔ should respect paddingX when calculating table width (0.171625ms)
+    ✔ should not add a trailing blank line when table is the last rendered block (0.109584ms)
+  ✔ Tables (4.809167ms)
+  ▶ Combined features
+    ✔ should render lists and tables together (0.275625ms)
+  ✔ Combined features (0.310458ms)
+  ▶ Pre-styled text (thinking traces)
+    ✔ should preserve gray italic styling after inline code (1.555875ms)
+    ✔ should preserve gray italic styling after bold text (4.475625ms)
+    ✖ should not leak styles into following lines when rendered in TUI (18.352125ms)
+  ✖ Pre-styled text (thinking traces) (24.749208ms)
+  ▶ Spacing after code blocks
+    ✔ should have only one blank line between code block and following paragraph (0.342916ms)
+    ✔ should normalize paragraph and code block spacing to one blank line (1.303917ms)
+    ✔ should not add a trailing blank line when code block is the last rendered block (0.169042ms)
+  ✔ Spacing after code blocks (1.958084ms)
+  ▶ Spacing after dividers
+    ✔ should have only one blank line between divider and following paragraph (0.20425ms)
+    ✔ should not add a trailing blank line when divider is the last rendered block (0.061084ms)
+  ✔ Spacing after dividers (0.374333ms)
+  ▶ Spacing after headings
+    ✔ should have only one blank line between heading and following paragraph (0.185292ms)
+    ✔ should not add a trailing blank line when heading is the last rendered block (0.112417ms)
+  ✔ Spacing after headings (0.365ms)
+  ▶ Spacing after blockquotes
+    ✔ should have only one blank line between blockquote and following paragraph (0.351667ms)
+    ✔ should not add a trailing blank line when blockquote is the last rendered block (0.097ms)
+  ✔ Spacing after blockquotes (0.5195ms)
+  ▶ Blockquotes with multiline content
+    ✔ should apply consistent styling to all lines in lazy continuation blockquote (0.223209ms)
+    ✔ should apply consistent styling to explicit multiline blockquote (1.382417ms)
+    ✔ should render list content inside blockquotes (0.443ms)
+    ✔ should wrap long blockquote lines and add border to each wrapped line (0.194042ms)
+    ✔ should properly indent wrapped blockquote lines with styling (0.25575ms)
+    ✔ should render inline formatting inside blockquotes and reapply quote styling after (0.69125ms)
+  ✔ Blockquotes with multiline content (3.567541ms)
+  ▶ Heading with inline code
+    ✔ should preserve heading styling after inline code (0.596167ms)
+    ✔ should preserve heading styling after inline code for h1 (0.12975ms)
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Provider Empty Messages > should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Provider Empty Messages > should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Provider Empty Messages > should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Provider Empty Messages > should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > OpenAI Completions Provider Empty Messages > should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > OpenAI Completions Provider Empty Messages > should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > OpenAI Completions Provider Empty Messages > should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > OpenAI Completions Provider Empty Messages > should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > OpenAI Responses Provider Empty Messages > should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > OpenAI Responses Provider Empty Messages > should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > OpenAI Responses Provider Empty Messages > should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > OpenAI Responses Provider Empty Messages > should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Azure OpenAI Responses Provider Empty Messages > should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Azure OpenAI Responses Provider Empty Messages > should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Azure OpenAI Responses Provider Empty Messages > should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Azure OpenAI Responses Provider Empty Messages > should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Anthropic Provider Empty Messages > should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Anthropic Provider Empty Messages > should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Anthropic Provider Empty Messages > should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Anthropic Provider Empty Messages > should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > xAI Provider Empty Messages > should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > xAI Provider Empty Messages > should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > xAI Provider Empty Messages > should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > xAI Provider Empty Messages > should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Groq Provider Empty Messages > should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Groq Provider Empty Messages > should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Groq Provider Empty Messages > should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Groq Provider Empty Messages > should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Cerebras Provider Empty Messages > should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Cerebras Provider Empty Messages > should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Cerebras Provider Empty Messages > should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Cerebras Provider Empty Messages > should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Hugging Face Provider Empty Messages > should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Hugging Face Provider Empty Messages > should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Hugging Face Provider Empty Messages > should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Hugging Face Provider Empty Messages > should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > zAI Provider Empty Messages > should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > zAI Provider Empty Messages > should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > zAI Provider Empty Messages > should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > zAI Provider Empty Messages > should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Mistral Provider Empty Messages > should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Mistral Provider Empty Messages > should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Mistral Provider Empty Messages > should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Mistral Provider Empty Messages > should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > MiniMax Provider Empty Messages > should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > MiniMax Provider Empty Messages > should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > MiniMax Provider Empty Messages > should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > MiniMax Provider Empty Messages > should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Kimi For Coding Provider Empty Messages > should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Kimi For Coding Provider Empty Messages > should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Kimi For Coding Provider Empty Messages > should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Kimi For Coding Provider Empty Messages > should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Vercel AI Gateway Provider Empty Messages > should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Vercel AI Gateway Provider Empty Messages > should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Vercel AI Gateway Provider Empty Messages > should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Vercel AI Gateway Provider Empty Messages > should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Amazon Bedrock Provider Empty Messages > should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Amazon Bedrock Provider Empty Messages > should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Amazon Bedrock Provider Empty Messages > should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Amazon Bedrock Provider Empty Messages > should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Anthropic OAuth Provider Empty Messages > should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Anthropic OAuth Provider Empty Messages > should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Anthropic OAuth Provider Empty Messages > should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Anthropic OAuth Provider Empty Messages > should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > GitHub Copilot Provider Empty Messages > gpt-4o - should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > GitHub Copilot Provider Empty Messages > gpt-4o - should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > GitHub Copilot Provider Empty Messages > gpt-4o - should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > GitHub Copilot Provider Empty Messages > gpt-4o - should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > GitHub Copilot Provider Empty Messages > claude-sonnet-4 - should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > GitHub Copilot Provider Empty Messages > claude-sonnet-4 - should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > GitHub Copilot Provider Empty Messages > claude-sonnet-4 - should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > GitHub Copilot Provider Empty Messages > claude-sonnet-4 - should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Gemini CLI Provider Empty Messages > gemini-2.5-flash - should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Gemini CLI Provider Empty Messages > gemini-2.5-flash - should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Gemini CLI Provider Empty Messages > gemini-2.5-flash - should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Gemini CLI Provider Empty Messages > gemini-2.5-flash - should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Antigravity Provider Empty Messages > gemini-3-flash - should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Antigravity Provider Empty Messages > gemini-3-flash - should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Antigravity Provider Empty Messages > gemini-3-flash - should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Antigravity Provider Empty Messages > gemini-3-flash - should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Antigravity Provider Empty Messages > claude-sonnet-4-5 - should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Antigravity Provider Empty Messages > claude-sonnet-4-5 - should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Antigravity Provider Empty Messages > claude-sonnet-4-5 - should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Antigravity Provider Empty Messages > claude-sonnet-4-5 - should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Antigravity Provider Empty Messages > gpt-oss-120b-medium - should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Antigravity Provider Empty Messages > gpt-oss-120b-medium - should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Antigravity Provider Empty Messages > gpt-oss-120b-medium - should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > Google Antigravity Provider Empty Messages > gpt-oss-120b-medium - should handle empty assistant message in conversation
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > OpenAI Codex Provider Empty Messages > gpt-5.2-codex - should handle empty content array
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > OpenAI Codex Provider Empty Messages > gpt-5.2-codex - should handle empty string content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > OpenAI Codex Provider Empty Messages > gpt-5.2-codex - should handle whitespace-only content
+ ↓ packages/ai/test/empty.test.ts > AI Providers Empty Message Tests > OpenAI Codex Provider Empty Messages > gpt-5.2-codex - should handle empty assistant message in conversation
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Google Provider Unicode Handling > should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Google Provider Unicode Handling > should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Google Provider Unicode Handling > should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > OpenAI Completions Provider Unicode Handling > should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > OpenAI Completions Provider Unicode Handling > should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > OpenAI Completions Provider Unicode Handling > should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > OpenAI Responses Provider Unicode Handling > should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > OpenAI Responses Provider Unicode Handling > should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > OpenAI Responses Provider Unicode Handling > should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Azure OpenAI Responses Provider Unicode Handling > should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Azure OpenAI Responses Provider Unicode Handling > should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Azure OpenAI Responses Provider Unicode Handling > should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Anthropic Provider Unicode Handling > should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Anthropic Provider Unicode Handling > should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Anthropic Provider Unicode Handling > should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Anthropic OAuth Provider Unicode Handling > should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Anthropic OAuth Provider Unicode Handling > should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Anthropic OAuth Provider Unicode Handling > should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > GitHub Copilot Provider Unicode Handling > gpt-4o - should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > GitHub Copilot Provider Unicode Handling > gpt-4o - should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > GitHub Copilot Provider Unicode Handling > gpt-4o - should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > GitHub Copilot Provider Unicode Handling > claude-sonnet-4 - should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > GitHub Copilot Provider Unicode Handling > claude-sonnet-4 - should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > GitHub Copilot Provider Unicode Handling > claude-sonnet-4 - should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Google Gemini CLI Provider Unicode Handling > gemini-2.5-flash - should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Google Gemini CLI Provider Unicode Handling > gemini-2.5-flash - should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Google Gemini CLI Provider Unicode Handling > gemini-2.5-flash - should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Google Antigravity Provider Unicode Handling > gemini-3-flash - should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Google Antigravity Provider Unicode Handling > gemini-3-flash - should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Google Antigravity Provider Unicode Handling > gemini-3-flash - should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Google Antigravity Provider Unicode Handling > claude-sonnet-4-5 - should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Google Antigravity Provider Unicode Handling > claude-sonnet-4-5 - should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Google Antigravity Provider Unicode Handling > claude-sonnet-4-5 - should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Google Antigravity Provider Unicode Handling > gpt-oss-120b-medium - should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Google Antigravity Provider Unicode Handling > gpt-oss-120b-medium - should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Google Antigravity Provider Unicode Handling > gpt-oss-120b-medium - should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > xAI Provider Unicode Handling > should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > xAI Provider Unicode Handling > should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > xAI Provider Unicode Handling > should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Groq Provider Unicode Handling > should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Groq Provider Unicode Handling > should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Groq Provider Unicode Handling > should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Cerebras Provider Unicode Handling > should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Cerebras Provider Unicode Handling > should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Cerebras Provider Unicode Handling > should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Hugging Face Provider Unicode Handling > should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Hugging Face Provider Unicode Handling > should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Hugging Face Provider Unicode Handling > should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > zAI Provider Unicode Handling > should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > zAI Provider Unicode Handling > should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > zAI Provider Unicode Handling > should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Mistral Provider Unicode Handling > should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Mistral Provider Unicode Handling > should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Mistral Provider Unicode Handling > should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > MiniMax Provider Unicode Handling > should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > MiniMax Provider Unicode Handling > should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > MiniMax Provider Unicode Handling > should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Kimi For Coding Provider Unicode Handling > should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Kimi For Coding Provider Unicode Handling > should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Kimi For Coding Provider Unicode Handling > should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Vercel AI Gateway Provider Unicode Handling > should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Vercel AI Gateway Provider Unicode Handling > should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Vercel AI Gateway Provider Unicode Handling > should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Amazon Bedrock Provider Unicode Handling > should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Amazon Bedrock Provider Unicode Handling > should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > Amazon Bedrock Provider Unicode Handling > should handle unpaired high surrogate (0xD83D) in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > OpenAI Codex Provider Unicode Handling > gpt-5.2-codex - should handle emoji in tool results
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > OpenAI Codex Provider Unicode Handling > gpt-5.2-codex - should handle real-world LinkedIn comment data with emoji
+ ↓ packages/ai/test/unicode-surrogate.test.ts > AI Providers Unicode Surrogate Pair Tests > OpenAI Codex Provider Unicode Handling > gpt-5.2-codex - should handle unpaired high surrogate (0xD83D) in tool results
+    ✔ should not leak h1 underline into padding when inline code is the last token (3.615125ms)
+    ✔ should preserve heading styling after bold text (0.125375ms)
+  ✔ Heading with inline code (4.687041ms)
+  ▶ Links
+    ✔ should not duplicate URL for autolinked emails (0.146125ms)
+    ✔ should not duplicate URL for bare URLs (0.149292ms)
+    ✔ should show URL for explicit markdown links with different text (0.361708ms)
+    ✔ should show URL for explicit mailto links with different text (0.1055ms)
+  ✔ Links (0.864167ms)
+  ▶ HTML-like tags in text
+    ✔ should render content with HTML-like tags as text (0.167333ms)
+    ✔ should render HTML tags in code blocks correctly (0.072833ms)
+  ✔ HTML-like tags in text (0.286541ms)
+✖ Markdown component (57.1575ms)
+▶ Editor component
+  ▶ Prompt history navigation
+    ✔ does nothing on Up arrow when history is empty (5.386375ms)
+    ✔ shows most recent history entry on Up arrow when editor is empty (0.748ms)
+    ✔ cycles through history entries on repeated Up arrow (0.665458ms)
+    ✔ returns to empty editor on Down arrow after browsing history (0.390208ms)
+    ✔ navigates forward through history with Down arrow (0.797917ms)
+    ✔ exits history mode when typing a character (0.921125ms)
+    ✔ exits history mode on setText (0.991792ms)
+    ✔ does not add empty strings to history (0.422917ms)
+    ✔ does not add consecutive duplicates to history (0.33675ms)
+    ✔ allows non-consecutive duplicates in history (0.570958ms)
+    ✔ uses cursor movement instead of history when editor has content (0.541667ms)
+    ✔ limits history to 100 entries (3.717958ms)
+    ✔ allows cursor movement within multi-line history entry with Down (0.37475ms)
+    ✔ allows cursor movement within multi-line history entry with Up (0.315541ms)
+    ✔ navigates from multi-line entry back to newer via Down after cursor movement (0.84225ms)
+  ✔ Prompt history navigation (17.746625ms)
+  ▶ public state accessors
+    ✔ returns cursor position (1.35675ms)
+    ✔ returns lines as a defensive copy (0.284791ms)
+  ✔ public state accessors (1.708458ms)
+  ▶ Backslash+Enter newline workaround
+    ✔ inserts backslash immediately (no buffering) (0.244458ms)
+    ✔ converts standalone backslash to newline on Enter (0.29975ms)
+    ✔ inserts backslash normally when followed by other characters (0.264125ms)
+    ✔ does not trigger newline when backslash is not immediately before cursor (2.424042ms)
+    ✔ only removes one backslash when multiple are present (0.302ms)
+  ✔ Backslash+Enter newline workaround (3.613084ms)
+  ▶ Kitty CSI-u handling
+    ✔ ignores printable CSI-u sequences with unsupported modifiers (0.24875ms)
+  ✔ Kitty CSI-u handling (0.283709ms)
+  ▶ Unicode text editing behavior
+    ✔ inserts mixed ASCII, umlauts, and emojis as literal text (0.490917ms)
+    ✔ deletes single-code-unit unicode characters (umlauts) with Backspace (0.219208ms)
+    ✔ deletes multi-code-unit emojis with single Backspace (0.455208ms)
+    ✔ inserts characters at the correct position after cursor movement over umlauts (0.966292ms)
+    ✔ moves cursor across multi-code-unit emojis with single arrow key (16.270167ms)
+    ✔ preserves umlauts across line breaks (0.704333ms)
+    ✔ replaces the entire document with unicode text via setText (paste simulation) (0.253833ms)
+    ✔ moves cursor to document start on Ctrl+A and inserts at the beginning (0.409875ms)
+    ✔ deletes words correctly with Ctrl+W and Alt+Backspace (0.760541ms)
+    ✔ navigates words correctly with Ctrl+Left/Right (0.48475ms)
+  ✔ Unicode text editing behavior (21.301209ms)
+  ▶ Grapheme-aware text wrapping
+    ✔ wraps lines correctly when text contains wide emojis (0.610708ms)
+    ✔ wraps long text with emojis at correct positions (0.361959ms)
+    ✔ wraps CJK characters correctly (each is 2 columns wide) (0.551042ms)
+    ✔ handles mixed ASCII and wide characters in wrapping (0.186875ms)
+    ✔ renders cursor correctly on wide characters (0.205708ms)
+    ✔ does not exceed terminal width with emoji at wrap boundary (0.201042ms)
+    ✔ shows cursor at end of line before wrap, wraps on next char (0.576875ms)
+  ✔ Grapheme-aware text wrapping (2.77975ms)
+  ▶ Word wrapping
+    ✔ wraps at word boundaries instead of mid-word (0.327625ms)
+    ✔ does not start lines with leading whitespace after word wrap (0.220917ms)
+    ✔ breaks long words (URLs) at character level (0.216833ms)
+    ✔ preserves multiple spaces within words on same line (0.245125ms)
+    ✔ handles empty string (0.170417ms)
+    ✔ handles single word that fits exactly (0.17475ms)
+    ✔ wraps word to next line when it ends exactly at terminal width (0.042875ms)
+    ✔ keeps whitespace at terminal width boundary on same line (0.0345ms)
+    ✔ handles unbreakable word filling width exactly followed by space (0.035042ms)
+    ✔ wraps word to next line when it fits width but not remaining space (0.041625ms)
+    ✔ keeps word with multi-space and following word together when they fit (0.044ms)
+    ✔ keeps word with multi-space and following word when they fill width exactly (0.043667ms)
+    ✔ splits when word plus multi-space plus word exceeds width (0.051834ms)
+    ✔ breaks long whitespace at line boundary (0.062792ms)
+    ✔ breaks long whitespace at line boundary 2 (0.045625ms)
+    ✔ breaks whitespace spanning full lines (0.042417ms)
+    ✔ force-breaks when wide char after word boundary wrap still overflows (0.142542ms)
+    ✔ splits oversized atomic segment across multiple chunks (0.112875ms)
+    ✔ splits oversized atomic segment at start of line (0.0905ms)
+    ✔ splits oversized atomic segment at end of line (0.052542ms)
+    ✔ splits consecutive oversized atomic segments (0.082208ms)
+    ✔ wraps normally after oversized atomic segment (0.131917ms)
+  ✔ Word wrapping (2.61875ms)
+  ▶ Kill ring
+    ✔ Ctrl+W saves deleted text to kill ring and Ctrl+Y yanks it (0.511584ms)
+    ✔ Ctrl+U saves deleted text to kill ring (0.359208ms)
+    ✔ Ctrl+K saves deleted text to kill ring (0.243625ms)
+    ✔ Ctrl+Y does nothing when kill ring is empty (0.176834ms)
+    ✔ Alt+Y cycles through kill ring after Ctrl+Y (0.360458ms)
+    ✔ Alt+Y does nothing if not preceded by yank (0.273875ms)
+    ✔ Alt+Y does nothing if kill ring has ≤1 entry (0.248292ms)
+    ✔ consecutive Ctrl+W accumulates into one kill ring entry (0.258834ms)
+    ✔ Ctrl+U accumulates multiline deletes including newlines (0.215542ms)
+    ✔ backward deletions prepend, forward deletions append during accumulation (0.27975ms)
+    ✔ non-delete actions break kill accumulation (0.239625ms)
+    ✔ non-yank actions break Alt+Y chain (0.207875ms)
+    ✔ kill ring rotation persists after cycling (0.238333ms)
+    ✔ consecutive deletions across lines coalesce into one entry (0.218875ms)
+    ✔ Ctrl+K at line end deletes newline and coalesces (0.301041ms)
+    ✔ handles yank in middle of text (0.288541ms)
+    ✔ handles yank-pop in middle of text (1.247ms)
+    ✔ multiline yank and yank-pop in middle of text (1.000166ms)
+    ✔ Alt+D deletes word forward and saves to kill ring (0.887583ms)
+    ✔ Alt+D at end of line deletes newline (1.143958ms)
+  ✔ Kill ring (9.089666ms)
+  ▶ Undo
+    ✔ does nothing when undo stack is empty (0.374917ms)
+    ✔ coalesces consecutive word characters into one undo unit (1.234708ms)
+    ✔ undoes spaces one at a time (2.357875ms)
+    ✔ undoes newlines and signals next word to capture state (0.509458ms)
+    ✔ undoes backspace (0.344292ms)
+    ✔ undoes forward delete (0.411458ms)
+    ✔ undoes Ctrl+W (delete word backward) (1.177291ms)
+    ✔ undoes Ctrl+K (delete to line end) (0.557584ms)
+    ✔ undoes Ctrl+U (delete to line start) (0.42675ms)
+    ✔ undoes yank (0.623917ms)
+    ✔ undoes single-line paste atomically (0.788791ms)
+    ✔ does not trigger autocomplete during single-line paste (0.258208ms)
+    ✔ undoes multi-line paste atomically (1.2495ms)
+    ✔ undoes insertTextAtCursor atomically (0.334833ms)
+    ✔ insertTextAtCursor handles multiline text (0.25925ms)
+    ✔ insertTextAtCursor normalizes CRLF and CR line endings (0.1675ms)
+    ✔ undoes setText to empty string (0.2865ms)
+    ✔ clears undo stack on submit (0.284166ms)
+    ✔ exits history browsing mode on undo (0.237208ms)
+    ✔ undo restores to pre-history state even after multiple history navigations (0.284916ms)
+    ✔ cursor movement starts new undo unit (0.374542ms)
+    ✔ no-op delete operations do not push undo snapshots (0.221875ms)
+    ✔ undoes autocomplete (5.500792ms)
+  ✔ Undo (18.658416ms)
+  ▶ Autocomplete
+    ✔ auto-applies single force-file suggestion without showing menu (3.532791ms)
+    ✔ shows menu when force-file has multiple suggestions (2.649667ms)
+    ✔ keeps suggestions open when typing in force mode (Tab-triggered) (0.825458ms)
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Gemini Provider (gemini-2.5-flash) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Gemini Provider (gemini-2.5-flash) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Gemini Provider (gemini-2.5-flash) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Gemini Provider (gemini-2.5-flash) > should handle thinking
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Gemini Provider (gemini-2.5-flash) > should handle multi-turn with thinking and tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Gemini Provider (gemini-2.5-flash) > should handle image input
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Vertex Provider (gemini-3-flash-preview) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Vertex Provider (gemini-3-flash-preview) > should complete basic text generation with Vertex API key
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Vertex Provider (gemini-3-flash-preview) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Vertex Provider (gemini-3-flash-preview) > should handle thinking
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Vertex Provider (gemini-3-flash-preview) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Vertex Provider (gemini-3-flash-preview) > should handle multi-turn with thinking and tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Vertex Provider (gemini-3-flash-preview) > should handle image input
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > OpenAI Completions Provider (gpt-4o-mini) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > OpenAI Completions Provider (gpt-4o-mini) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > OpenAI Completions Provider (gpt-4o-mini) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > OpenAI Completions Provider (gpt-4o-mini) > should handle image input
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > OpenAI Responses Provider (gpt-5-mini) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > OpenAI Responses Provider (gpt-5-mini) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > OpenAI Responses Provider (gpt-5-mini) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > OpenAI Responses Provider (gpt-5-mini) > should handle thinking
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > OpenAI Responses Provider (gpt-5-mini) > should handle multi-turn with thinking and tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > OpenAI Responses Provider (gpt-5-mini) > should handle image input
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Anthropic Provider (claude-3-5-haiku-20241022) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Anthropic Provider (claude-3-5-haiku-20241022) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Anthropic Provider (claude-3-5-haiku-20241022) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Anthropic Provider (claude-3-5-haiku-20241022) > should handle image input
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Azure OpenAI Responses Provider (gpt-4o-mini) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Azure OpenAI Responses Provider (gpt-4o-mini) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Azure OpenAI Responses Provider (gpt-4o-mini) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Azure OpenAI Responses Provider (gpt-4o-mini) > should handle image input
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > xAI Provider (grok-code-fast-1 via OpenAI Completions) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > xAI Provider (grok-code-fast-1 via OpenAI Completions) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > xAI Provider (grok-code-fast-1 via OpenAI Completions) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > xAI Provider (grok-code-fast-1 via OpenAI Completions) > should handle thinking mode
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > xAI Provider (grok-code-fast-1 via OpenAI Completions) > should handle multi-turn with thinking and tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Groq Provider (gpt-oss-20b via OpenAI Completions) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Groq Provider (gpt-oss-20b via OpenAI Completions) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Groq Provider (gpt-oss-20b via OpenAI Completions) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Groq Provider (gpt-oss-20b via OpenAI Completions) > should handle thinking mode
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Groq Provider (gpt-oss-20b via OpenAI Completions) > should handle multi-turn with thinking and tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Cerebras Provider (gpt-oss-120b via OpenAI Completions) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Cerebras Provider (gpt-oss-120b via OpenAI Completions) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Cerebras Provider (gpt-oss-120b via OpenAI Completions) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Cerebras Provider (gpt-oss-120b via OpenAI Completions) > should handle thinking mode
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Cerebras Provider (gpt-oss-120b via OpenAI Completions) > should handle multi-turn with thinking and tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Hugging Face Provider (Kimi-K2.5 via OpenAI Completions) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Hugging Face Provider (Kimi-K2.5 via OpenAI Completions) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Hugging Face Provider (Kimi-K2.5 via OpenAI Completions) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Hugging Face Provider (Kimi-K2.5 via OpenAI Completions) > should handle thinking mode
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Hugging Face Provider (Kimi-K2.5 via OpenAI Completions) > should handle multi-turn with thinking and tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > OpenRouter Provider (glm-4.5v via OpenAI Completions) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > OpenRouter Provider (glm-4.5v via OpenAI Completions) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > OpenRouter Provider (glm-4.5v via OpenAI Completions) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > OpenRouter Provider (glm-4.5v via OpenAI Completions) > should handle thinking mode
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > OpenRouter Provider (glm-4.5v via OpenAI Completions) > should handle multi-turn with thinking and tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > OpenRouter Provider (glm-4.5v via OpenAI Completions) > should handle image input
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Vercel AI Gateway Provider (google/gemini-2.5-flash via Anthropic Messages) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Vercel AI Gateway Provider (google/gemini-2.5-flash via Anthropic Messages) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Vercel AI Gateway Provider (google/gemini-2.5-flash via Anthropic Messages) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Vercel AI Gateway Provider (google/gemini-2.5-flash via Anthropic Messages) > should handle image input
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Vercel AI Gateway Provider (google/gemini-2.5-flash via Anthropic Messages) > should handle multi-turn with tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Vercel AI Gateway Provider (anthropic/claude-opus-4.5 via Anthropic Messages) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Vercel AI Gateway Provider (anthropic/claude-opus-4.5 via Anthropic Messages) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Vercel AI Gateway Provider (anthropic/claude-opus-4.5 via Anthropic Messages) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Vercel AI Gateway Provider (anthropic/claude-opus-4.5 via Anthropic Messages) > should handle image input
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Vercel AI Gateway Provider (anthropic/claude-opus-4.5 via Anthropic Messages) > should handle multi-turn with tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Vercel AI Gateway Provider (openai/gpt-5.1-codex-max via Anthropic Messages) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Vercel AI Gateway Provider (openai/gpt-5.1-codex-max via Anthropic Messages) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Vercel AI Gateway Provider (openai/gpt-5.1-codex-max via Anthropic Messages) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Vercel AI Gateway Provider (openai/gpt-5.1-codex-max via Anthropic Messages) > should handle image input
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Vercel AI Gateway Provider (openai/gpt-5.1-codex-max via Anthropic Messages) > should handle multi-turn with tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > zAI Provider (glm-5 via OpenAI Completions) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > zAI Provider (glm-5 via OpenAI Completions) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > zAI Provider (glm-5 via OpenAI Completions) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > zAI Provider (glm-5 via OpenAI Completions) > should handle thinking mode
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > zAI Provider (glm-5 via OpenAI Completions) > should handle multi-turn with thinking and tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > zAI Provider (glm-5 via OpenAI Completions) > should handle image input
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Mistral Provider (devstral-medium-latest) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Mistral Provider (devstral-medium-latest) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Mistral Provider (devstral-medium-latest) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Mistral Provider (devstral-medium-latest) > should handle thinking mode
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Mistral Provider (devstral-medium-latest) > should handle multi-turn with thinking and tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Mistral Provider (pixtral-12b with image support) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Mistral Provider (pixtral-12b with image support) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Mistral Provider (pixtral-12b with image support) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Mistral Provider (pixtral-12b with image support) > should handle image input
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > MiniMax Provider (MiniMax-M2.7 via Anthropic Messages) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > MiniMax Provider (MiniMax-M2.7 via Anthropic Messages) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > MiniMax Provider (MiniMax-M2.7 via Anthropic Messages) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > MiniMax Provider (MiniMax-M2.7 via Anthropic Messages) > should handle thinking mode
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > MiniMax Provider (MiniMax-M2.7 via Anthropic Messages) > should handle multi-turn with thinking and tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Kimi For Coding Provider (kimi-k2-thinking via Anthropic Messages) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Kimi For Coding Provider (kimi-k2-thinking via Anthropic Messages) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Kimi For Coding Provider (kimi-k2-thinking via Anthropic Messages) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Kimi For Coding Provider (kimi-k2-thinking via Anthropic Messages) > should handle thinking mode
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Kimi For Coding Provider (kimi-k2-thinking via Anthropic Messages) > should handle multi-turn with thinking and tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Anthropic OAuth Provider (claude-sonnet-4-20250514) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Anthropic OAuth Provider (claude-sonnet-4-20250514) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Anthropic OAuth Provider (claude-sonnet-4-20250514) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Anthropic OAuth Provider (claude-sonnet-4-20250514) > should handle thinking
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Anthropic OAuth Provider (claude-sonnet-4-20250514) > should handle multi-turn with thinking and tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Anthropic OAuth Provider (claude-sonnet-4-20250514) > should handle image input
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Anthropic OAuth Provider (claude-opus-4-6 with adaptive thinking) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Anthropic OAuth Provider (claude-opus-4-6 with adaptive thinking) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Anthropic OAuth Provider (claude-opus-4-6 with adaptive thinking) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Anthropic OAuth Provider (claude-opus-4-6 with adaptive thinking) > should handle adaptive thinking with effort high
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Anthropic OAuth Provider (claude-opus-4-6 with adaptive thinking) > should handle adaptive thinking with effort medium
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Anthropic OAuth Provider (claude-opus-4-6 with adaptive thinking) > should handle multi-turn with adaptive thinking and tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Anthropic OAuth Provider (claude-opus-4-6 with adaptive thinking) > should handle image input
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > GitHub Copilot Provider (gpt-5.3-codex via OpenAI Completions) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > GitHub Copilot Provider (gpt-5.3-codex via OpenAI Completions) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > GitHub Copilot Provider (gpt-5.3-codex via OpenAI Completions) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > GitHub Copilot Provider (gpt-5.3-codex via OpenAI Completions) > should handle thinking
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > GitHub Copilot Provider (gpt-5.3-codex via OpenAI Completions) > should handle multi-turn with thinking and tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > GitHub Copilot Provider (gpt-5.3-codex via OpenAI Completions) > should handle image input
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > GitHub Copilot Provider (claude-sonnet-4 via Anthropic Messages) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > GitHub Copilot Provider (claude-sonnet-4 via Anthropic Messages) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > GitHub Copilot Provider (claude-sonnet-4 via Anthropic Messages) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > GitHub Copilot Provider (claude-sonnet-4 via Anthropic Messages) > should handle thinking
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > GitHub Copilot Provider (claude-sonnet-4 via Anthropic Messages) > should handle multi-turn with thinking and tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > GitHub Copilot Provider (claude-sonnet-4 via Anthropic Messages) > should handle image input
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Gemini CLI Provider (gemini-2.5-flash) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Gemini CLI Provider (gemini-2.5-flash) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Gemini CLI Provider (gemini-2.5-flash) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Gemini CLI Provider (gemini-2.5-flash) > should handle thinking
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Gemini CLI Provider (gemini-2.5-flash) > should handle multi-turn with thinking and tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Gemini CLI Provider (gemini-2.5-flash) > should handle image input
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Gemini CLI Provider (gemini-3-flash-preview with thinkingLevel) > should handle thinking with thinkingLevel
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Gemini CLI Provider (gemini-3-flash-preview with thinkingLevel) > should handle multi-turn with thinking and tools
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Antigravity Provider (gemini-3.1-pro-high) > should complete basic text generation
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Antigravity Provider (gemini-3.1-pro-high) > should handle tool calling
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Antigravity Provider (gemini-3.1-pro-high) > should handle streaming
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Antigravity Provider (gemini-3.1-pro-high) > should handle thinking with thinkingLevel
+ ↓ packages/ai/test/stream.test.ts > Generate E2E Tests > Google Antigravity Provider (gemini-3.1-pro-high) > should handle multi-turn with thinking and tools

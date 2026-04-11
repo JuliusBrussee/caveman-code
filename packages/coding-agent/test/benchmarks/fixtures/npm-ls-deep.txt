@@ -1,0 +1,700 @@
+cave-pi-monorepo@0.0.3 /Users/julb/Desktop/GitHub/caveman-cli
+├─┬ @biomejs/biome@2.3.5
+│ ├── @biomejs/cli-darwin-arm64@2.3.5
+│ ├── UNMET OPTIONAL DEPENDENCY @biomejs/cli-darwin-x64@2.3.5
+│ ├── UNMET OPTIONAL DEPENDENCY @biomejs/cli-linux-arm64-musl@2.3.5
+│ ├── UNMET OPTIONAL DEPENDENCY @biomejs/cli-linux-arm64@2.3.5
+│ ├── UNMET OPTIONAL DEPENDENCY @biomejs/cli-linux-x64-musl@2.3.5
+│ ├── UNMET OPTIONAL DEPENDENCY @biomejs/cli-linux-x64@2.3.5
+│ ├── UNMET OPTIONAL DEPENDENCY @biomejs/cli-win32-arm64@2.3.5
+│ └── UNMET OPTIONAL DEPENDENCY @biomejs/cli-win32-x64@2.3.5
+├─┬ @cave/markdown-preview@0.9.6 -> ./packages/markdown-preview
+│ ├── @cavepi/pi-coding-agent@0.65.2 deduped -> ./packages/coding-agent
+│ ├── @cavepi/pi-tui@0.65.2 deduped -> ./packages/tui
+│ ├─┬ @types/node@24.12.2
+│ │ └── undici-types@7.16.0
+│ ├─┬ puppeteer-core@24.40.0
+│ │ ├─┬ @puppeteer/browsers@2.13.0
+│ │ │ ├── debug@4.4.3 deduped
+│ │ │ ├── extract-zip@2.0.1 deduped
+│ │ │ ├── progress@2.0.3
+│ │ │ ├── proxy-agent@6.5.0 deduped
+│ │ │ ├── semver@7.7.4
+│ │ │ ├─┬ tar-fs@3.1.2
+│ │ │ │ ├─┬ bare-fs@4.6.0
+│ │ │ │ │ ├── UNMET OPTIONAL DEPENDENCY bare-buffer@*
+│ │ │ │ │ ├─┬ bare-events@2.8.2
+│ │ │ │ │ │ └── UNMET OPTIONAL DEPENDENCY bare-abort-controller@*
+│ │ │ │ │ ├── bare-path@3.0.0 deduped
+│ │ │ │ │ ├─┬ bare-stream@2.12.0
+│ │ │ │ │ │ ├── UNMET OPTIONAL DEPENDENCY bare-abort-controller@*
+│ │ │ │ │ │ ├── UNMET OPTIONAL DEPENDENCY bare-buffer@*
+│ │ │ │ │ │ ├── bare-events@2.8.2 deduped
+│ │ │ │ │ │ ├── streamx@2.25.0 deduped
+│ │ │ │ │ │ └─┬ teex@1.0.1
+│ │ │ │ │ │   └── streamx@2.25.0 deduped
+│ │ │ │ │ ├─┬ bare-url@2.4.0
+│ │ │ │ │ │ └── bare-path@3.0.0 deduped
+│ │ │ │ │ └── fast-fifo@1.3.2
+│ │ │ │ ├─┬ bare-path@3.0.0
+│ │ │ │ │ └── bare-os@3.8.7
+│ │ │ │ ├── pump@3.0.4 deduped
+│ │ │ │ └─┬ tar-stream@3.1.8
+│ │ │ │   ├─┬ b4a@1.8.0
+│ │ │ │   │ └── UNMET OPTIONAL DEPENDENCY react-native-b4a@*
+│ │ │ │   ├── bare-fs@4.6.0 deduped
+│ │ │ │   ├── fast-fifo@1.3.2 deduped
+│ │ │ │   └─┬ streamx@2.25.0
+│ │ │ │     ├─┬ events-universal@1.0.1
+│ │ │ │     │ └── bare-events@2.8.2 deduped
+│ │ │ │     ├── fast-fifo@1.3.2 deduped
+│ │ │ │     └─┬ text-decoder@1.2.7
+│ │ │ │       └── b4a@1.8.0 deduped
+│ │ │ └─┬ yargs@17.7.2
+│ │ │   ├─┬ cliui@8.0.1
+│ │ │   │ ├── string-width@4.2.3 deduped
+│ │ │   │ ├─┬ strip-ansi@6.0.1
+│ │ │   │ │ └── ansi-regex@5.0.1
+│ │ │   │ └── wrap-ansi@7.0.0 deduped
+│ │ │   ├── escalade@3.2.0 deduped
+│ │ │   ├── get-caller-file@2.0.5 deduped
+│ │ │   ├── require-directory@2.1.1 deduped
+│ │ │   ├── string-width@4.2.3 deduped
+│ │ │   ├── y18n@5.0.8 deduped
+│ │ │   └── yargs-parser@21.1.1
+│ │ ├─┬ chromium-bidi@14.0.0
+│ │ │ ├── devtools-protocol@0.0.1581282 deduped
+│ │ │ ├── mitt@3.0.1
+│ │ │ └── zod@3.25.76
+│ │ ├─┬ debug@4.4.3
+│ │ │ └── ms@2.1.3 deduped
+│ │ ├── devtools-protocol@0.0.1581282
+│ │ ├── typed-query-selector@2.12.1
+│ │ ├── webdriver-bidi-protocol@0.4.1
+│ │ └─┬ ws@8.20.0
+│ │   ├── UNMET OPTIONAL DEPENDENCY bufferutil@^4.0.1
+│ │   └── UNMET OPTIONAL DEPENDENCY utf-8-validate@>=5.0.2
+│ └── typescript@5.9.3 deduped
+├─┬ @cavekit/pi-extension@0.1.0 -> ./packages/cavekit-extension
+│ ├── @cavepi/pi-ai@0.65.2 deduped -> ./packages/ai
+│ ├── @cavepi/pi-coding-agent@0.65.2 deduped -> ./packages/coding-agent
+│ ├── @cavepi/pi-tui@0.65.2 deduped -> ./packages/tui
+│ ├── @types/node@22.19.17 deduped
+│ ├── shx@0.4.0 deduped
+│ ├── typescript@5.9.3 deduped
+│ ├─┬ vitest@3.2.4
+│ │ ├── UNMET OPTIONAL DEPENDENCY @edge-runtime/vm@*
+│ │ ├─┬ @types/chai@5.2.3
+│ │ │ ├── @types/deep-eql@4.0.2
+│ │ │ └── assertion-error@2.0.1
+│ │ ├── UNMET OPTIONAL DEPENDENCY @types/debug@^4.1.12
+│ │ ├── @types/node@22.19.17 deduped
+│ │ ├── UNMET OPTIONAL DEPENDENCY @vitest/browser@3.2.4
+│ │ ├─┬ @vitest/expect@3.2.4
+│ │ │ ├── @types/chai@5.2.3 deduped
+│ │ │ ├── @vitest/spy@3.2.4 deduped
+│ │ │ ├── @vitest/utils@3.2.4 deduped
+│ │ │ ├── chai@5.3.3 deduped
+│ │ │ └── tinyrainbow@2.0.0 deduped
+│ │ ├─┬ @vitest/mocker@3.2.4
+│ │ │ ├── @vitest/spy@3.2.4 deduped
+│ │ │ ├─┬ estree-walker@3.0.3
+│ │ │ │ └── @types/estree@1.0.8 deduped
+│ │ │ ├── magic-string@0.30.21 deduped
+│ │ │ ├── UNMET OPTIONAL DEPENDENCY msw@^2.4.9
+│ │ │ └── vite@7.3.1 deduped
+│ │ ├─┬ @vitest/pretty-format@3.2.4
+│ │ │ └── tinyrainbow@2.0.0 deduped
+│ │ ├─┬ @vitest/runner@3.2.4
+│ │ │ ├── @vitest/utils@3.2.4 deduped
+│ │ │ ├── pathe@2.0.3 deduped
+│ │ │ └─┬ strip-literal@3.1.0
+│ │ │   └── js-tokens@9.0.1
+│ │ ├─┬ @vitest/snapshot@3.2.4
+│ │ │ ├── @vitest/pretty-format@3.2.4 deduped
+│ │ │ ├── magic-string@0.30.21 deduped
+│ │ │ └── pathe@2.0.3 deduped
+│ │ ├─┬ @vitest/spy@3.2.4
+│ │ │ └── tinyspy@4.0.4
+│ │ ├── UNMET OPTIONAL DEPENDENCY @vitest/ui@3.2.4
+│ │ ├─┬ @vitest/utils@3.2.4
+│ │ │ ├── @vitest/pretty-format@3.2.4 deduped
+│ │ │ ├── loupe@3.2.1
+│ │ │ └── tinyrainbow@2.0.0 deduped
+│ │ ├─┬ chai@5.3.3
+│ │ │ ├── assertion-error@2.0.1 deduped
+│ │ │ ├── check-error@2.1.3
+│ │ │ ├── deep-eql@5.0.2
+│ │ │ ├── loupe@3.2.1 deduped
+│ │ │ └── pathval@2.0.1
+│ │ ├── debug@4.4.3 deduped
+│ │ ├── expect-type@1.3.0
+│ │ ├── UNMET OPTIONAL DEPENDENCY happy-dom@*
+│ │ ├── UNMET OPTIONAL DEPENDENCY jsdom@*
+│ │ ├─┬ magic-string@0.30.21
+│ │ │ └── @jridgewell/sourcemap-codec@1.5.5
+│ │ ├── pathe@2.0.3
+│ │ ├── picomatch@4.0.4
+│ │ ├── std-env@3.10.0 deduped
+│ │ ├── tinybench@2.9.0
+│ │ ├── tinyexec@0.3.2
+│ │ ├─┬ tinyglobby@0.2.15
+│ │ │ ├─┬ fdir@6.5.0
+│ │ │ │ └── picomatch@4.0.4 deduped
+│ │ │ └── picomatch@4.0.4
+│ │ ├── tinypool@1.1.1
+│ │ ├── tinyrainbow@2.0.0
+│ │ ├─┬ vite-node@3.2.4
+│ │ │ ├── cac@6.7.14
+│ │ │ ├── debug@4.4.3 deduped
+│ │ │ ├── es-module-lexer@1.7.0
+│ │ │ ├── pathe@2.0.3 deduped
+│ │ │ └── vite@7.3.1 deduped
+│ │ ├── vite@7.3.1 deduped
+│ │ └─┬ why-is-node-running@2.3.0
+│ │   ├── siginfo@2.0.0
+│ │   └── stackback@0.0.2
+│ └── yaml@2.8.3
+├─┬ @cavepi/pi-agent-core@0.65.2 -> ./packages/agent
+│ ├── @cavepi/pi-ai@0.65.2 deduped -> ./packages/ai
+│ ├─┬ @types/node@24.12.2
+│ │ └── undici-types@7.16.0
+│ ├── typescript@5.9.3 deduped
+│ └── vitest@3.2.4 deduped
+├─┬ @cavepi/pi-ai@0.65.2 -> ./packages/ai
+│ ├─┬ @anthropic-ai/sdk@0.73.0
+│ │ ├─┬ json-schema-to-ts@3.1.1
+│ │ │ ├── @babel/runtime@7.29.2
+│ │ │ └── ts-algebra@2.0.0
+│ │ └── zod@4.3.6
+│ ├─┬ @aws-sdk/client-bedrock-runtime@3.1024.0
+│ │ ├─┬ @aws-crypto/sha256-browser@5.2.0
+│ │ │ ├── @aws-crypto/sha256-js@5.2.0 deduped
+│ │ │ ├─┬ @aws-crypto/supports-web-crypto@5.2.0
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├─┬ @aws-crypto/util@5.2.0
+│ │ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ │ ├─┬ @smithy/util-utf8@2.3.0
+│ │ │ │ │ ├─┬ @smithy/util-buffer-from@2.2.0
+│ │ │ │ │ │ ├─┬ @smithy/is-array-buffer@2.2.0
+│ │ │ │ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ ├─┬ @aws-sdk/util-locate-window@3.965.5
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├─┬ @smithy/util-utf8@2.3.0
+│ │ │ │ ├─┬ @smithy/util-buffer-from@2.2.0
+│ │ │ │ │ ├─┬ @smithy/is-array-buffer@2.2.0
+│ │ │ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @aws-crypto/sha256-js@5.2.0
+│ │ │ ├── @aws-crypto/util@5.2.0 deduped
+│ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @aws-sdk/core@3.973.26
+│ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ ├─┬ @aws-sdk/xml-builder@3.972.16
+│ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ ├─┬ fast-xml-parser@5.3.8 invalid: "5.5.8" from node_modules/@aws-sdk/xml-builder
+│ │ │ │ │ └── strnum@2.2.2
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├── @smithy/core@3.23.13 deduped
+│ │ │ ├── @smithy/node-config-provider@4.3.12 deduped
+│ │ │ ├─┬ @smithy/property-provider@4.2.12
+│ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├── @smithy/protocol-http@5.3.12 deduped
+│ │ │ ├─┬ @smithy/signature-v4@5.3.12
+│ │ │ │ ├─┬ @smithy/is-array-buffer@4.2.2
+│ │ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ │ ├── @smithy/protocol-http@5.3.12 deduped
+│ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ ├── @smithy/util-hex-encoding@4.2.2 deduped
+│ │ │ │ ├── @smithy/util-middleware@4.2.12 deduped
+│ │ │ │ ├─┬ @smithy/util-uri-escape@4.2.2
+│ │ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ │ ├── @smithy/util-utf8@4.2.2 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├── @smithy/smithy-client@4.12.8 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ ├── @smithy/util-base64@4.3.2 deduped
+│ │ │ ├── @smithy/util-middleware@4.2.12 deduped
+│ │ │ ├── @smithy/util-utf8@4.2.2 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @aws-sdk/credential-provider-node@3.972.29
+│ │ │ ├─┬ @aws-sdk/credential-provider-env@3.972.24
+│ │ │ │ ├── @aws-sdk/core@3.973.26 deduped
+│ │ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ │ ├── @smithy/property-provider@4.2.12 deduped
+│ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├─┬ @aws-sdk/credential-provider-http@3.972.26
+│ │ │ │ ├── @aws-sdk/core@3.973.26 deduped
+│ │ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ │ ├── @smithy/fetch-http-handler@5.3.15 deduped
+│ │ │ │ ├── @smithy/node-http-handler@4.5.1 deduped
+│ │ │ │ ├── @smithy/property-provider@4.2.12 deduped
+│ │ │ │ ├── @smithy/protocol-http@5.3.12 deduped
+│ │ │ │ ├── @smithy/smithy-client@4.12.8 deduped
+│ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ ├── @smithy/util-stream@4.5.21 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├─┬ @aws-sdk/credential-provider-ini@3.972.28
+│ │ │ │ ├── @aws-sdk/core@3.973.26 deduped
+│ │ │ │ ├── @aws-sdk/credential-provider-env@3.972.24 deduped
+│ │ │ │ ├── @aws-sdk/credential-provider-http@3.972.26 deduped
+│ │ │ │ ├─┬ @aws-sdk/credential-provider-login@3.972.28
+│ │ │ │ │ ├── @aws-sdk/core@3.973.26 deduped
+│ │ │ │ │ ├── @aws-sdk/nested-clients@3.996.18 deduped
+│ │ │ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ │ │ ├── @smithy/property-provider@4.2.12 deduped
+│ │ │ │ │ ├── @smithy/protocol-http@5.3.12 deduped
+│ │ │ │ │ ├── @smithy/shared-ini-file-loader@4.4.7 deduped
+│ │ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ │ ├── @aws-sdk/credential-provider-process@3.972.24 deduped
+│ │ │ │ ├── @aws-sdk/credential-provider-sso@3.972.28 deduped
+│ │ │ │ ├── @aws-sdk/credential-provider-web-identity@3.972.28 deduped
+│ │ │ │ ├── @aws-sdk/nested-clients@3.996.18 deduped
+│ │ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ │ ├── @smithy/credential-provider-imds@4.2.12 deduped
+│ │ │ │ ├── @smithy/property-provider@4.2.12 deduped
+│ │ │ │ ├── @smithy/shared-ini-file-loader@4.4.7 deduped
+│ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├─┬ @aws-sdk/credential-provider-process@3.972.24
+│ │ │ │ ├── @aws-sdk/core@3.973.26 deduped
+│ │ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ │ ├── @smithy/property-provider@4.2.12 deduped
+│ │ │ │ ├── @smithy/shared-ini-file-loader@4.4.7 deduped
+│ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├─┬ @aws-sdk/credential-provider-sso@3.972.28
+│ │ │ │ ├── @aws-sdk/core@3.973.26 deduped
+│ │ │ │ ├── @aws-sdk/nested-clients@3.996.18 deduped
+│ │ │ │ ├─┬ @aws-sdk/token-providers@3.1021.0
+│ │ │ │ │ ├── @aws-sdk/core@3.973.26 deduped
+│ │ │ │ │ ├── @aws-sdk/nested-clients@3.996.18 deduped
+│ │ │ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ │ │ ├── @smithy/property-provider@4.2.12 deduped
+│ │ │ │ │ ├── @smithy/shared-ini-file-loader@4.4.7 deduped
+│ │ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ │ ├── @smithy/property-provider@4.2.12 deduped
+│ │ │ │ ├── @smithy/shared-ini-file-loader@4.4.7 deduped
+│ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├─┬ @aws-sdk/credential-provider-web-identity@3.972.28
+│ │ │ │ ├── @aws-sdk/core@3.973.26 deduped
+│ │ │ │ ├── @aws-sdk/nested-clients@3.996.18 deduped
+│ │ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ │ ├── @smithy/property-provider@4.2.12 deduped
+│ │ │ │ ├── @smithy/shared-ini-file-loader@4.4.7 deduped
+│ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ ├─┬ @smithy/credential-provider-imds@4.2.12
+│ │ │ │ ├── @smithy/node-config-provider@4.3.12 deduped
+│ │ │ │ ├── @smithy/property-provider@4.2.12 deduped
+│ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ ├── @smithy/url-parser@4.2.12 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├── @smithy/property-provider@4.2.12 deduped
+│ │ │ ├─┬ @smithy/shared-ini-file-loader@4.4.7
+│ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @aws-sdk/eventstream-handler-node@3.972.12
+│ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ ├─┬ @smithy/eventstream-codec@4.2.12
+│ │ │ │ ├─┬ @aws-crypto/crc32@5.2.0
+│ │ │ │ │ ├── @aws-crypto/util@5.2.0 deduped
+│ │ │ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ ├── @smithy/util-hex-encoding@4.2.2 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @aws-sdk/middleware-eventstream@3.972.8
+│ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ ├── @smithy/protocol-http@5.3.12 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @aws-sdk/middleware-host-header@3.972.8
+│ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ ├── @smithy/protocol-http@5.3.12 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @aws-sdk/middleware-logger@3.972.8
+│ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @aws-sdk/middleware-recursion-detection@3.972.9
+│ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ ├── @aws/lambda-invoke-store@0.2.4
+│ │ │ ├── @smithy/protocol-http@5.3.12 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @aws-sdk/middleware-user-agent@3.972.28
+│ │ │ ├── @aws-sdk/core@3.973.26 deduped
+│ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ ├── @aws-sdk/util-endpoints@3.996.5 deduped
+│ │ │ ├── @smithy/core@3.23.13 deduped
+│ │ │ ├── @smithy/protocol-http@5.3.12 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ ├── @smithy/util-retry@4.2.13 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @aws-sdk/middleware-websocket@3.972.14
+│ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ ├─┬ @aws-sdk/util-format-url@3.972.8
+│ │ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ │ ├── @smithy/querystring-builder@4.2.12 deduped
+│ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├── @smithy/eventstream-codec@4.2.12 deduped
+│ │ │ ├── @smithy/eventstream-serde-browser@4.2.12 deduped
+│ │ │ ├── @smithy/fetch-http-handler@5.3.15 deduped
+│ │ │ ├── @smithy/protocol-http@5.3.12 deduped
+│ │ │ ├── @smithy/signature-v4@5.3.12 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ ├── @smithy/util-base64@4.3.2 deduped
+│ │ │ ├─┬ @smithy/util-hex-encoding@4.2.2
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├── @smithy/util-utf8@4.2.2 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @aws-sdk/region-config-resolver@3.972.10
+│ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ ├── @smithy/config-resolver@4.4.13 deduped
+│ │ │ ├── @smithy/node-config-provider@4.3.12 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @aws-sdk/token-providers@3.1024.0
+│ │ │ ├── @aws-sdk/core@3.973.26 deduped
+│ │ │ ├─┬ @aws-sdk/nested-clients@3.996.18
+│ │ │ │ ├── @aws-crypto/sha256-browser@5.2.0 deduped
+│ │ │ │ ├── @aws-crypto/sha256-js@5.2.0 deduped
+│ │ │ │ ├── @aws-sdk/core@3.973.26 deduped
+│ │ │ │ ├── @aws-sdk/middleware-host-header@3.972.8 deduped
+│ │ │ │ ├── @aws-sdk/middleware-logger@3.972.8 deduped
+│ │ │ │ ├── @aws-sdk/middleware-recursion-detection@3.972.9 deduped
+│ │ │ │ ├── @aws-sdk/middleware-user-agent@3.972.28 deduped
+│ │ │ │ ├── @aws-sdk/region-config-resolver@3.972.10 deduped
+│ │ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ │ ├── @aws-sdk/util-endpoints@3.996.5 deduped
+│ │ │ │ ├── @aws-sdk/util-user-agent-browser@3.972.8 deduped
+│ │ │ │ ├── @aws-sdk/util-user-agent-node@3.973.14 deduped
+│ │ │ │ ├── @smithy/config-resolver@4.4.13 deduped
+│ │ │ │ ├── @smithy/core@3.23.13 deduped
+│ │ │ │ ├── @smithy/fetch-http-handler@5.3.15 deduped
+│ │ │ │ ├── @smithy/hash-node@4.2.12 deduped
+│ │ │ │ ├── @smithy/invalid-dependency@4.2.12 deduped
+│ │ │ │ ├── @smithy/middleware-content-length@4.2.12 deduped
+│ │ │ │ ├── @smithy/middleware-endpoint@4.4.28 deduped
+│ │ │ │ ├── @smithy/middleware-retry@4.4.46 deduped
+│ │ │ │ ├── @smithy/middleware-serde@4.2.16 deduped
+│ │ │ │ ├── @smithy/middleware-stack@4.2.12 deduped
+│ │ │ │ ├── @smithy/node-config-provider@4.3.12 deduped
+│ │ │ │ ├── @smithy/node-http-handler@4.5.1 deduped
+│ │ │ │ ├── @smithy/protocol-http@5.3.12 deduped
+│ │ │ │ ├── @smithy/smithy-client@4.12.8 deduped
+│ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ ├── @smithy/url-parser@4.2.12 deduped
+│ │ │ │ ├── @smithy/util-base64@4.3.2 deduped
+│ │ │ │ ├── @smithy/util-body-length-browser@4.2.2 deduped
+│ │ │ │ ├── @smithy/util-body-length-node@4.2.3 deduped
+│ │ │ │ ├── @smithy/util-defaults-mode-browser@4.3.44 deduped
+│ │ │ │ ├── @smithy/util-defaults-mode-node@4.2.48 deduped
+│ │ │ │ ├── @smithy/util-endpoints@3.3.3 deduped
+│ │ │ │ ├── @smithy/util-middleware@4.2.12 deduped
+│ │ │ │ ├── @smithy/util-retry@4.2.13 deduped
+│ │ │ │ ├── @smithy/util-utf8@4.2.2 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ ├── @smithy/property-provider@4.2.12 deduped
+│ │ │ ├── @smithy/shared-ini-file-loader@4.4.7 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @aws-sdk/types@3.973.6
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @aws-sdk/util-endpoints@3.996.5
+│ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ ├── @smithy/url-parser@4.2.12 deduped
+│ │ │ ├── @smithy/util-endpoints@3.3.3 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @aws-sdk/util-user-agent-browser@3.972.8
+│ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ ├── bowser@2.14.1
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @aws-sdk/util-user-agent-node@3.973.14
+│ │ │ ├── @aws-sdk/middleware-user-agent@3.972.28 deduped
+│ │ │ ├── @aws-sdk/types@3.973.6 deduped
+│ │ │ ├── @smithy/node-config-provider@4.3.12 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ ├─┬ @smithy/util-config-provider@4.2.2
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├── UNMET OPTIONAL DEPENDENCY aws-crt@>=1.0.0
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/config-resolver@4.4.13
+│ │ │ ├── @smithy/node-config-provider@4.3.12 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ ├── @smithy/util-config-provider@4.2.2 deduped
+│ │ │ ├── @smithy/util-endpoints@3.3.3 deduped
+│ │ │ ├── @smithy/util-middleware@4.2.12 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/core@3.23.13
+│ │ │ ├── @smithy/protocol-http@5.3.12 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ ├── @smithy/url-parser@4.2.12 deduped
+│ │ │ ├── @smithy/util-base64@4.3.2 deduped
+│ │ │ ├── @smithy/util-body-length-browser@4.2.2 deduped
+│ │ │ ├── @smithy/util-middleware@4.2.12 deduped
+│ │ │ ├── @smithy/util-stream@4.5.21 deduped
+│ │ │ ├── @smithy/util-utf8@4.2.2 deduped
+│ │ │ ├─┬ @smithy/uuid@1.1.2
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/eventstream-serde-browser@4.2.12
+│ │ │ ├─┬ @smithy/eventstream-serde-universal@4.2.12
+│ │ │ │ ├── @smithy/eventstream-codec@4.2.12 deduped
+│ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/eventstream-serde-config-resolver@4.3.12
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/eventstream-serde-node@4.2.12
+│ │ │ ├── @smithy/eventstream-serde-universal@4.2.12 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/fetch-http-handler@5.3.15
+│ │ │ ├── @smithy/protocol-http@5.3.12 deduped
+│ │ │ ├─┬ @smithy/querystring-builder@4.2.12
+│ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ ├── @smithy/util-uri-escape@4.2.2 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ ├── @smithy/util-base64@4.3.2 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/hash-node@4.2.12
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ ├─┬ @smithy/util-buffer-from@4.2.2
+│ │ │ │ ├── @smithy/is-array-buffer@4.2.2 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├── @smithy/util-utf8@4.2.2 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/invalid-dependency@4.2.12
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/middleware-content-length@4.2.12
+│ │ │ ├── @smithy/protocol-http@5.3.12 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/middleware-endpoint@4.4.28
+│ │ │ ├── @smithy/core@3.23.13 deduped
+│ │ │ ├── @smithy/middleware-serde@4.2.16 deduped
+│ │ │ ├── @smithy/node-config-provider@4.3.12 deduped
+│ │ │ ├── @smithy/shared-ini-file-loader@4.4.7 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ ├── @smithy/url-parser@4.2.12 deduped
+│ │ │ ├── @smithy/util-middleware@4.2.12 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/middleware-retry@4.4.46
+│ │ │ ├── @smithy/node-config-provider@4.3.12 deduped
+│ │ │ ├── @smithy/protocol-http@5.3.12 deduped
+│ │ │ ├─┬ @smithy/service-error-classification@4.2.12
+│ │ │ │ └── @smithy/types@4.13.1 deduped
+│ │ │ ├── @smithy/smithy-client@4.12.8 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ ├── @smithy/util-middleware@4.2.12 deduped
+│ │ │ ├── @smithy/util-retry@4.2.13 deduped
+│ │ │ ├── @smithy/uuid@1.1.2 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/middleware-serde@4.2.16
+│ │ │ ├── @smithy/core@3.23.13 deduped
+│ │ │ ├── @smithy/protocol-http@5.3.12 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/middleware-stack@4.2.12
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/node-config-provider@4.3.12
+│ │ │ ├── @smithy/property-provider@4.2.12 deduped
+│ │ │ ├── @smithy/shared-ini-file-loader@4.4.7 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/node-http-handler@4.5.1
+│ │ │ ├── @smithy/protocol-http@5.3.12 deduped
+│ │ │ ├── @smithy/querystring-builder@4.2.12 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/protocol-http@5.3.12
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/smithy-client@4.12.8
+│ │ │ ├── @smithy/core@3.23.13 deduped
+│ │ │ ├── @smithy/middleware-endpoint@4.4.28 deduped
+│ │ │ ├── @smithy/middleware-stack@4.2.12 deduped
+│ │ │ ├── @smithy/protocol-http@5.3.12 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ ├── @smithy/util-stream@4.5.21 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/types@4.13.1
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/url-parser@4.2.12
+│ │ │ ├─┬ @smithy/querystring-parser@4.2.12
+│ │ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ │ └── tslib@2.8.1 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/util-base64@4.3.2
+│ │ │ ├── @smithy/util-buffer-from@4.2.2 deduped
+│ │ │ ├── @smithy/util-utf8@4.2.2 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/util-body-length-browser@4.2.2
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/util-body-length-node@4.2.3
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/util-defaults-mode-browser@4.3.44
+│ │ │ ├── @smithy/property-provider@4.2.12 deduped
+│ │ │ ├── @smithy/smithy-client@4.12.8 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/util-defaults-mode-node@4.2.48
+│ │ │ ├── @smithy/config-resolver@4.4.13 deduped
+│ │ │ ├── @smithy/credential-provider-imds@4.2.12 deduped
+│ │ │ ├── @smithy/node-config-provider@4.3.12 deduped
+│ │ │ ├── @smithy/property-provider@4.2.12 deduped
+│ │ │ ├── @smithy/smithy-client@4.12.8 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/util-endpoints@3.3.3
+│ │ │ ├── @smithy/node-config-provider@4.3.12 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/util-middleware@4.2.12
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/util-retry@4.2.13
+│ │ │ ├── @smithy/service-error-classification@4.2.12 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/util-stream@4.5.21
+│ │ │ ├── @smithy/fetch-http-handler@5.3.15 deduped
+│ │ │ ├── @smithy/node-http-handler@4.5.1 deduped
+│ │ │ ├── @smithy/types@4.13.1 deduped
+│ │ │ ├── @smithy/util-base64@4.3.2 deduped
+│ │ │ ├── @smithy/util-buffer-from@4.2.2 deduped
+│ │ │ ├── @smithy/util-hex-encoding@4.2.2 deduped
+│ │ │ ├── @smithy/util-utf8@4.2.2 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ ├─┬ @smithy/util-utf8@4.2.2
+│ │ │ ├── @smithy/util-buffer-from@4.2.2 deduped
+│ │ │ └── tslib@2.8.1 deduped
+│ │ └── tslib@2.8.1
+│ ├─┬ @google/genai@1.48.0
+│ │ ├── UNMET OPTIONAL DEPENDENCY @modelcontextprotocol/sdk@^1.25.2
+│ │ ├─┬ google-auth-library@10.6.2
+│ │ │ ├── base64-js@1.5.1
+│ │ │ ├─┬ ecdsa-sig-formatter@1.0.11
+│ │ │ │ └── safe-buffer@5.2.1
+│ │ │ ├─┬ gaxios@7.1.4
+│ │ │ │ ├── extend@3.0.2
+│ │ │ │ ├── https-proxy-agent@7.0.6 deduped
+│ │ │ │ └─┬ node-fetch@3.3.2
+│ │ │ │   ├── data-uri-to-buffer@4.0.1
+│ │ │ │   ├─┬ fetch-blob@3.2.0
+│ │ │ │   │ ├── node-domexception@1.0.0
+│ │ │ │   │ └── web-streams-polyfill@3.3.3
+│ │ │ │   └─┬ formdata-polyfill@4.0.10
+│ │ │ │     └── fetch-blob@3.2.0 deduped
+│ │ │ ├─┬ gcp-metadata@8.1.2
+│ │ │ │ ├── gaxios@7.1.4 deduped
+│ │ │ │ ├── google-logging-utils@1.1.3 deduped
+│ │ │ │ └─┬ json-bigint@1.0.0
+│ │ │ │   └── bignumber.js@9.3.1
+│ │ │ ├── google-logging-utils@1.1.3
+│ │ │ └─┬ jws@4.0.1
+│ │ │   ├─┬ jwa@2.0.1
+│ │ │   │ ├── buffer-equal-constant-time@1.0.1
+│ │ │   │ ├── ecdsa-sig-formatter@1.0.11 deduped
+│ │ │   │ └── safe-buffer@5.2.1 deduped
+│ │ │   └── safe-buffer@5.2.1 deduped
+│ │ ├─┬ p-retry@4.6.2
+│ │ │ ├── @types/retry@0.12.0 deduped
+│ │ │ └── retry@0.13.1 deduped
+│ │ ├─┬ protobufjs@7.5.4
+│ │ │ ├── @protobufjs/aspromise@1.1.2
+│ │ │ ├── @protobufjs/base64@1.1.2
+│ │ │ ├── @protobufjs/codegen@2.0.4
+│ │ │ ├── @protobufjs/eventemitter@1.1.0
+│ │ │ ├─┬ @protobufjs/fetch@1.1.0
+│ │ │ │ ├── @protobufjs/aspromise@1.1.2 deduped
+│ │ │ │ └── @protobufjs/inquire@1.1.0 deduped
+│ │ │ ├── @protobufjs/float@1.0.2
+│ │ │ ├── @protobufjs/inquire@1.1.0
+│ │ │ ├── @protobufjs/path@1.1.2
+│ │ │ ├── @protobufjs/pool@1.1.0
+│ │ │ ├── @protobufjs/utf8@1.1.0
+│ │ │ ├── @types/node@22.19.17 deduped
+│ │ │ └── long@5.3.2
+│ │ └── ws@8.20.0 deduped
+│ ├─┬ @mistralai/mistralai@1.14.1
+│ │ ├── ws@8.20.0 deduped
+│ │ ├── zod-to-json-schema@3.25.2 deduped
+│ │ └── zod@4.3.6 deduped
+│ ├── @sinclair/typebox@0.34.49
+│ ├─┬ @types/node@24.12.2
+│ │ └── undici-types@7.16.0
+│ ├─┬ ajv-formats@3.0.1
+│ │ └── ajv@8.18.0 deduped
+│ ├─┬ ajv@8.18.0
+│ │ ├── fast-deep-equal@3.1.3
+│ │ ├── fast-uri@3.1.0
+│ │ ├── json-schema-traverse@1.0.0
+│ │ └── require-from-string@2.0.2
+│ ├─┬ canvas@3.2.3
+│ │ ├── node-addon-api@7.1.1
+│ │ └─┬ prebuild-install@7.1.3
+│ │   ├── detect-libc@2.1.2
+│ │   ├── expand-template@2.0.3
+│ │   ├── github-from-package@0.0.0
+│ │   ├── minimist@1.2.8 deduped
+│ │   ├── mkdirp-classic@0.5.3
+│ │   ├── napi-build-utils@2.0.0
+│ │   ├─┬ node-abi@3.89.0
+│ │   │ └── semver@7.7.4 deduped
+│ │   ├─┬ pump@3.0.4
+│ │   │ ├─┬ end-of-stream@1.4.5
+│ │   │ │ └── once@1.4.0 deduped
+│ │   │ └─┬ once@1.4.0
+│ │   │   └── wrappy@1.0.2
+│ │   ├─┬ rc@1.2.8
+│ │   │ ├── deep-extend@0.6.0
+│ │   │ ├── ini@1.3.8
+│ │   │ ├── minimist@1.2.8 deduped
+│ │   │ └── strip-json-comments@2.0.1
+│ │   ├─┬ simple-get@4.0.1
+│ │   │ ├─┬ decompress-response@6.0.0
+│ │   │ │ └── mimic-response@3.1.0
+│ │   │ ├── once@1.4.0 deduped
+│ │   │ └── simple-concat@1.0.1
+│ │   ├─┬ tar-fs@2.1.4
+│ │   │ ├── chownr@1.1.4
+│ │   │ ├── mkdirp-classic@0.5.3 deduped
+│ │   │ ├── pump@3.0.4 deduped
+│ │   │ └─┬ tar-stream@2.2.0
+│ │   │   ├─┬ bl@4.1.0
+│ │   │   │ ├─┬ buffer@5.7.1
+│ │   │   │ │ ├── base64-js@1.5.1 deduped
+│ │   │   │ │ └── ieee754@1.2.1 deduped

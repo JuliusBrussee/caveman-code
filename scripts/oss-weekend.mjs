@@ -7,7 +7,7 @@ const DEFAULT_README_PATHS = ["README.md", "packages/coding-agent/README.md"];
 const DEFAULT_STATE_PATH = ".github/oss-weekend.json";
 const MARKER_START = "<!-- OSS_WEEKEND_START -->";
 const MARKER_END = "<!-- OSS_WEEKEND_END -->";
-const DISCORD_URL = "https://discord.com/invite/3cU7Bz4UPx";
+const DISCORD_URL = "https://discord.com/invite/nKXTsAcmbT";
 
 function normalizeReason(reason) {
 	const trimmedReason = reason.trim();
