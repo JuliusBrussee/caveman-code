@@ -290,6 +290,15 @@ export {
 	writeTool,
 	writeToolDefinition,
 } from "./core/tools/index.js";
+// RTK (command rewriting)
+export {
+	createRtkSpawnHook,
+	detectRtk,
+	getRtkStatus,
+	resetRtkCache,
+	rewriteCommand,
+	type RtkDetectionResult,
+} from "./core/rtk.js";
 // Main entry point
 export { main } from "./main.js";
 // Run modes for programmatic SDK usage

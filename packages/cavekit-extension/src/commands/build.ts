@@ -11,12 +11,12 @@
  * AC-5: Commits the working tree after each wave via git commit.
  */
 
-import { execSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import type { ExtensionAPI } from "cave";
 import type { CaveKitConfig } from "../config/index.js";
 import { buildScopedContext } from "../context-builder.js";
+import { rtkExec } from "../rtk-exec.js";
 import type { ExecutorTask } from "../wave/executor.js";
 import { parseBuildSite as parseExecutorBuildSite, WaveExecutor } from "../wave/executor.js";
 import { BuildDashboardWidget } from "../widgets/build-dashboard.js";
@@ -101,11 +101,11 @@ function commitWave(cwd: string, waveNum: number, results: Array<[ExecutorTask, 
 		const taskIds = results.map(([t]) => t.id).join(", ");
 		const msg = `chore(build): wave ${waveNum} — ${taskIds}`;
 		// Stage both tracked modifications AND new impl files (not -u which skips untracked)
-		execSync("git add context/ packages/", { cwd, stdio: "ignore" });
+		rtkExec("git add context/ packages/", { cwd, stdio: "ignore" });
 		// Only commit if there are staged changes — no empty commits
-		const status = execSync("git diff --cached --stat", { cwd, encoding: "utf8" }).trim();
+		const status = rtkExec("git diff --cached --stat", { cwd, encoding: "utf8" }).trim();
 		if (!status) return; // Nothing staged, skip commit
-		execSync(`git commit -m ${JSON.stringify(msg)}`, { cwd, stdio: "ignore" });
+		rtkExec(`git commit -m ${JSON.stringify(msg)}`, { cwd, stdio: "ignore" });
 	} catch {
 		// Non-fatal — skip commit if git is not available or nothing to commit
 	}

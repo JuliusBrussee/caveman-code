@@ -5,9 +5,10 @@
  * After a wave completes, changes are merged back to the main worktree.
  */
 
-import { execSync, spawnSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { rtkExec } from "../rtk-exec.js";
 
 export interface WorktreeHandle {
 	taskId: string;
@@ -24,10 +25,7 @@ export function createWorktree(cwd: string, taskId: string): WorktreeHandle {
 	fs.mkdirSync(path.dirname(worktreePath), { recursive: true });
 
 	// Create branch and worktree
-	execSync(`git worktree add -b "${branch}" "${worktreePath}"`, {
-		cwd,
-		stdio: "pipe",
-	});
+	rtkExec(`git worktree add -b "${branch}" "${worktreePath}"`, { cwd, stdio: "ignore" });
 
 	return {
 		taskId,
@@ -74,12 +72,12 @@ export function mergeWorktree(cwd: string, handle: WorktreeHandle): { success: b
 
 function removeWorktree(cwd: string, worktreePath: string, branch: string): void {
 	try {
-		execSync(`git worktree remove --force "${worktreePath}"`, { cwd, stdio: "pipe" });
+		rtkExec(`git worktree remove --force "${worktreePath}"`, { cwd, stdio: "ignore" });
 	} catch {
 		// Ignore cleanup errors
 	}
 	try {
-		execSync(`git branch -D "${branch}"`, { cwd, stdio: "pipe" });
+		rtkExec(`git branch -D "${branch}"`, { cwd, stdio: "ignore" });
 	} catch {
 		// Ignore if branch already removed
 	}

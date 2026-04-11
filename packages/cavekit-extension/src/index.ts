@@ -13,6 +13,7 @@ import type { ExtensionAPI } from "cave";
 import { registerCommands } from "./commands/index.js";
 import { loadConfig } from "./config/index.js";
 import { registerHooks } from "./hooks/index.js";
+import { initRtkExec } from "./rtk-exec.js";
 import { registerTools } from "./tools/index.js";
 import { registerWidgets } from "./widgets/index.js";
 
@@ -63,6 +64,13 @@ export default function cavekit(pi: ExtensionAPI) {
 		// Phase 5: Register TUI shortcuts
 		// Shortcuts are no-ops until invoked, safe on vanilla Pi.
 		registerWidgets(pi, config);
+
+		// Phase 6: Warm RTK imports for the rtkExec helper.
+		// All extension shell calls route through rtkExec so RTK rewriting
+		// applies consistently — same pipeline as the main agent's bash tool.
+		initRtkExec().catch(() => {
+			/* non-fatal — rtkExec falls back to direct exec */
+		});
 
 		// Announce environment for diagnostics (debug builds only)
 		if (process.env.CAVEKIT_DEBUG) {
