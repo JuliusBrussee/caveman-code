@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="packages/coding-agent/src/modes/interactive/assets/clankolas.png" width="120" />
-</p>
-
 <h1 align="center">Caveman Code</h1>
 
 <p align="center">
