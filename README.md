@@ -66,6 +66,57 @@ Optional external binary. When installed, bash commands are rewritten through `r
 
 Change level anytime: `/cave [lite|full|ultra|off]`
 
+### Benchmarks
+
+Measured on 10 real-world tool output fixtures. Run `npm run bench` to reproduce.
+
+```
+Tool Output Compression (chars reduced)
+
+  git diff (901 lines)   ██████████████████████████████████████████████████  -94%
+  npm ls (701 lines)     ████████████████████████████████████████████████    -92%
+  ls recursive (601 ln)  ███████████████████████████████████████████████     -90%
+  grep results (801 ln)  █████████████████████████████████████████████       -89%
+  test output (501 ln)   ████████████████████████████████████████████        -88%
+  XML/pom.xml (382 ln)   ████████████████████████████████████████            -79%
+  docker inspect (258)   ██████████████████████████████████                  -68%
+  ANSI colored (97 ln)   █████████████████████████                          -50%
+  read file (429 lines)  ████████████████                                   -32%
+  build output (19 ln)   █████████                                          -18%
+                         ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+  AGGREGATE              ███████████████████████████████████████████████     -86%
+```
+
+| Metric | Value |
+|--------|-------|
+| Total tokens saved (10 fixtures) | **~72,400** out of 337K chars |
+| Read dedup savings (re-read) | **99.3%** (2,966 → 22 tokens) |
+| System prompt overhead | 120–195 tokens (lite–ultra) |
+| Break-even point | **1 tool call** |
+| Net savings (15-turn session) | **+567K tokens** |
+| Cost saved (Sonnet, 15 turns) | **~$1.70/session** |
+| Cost saved (Sonnet, 30 turns) | **~$6.92/session** |
+
+<details>
+<summary>Where savings come from</summary>
+
+| Layer | What | Biggest impact |
+|-------|------|----------------|
+| Flint Chipper | Per-tool line budgets (bash: 80, read: 300, grep: 120) | -67% to -92% on large outputs |
+| ANSI Strip | Remove terminal escape codes | -20% to -40% on colored output |
+| Stone Tablet | Semantic JSON/XML key extraction | Structured bash output |
+| Read Dedup | Fingerprint-based stub on re-reads | -99% on repeated file reads |
+| Blank Collapse | Merge consecutive empty lines | Sparse output |
+
+</details>
+
+```bash
+npm run bench:offline   # compression analysis — free, <1s
+npm run bench:replay    # analyze your real sessions — free
+npm run bench:live      # A/B with LLM calls — needs API key, ~$1-2
+npm run bench           # all tiers
+```
+
 ---
 
 ## Quick Start
