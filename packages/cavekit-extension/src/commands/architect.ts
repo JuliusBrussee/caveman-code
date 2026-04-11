@@ -14,6 +14,26 @@ import type { CaveKitConfig } from "../config/index.js";
 import { parseKitDirectory } from "../parsers/kit-parser.js";
 import { reviewKits } from "../widgets/kit-reviewer.js";
 
+/**
+ * Sanitize user input into a valid build-site filename slug.
+ * "yes continue" → "" (rejected — not a real name)
+ * "my-feature" → "build-site-my-feature"
+ * "" → "" (caller falls back to "build-site")
+ */
+function sanitizeSiteName(raw: string): string {
+	if (!raw) return "";
+	// Reject common dialog responses that leak into args
+	const rejectPatterns = /^(yes|no|ok|continue|cancel|confirm|y|n)\b/i;
+	if (rejectPatterns.test(raw)) return "";
+	// Slugify: lowercase, replace non-alphanum with hyphens, collapse, trim
+	const slug = raw
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/^-+|-+$/g, "");
+	if (!slug) return "";
+	return slug.startsWith("build-site") ? slug : `build-site-${slug}`;
+}
+
 export function registerArchitectCommand(pi: ExtensionAPI, _config: CaveKitConfig): void {
 	pi.registerCommand("ck:architect", {
 		description: "Generate a tiered build site from approved kits",
@@ -66,7 +86,8 @@ export function registerArchitectCommand(pi: ExtensionAPI, _config: CaveKitConfi
 			const plansDir = path.join(cwd, "context", "plans");
 			fs.mkdirSync(plansDir, { recursive: true });
 
-			const siteName = args.trim() || "build-site";
+			const rawName = args.trim();
+			const siteName = sanitizeSiteName(rawName) || "build-site";
 			const outputPath = path.join(plansDir, `${siteName}.md`);
 
 			ctx.ui.notify(
@@ -129,6 +150,10 @@ function buildArchitectPrompt(
 		.join("\n");
 
 	return `You are executing the CaveKit ARCHITECT phase.
+
+## Constraints
+- Write ALL content directly using the write tool. Do NOT use Python, Node, or any external scripts to generate content.
+- Do NOT use bash to programmatically generate file content. Compose everything inline.
 
 ## Task
 Read the parsed kit data below and generate a tiered build site with dependency-ordered tasks.

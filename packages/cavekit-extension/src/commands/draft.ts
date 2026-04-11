@@ -41,10 +41,14 @@ export function registerDraftCommand(pi: ExtensionAPI, _config: CaveKitConfig): 
 			const prompt = buildDraftPrompt(description, cwd, refContext);
 			pi.sendUserMessage([{ type: "text", text: prompt }]);
 
-			// After the agent completes, the kit files will be written to context/kits/
-			// The /ck:architect command reads from there.
-			// Hint: preview kits with /ck:preview
-			ctx.ui.notify("Kits will be written to context/kits/. Preview with: /ck:preview <domain>", "info");
+			// Kit files are written asynchronously by the LLM turn.
+			// Notify the user about next steps — kits must be reviewed before architecting.
+			ctx.ui.notify(
+				"Drafting kits → context/kits/. When complete:\n" +
+					"  /ck:preview <domain>  — preview a kit\n" +
+					"  /ck:architect         — review & approve kits, then generate build site",
+				"info",
+			);
 		},
 	});
 }
@@ -79,6 +83,10 @@ function buildDraftPrompt(description: string, cwd: string, refContext: string):
 	const kitsDir = path.join(cwd, "context", "kits");
 	const blueprintsDir = path.join(cwd, "context", "blueprints");
 	return `You are executing the CaveKit DRAFT phase.
+
+## Constraints
+- Write ALL file content directly using the write tool. Do NOT use Python, Node, or any external scripts.
+- Do NOT use bash to programmatically generate file content. Compose everything inline.
 
 ## Task
 Decompose the following feature description into structured domain kits using the CaveKit specification format.

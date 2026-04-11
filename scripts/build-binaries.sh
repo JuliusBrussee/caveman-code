@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Build pi binaries for all platforms locally.
+# Build cave binaries for all platforms locally.
 # Mirrors .github/workflows/build-binaries.yml
 #
 # Usage:
@@ -107,9 +107,9 @@ for platform in "${PLATFORMS[@]}"; do
     # call site has a try/catch fallback. For Windows builds, we copy the
     # appropriate .node file alongside the binary below.
     if [[ "$platform" == "windows-x64" ]]; then
-        bun build --compile --external koffi --target=bun-$platform ./dist/bun/cli.js --outfile binaries/$platform/pi.exe
+        bun build --compile --external koffi --target=bun-$platform ./dist/bun/cli.js --outfile binaries/$platform/cave.exe
     else
-        bun build --compile --external koffi --target=bun-$platform ./dist/bun/cli.js --outfile binaries/$platform/pi
+        bun build --compile --external koffi --target=bun-$platform ./dist/bun/cli.js --outfile binaries/$platform/cave
     fi
 done
 
@@ -147,7 +147,7 @@ for platform in "${PLATFORMS[@]}"; do
     else
         # Unix platforms (tar.gz) - use wrapper directory for mise compatibility
         echo "Creating cave-$platform.tar.gz..."
-        mv $platform pi && tar -czf cave-$platform.tar.gz pi && mv pi $platform
+        mv $platform cave && tar -czf cave-$platform.tar.gz cave && mv cave $platform
     fi
 done
 
@@ -158,7 +158,7 @@ for platform in "${PLATFORMS[@]}"; do
     if [[ "$platform" == "windows-x64" ]]; then
         mkdir -p $platform && (cd $platform && unzip -q ../cave-$platform.zip)
     else
-        tar -xzf cave-$platform.tar.gz && mv pi $platform
+        tar -xzf cave-$platform.tar.gz && mv cave $platform
     fi
 done
 
@@ -169,5 +169,5 @@ ls -lh *.tar.gz *.zip 2>/dev/null || true
 echo ""
 echo "Extracted directories for testing:"
 for platform in "${PLATFORMS[@]}"; do
-    echo "  binaries/$platform/pi"
+    echo "  binaries/$platform/cave"
 done

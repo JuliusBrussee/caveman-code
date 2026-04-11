@@ -18,26 +18,31 @@ import type { ExtensionAPI } from "cave";
 import type { CaveKitConfig } from "../config/index.js";
 import { buildScopedContext } from "../context-builder.js";
 import type { ExecutorTask } from "../wave/executor.js";
-import { WaveExecutor } from "../wave/executor.js";
+import { parseBuildSite as parseExecutorBuildSite, WaveExecutor } from "../wave/executor.js";
 import { BuildDashboardWidget } from "../widgets/build-dashboard.js";
+import { renderDependencyGraph } from "../widgets/dependency-graph.js";
 
 // ---------------------------------------------------------------------------
 // Canonical build-site location (T-030)
 // ---------------------------------------------------------------------------
 
-const BUILD_SITE_CANDIDATES = [
-	path.join("context", "plans", "build-site.md"),
-	path.join("context", "sites", "build-site.md"),
-] as const;
+const BUILD_SITE_DIRS = [path.join("context", "plans"), path.join("context", "sites")] as const;
 
 function findBuildSite(cwd: string, override?: string): string | null {
 	if (override) {
 		const abs = path.isAbsolute(override) ? override : path.join(cwd, override);
 		return fs.existsSync(abs) ? abs : null;
 	}
-	for (const rel of BUILD_SITE_CANDIDATES) {
-		const abs = path.join(cwd, rel);
-		if (fs.existsSync(abs)) return abs;
+	// Look for build-site.md or build-site-*.md (most recently modified wins)
+	for (const dir of BUILD_SITE_DIRS) {
+		const absDir = path.join(cwd, dir);
+		if (!fs.existsSync(absDir)) continue;
+		const candidates = fs
+			.readdirSync(absDir)
+			.filter((f) => /^build-site(-[\w-]+)?\.md$/.test(f))
+			.map((f) => ({ file: path.join(absDir, f), mtime: fs.statSync(path.join(absDir, f)).mtimeMs }))
+			.sort((a, b) => b.mtime - a.mtime);
+		if (candidates.length > 0) return candidates[0].file;
 	}
 	return null;
 }
@@ -95,8 +100,12 @@ function commitWave(cwd: string, waveNum: number, results: Array<[ExecutorTask, 
 	try {
 		const taskIds = results.map(([t]) => t.id).join(", ");
 		const msg = `chore(build): wave ${waveNum} — ${taskIds}`;
-		execSync("git add -u context/ packages/", { cwd, stdio: "ignore" });
-		execSync(`git commit -m ${JSON.stringify(msg)} --allow-empty`, { cwd, stdio: "ignore" });
+		// Stage both tracked modifications AND new impl files (not -u which skips untracked)
+		execSync("git add context/ packages/", { cwd, stdio: "ignore" });
+		// Only commit if there are staged changes — no empty commits
+		const status = execSync("git diff --cached --stat", { cwd, encoding: "utf8" }).trim();
+		if (!status) return; // Nothing staged, skip commit
+		execSync(`git commit -m ${JSON.stringify(msg)}`, { cwd, stdio: "ignore" });
 	} catch {
 		// Non-fatal — skip commit if git is not available or nothing to commit
 	}
@@ -127,14 +136,26 @@ export function registerBuildCommand(pi: ExtensionAPI, config: CaveKitConfig): v
 			const siteFile = findBuildSite(cwd, override);
 
 			if (!siteFile) {
-				const tried = BUILD_SITE_CANDIDATES.join(", ");
-				ctx.ui.notify(`Build site not found. Expected one of: ${tried}. Run /ck:architect first.`, "warning");
+				ctx.ui.notify(
+					"Build site not found. Expected build-site*.md in context/plans/ or context/sites/. Run /ck:architect first.",
+					"warning",
+				);
 				return;
+			}
+
+			// --- Render dependency graph before confirmation so user sees the DAG ---
+			const siteContent = fs.readFileSync(siteFile, "utf8");
+			const previewTasks = parseExecutorBuildSite(siteContent);
+			if (previewTasks.length > 0) {
+				renderDependencyGraph(previewTasks, {
+					ui: ctx.ui,
+					say: (text) => ctx.ui.notify(text, "info"),
+				});
 			}
 
 			const confirmed = await ctx.ui.confirm(
 				"Start Build",
-				`Execute build from ${path.relative(cwd, siteFile)}?\n\nThis will spawn parallel subagents for each wave.`,
+				`Execute build from ${path.relative(cwd, siteFile)}?\n${previewTasks.length} tasks across ${new Set(previewTasks.map((t) => t.tier)).size} tiers.\n\nThis will spawn parallel subagents for each wave.`,
 			);
 			if (!confirmed) return;
 

@@ -1,11 +1,10 @@
 /**
  * Wave executor — parses a build site and dispatches parallel subagents per wave.
  *
- * Phase 1: Uses Pi print-mode dispatch (pi -p "<task>") via child_process.
- * Phase 2 (TODO): Migrate to createAgentSession() SDK embedding for live progress.
+ * Uses createAgentSession() SDK embedding for full tool support including RTK
+ * hooks on bash commands, extension hooks, and proper auth propagation.
  */
 
-import { spawn } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import type { CaveKitConfig } from "../config/index.js";
@@ -195,7 +194,7 @@ export class WaveExecutor {
 			}
 			this.dashboard.render(this.tasks);
 
-			// Dispatch parallel tasks (Phase 1: print-mode)
+			// Dispatch parallel tasks via embedded agent sessions (RTK-enabled)
 			const results = await this.dispatchWave(workable);
 
 			// Process results
@@ -263,42 +262,61 @@ export class WaveExecutor {
 	}
 
 	private async dispatchTask(task: ExecutorTask): Promise<boolean> {
-		return new Promise((resolve) => {
-			const prompt = this.buildTaskPrompt(task);
-			const piArgs = ["-p", prompt];
+		const prompt = this.buildTaskPrompt(task);
+		const implDir = path.join(this.ctx.cwd, "context", "impl");
+		fs.mkdirSync(implDir, { recursive: true });
 
-			// T-043: Resolve binary dynamically — prefer basename of current process entry
-			const binary = process.argv[1] ? path.basename(process.argv[1]) : "cave";
+		try {
+			// Dynamic import — cave is a peer dep, resolved at runtime inside host process.
+			// createAgentSession wires RTK hooks, extension hooks, and proper auth automatically
+			// via _buildRuntime() → createRtkSpawnHook() → bash tool.
+			const { createAgentSession, SessionManager } = await import("cave");
 
-			const child = spawn(binary, piArgs, {
+			const { session } = await createAgentSession({
 				cwd: this.ctx.cwd,
-				stdio: ["ignore", "pipe", "pipe"],
-				signal: this.ctx.signal,
+				// In-memory session — subagent work doesn't need file persistence
+				sessionManager: SessionManager.inMemory(this.ctx.cwd),
 			});
 
-			let stdout = "";
-			child.stdout?.on("data", (d: Buffer) => {
-				stdout += d.toString();
-				this.dashboard.updateTaskOutput(task.id, stdout.slice(-200));
+			// Capture assistant text output for impl records
+			let output = "";
+			const unsub = session.subscribe((event: any) => {
+				if (event.type === "message_end" && event.message?.role === "assistant") {
+					const content = event.message.content;
+					if (Array.isArray(content)) {
+						for (const block of content) {
+							if (block.type === "text" && block.text) {
+								output += `${block.text}\n`;
+							}
+						}
+					}
+				}
 			});
 
-			// T-044: Drain stderr to prevent pipe buffer deadlock on >64KB output
-			child.stderr?.resume();
+			// Run the full agent turn — all tool calls (bash, read, edit, write) go through
+			// the host agent's tool infrastructure with RTK hooks active.
+			await session.prompt(prompt);
+			unsub();
 
-			child.on("close", (code) => {
-				resolve(code === 0);
-				// Write task output to impl record
-				const implDir = path.join(this.ctx.cwd, "context", "impl");
-				fs.mkdirSync(implDir, { recursive: true });
-				fs.writeFileSync(
-					path.join(implDir, `${task.id}.md`),
-					`# ${task.id}: ${task.name}\n**Status:** ${code === 0 ? "done" : "failed"}\n\n${stdout}`,
-					"utf8",
-				);
-			});
+			this.dashboard.updateTaskOutput(task.id, output.slice(-200));
 
-			child.on("error", () => resolve(false));
-		});
+			fs.writeFileSync(
+				path.join(implDir, `${task.id}.md`),
+				`# ${task.id}: ${task.name}\n**Status:** done\n\n${output}`,
+				"utf8",
+			);
+			return true;
+		} catch (err) {
+			const errorMsg = err instanceof Error ? err.message : String(err);
+			this.ctx.ui.notify(`Task ${task.id} failed: ${errorMsg}`, "error");
+
+			fs.writeFileSync(
+				path.join(implDir, `${task.id}.md`),
+				`# ${task.id}: ${task.name}\n**Status:** failed\n\n**Error:** ${errorMsg}`,
+				"utf8",
+			);
+			return false;
+		}
 	}
 
 	private buildTaskPrompt(task: ExecutorTask): string {
@@ -316,7 +334,9 @@ export class WaveExecutor {
 			"",
 			kitContext ? `## Relevant Requirements\n${kitContext}` : "",
 			"",
-			"Implement this task. Follow the design constraints above. When done, confirm which acceptance criteria are met.",
+			"Implement this task. Follow the design constraints above.",
+			"Write all file content directly using the write or edit tool. Do NOT use Python, Node, or external scripts to generate content.",
+			"When done, confirm which acceptance criteria are met.",
 		]
 			.filter(Boolean)
 			.join("\n");
