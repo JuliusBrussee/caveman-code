@@ -385,6 +385,13 @@ export async function loadExtensions(paths: string[], cwd: string, eventBus?: Ev
 		}
 
 		if (extension) {
+			const resolvedDir = path.resolve(cwd);
+			if (extension.resolvedPath.startsWith(resolvedDir + path.sep)) {
+				console.warn(
+					`[cave] Loading project-local extension: ${path.relative(cwd, extension.resolvedPath)}\n` +
+						`  Extensions execute arbitrary code. Review source before trusting.`,
+				);
+			}
 			extensions.push(extension);
 		}
 	}

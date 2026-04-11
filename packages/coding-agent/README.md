@@ -3,27 +3,19 @@
 
 **Issue tracker reopens Monday, April 13, 2026.**
 
-OSS weekend runs Thursday, April 2, 2026 through Monday, April 13, 2026. New issues and PRs from unapproved contributors are auto-closed during this time. Approved contributors can still open issues and PRs if something is genuinely urgent, but please keep that to pressing matters only. For support, join [Discord](https://discord.com/invite/3cU7Bz4UPx).
+OSS weekend runs Thursday, April 2, 2026 through Monday, April 13, 2026. New issues and PRs from unapproved contributors are auto-closed during this time. Approved contributors can still open issues and PRs if something is genuinely urgent, but please keep that to pressing matters only. For support, join [Discord](https://discord.com/invite/nKXTsAcmbT).
 
 > _Current focus: at the moment i'm deep in refactoring internals, and need to focus._
 <!-- OSS_WEEKEND_END -->
 
 ---
 
+<h1 align="center">Cave</h1>
+<p align="center">Minimal terminal coding harness with token-saving cave mode</p>
 <p align="center">
-  <a href="https://shittycodingagent.ai">
-    <img src="https://shittycodingagent.ai/logo.svg" alt="pi logo" width="128">
-  </a>
-</p>
-<p align="center">
-  <a href="https://discord.com/invite/3cU7Bz4UPx"><img alt="Discord" src="https://img.shields.io/badge/discord-community-5865F2?style=flat-square&logo=discord&logoColor=white" /></a>
-  <a href="https://www.npmjs.com/package/@mariozechner/pi-coding-agent"><img alt="npm" src="https://img.shields.io/npm/v/@mariozechner/pi-coding-agent?style=flat-square" /></a>
-  <a href="https://github.com/badlogic/pi-mono/actions/workflows/ci.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/badlogic/pi-mono/ci.yml?style=flat-square&branch=main" /></a>
-</p>
-<p align="center">
-  <a href="https://pi.dev">pi.dev</a> domain graciously donated by
-  <br /><br />
-  <a href="https://exe.dev"><img src="docs/images/exy.png" alt="Exy mascot" width="48" /><br />exe.dev</a>
+  <a href="https://discord.com/invite/nKXTsAcmbT"><img alt="Discord" src="https://img.shields.io/badge/discord-community-5865F2?style=flat-square&logo=discord&logoColor=white" /></a>
+  <a href="https://www.npmjs.com/package/@cavepi/pi-coding-agent"><img alt="npm" src="https://img.shields.io/npm/v/@cavepi/pi-coding-agent?style=flat-square" /></a>
+  <a href="https://github.com/JuliusBrussee/caveman-cli/actions/workflows/ci.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/JuliusBrussee/caveman-cli/ci.yml?style=flat-square&branch=main" /></a>
 </p>
 
 Cave is a minimal terminal coding harness, forked from [pi-mono](https://github.com/badlogic/pi-mono) by Mario Zechner (badlogic). Adapt Cave to your workflows, not the other way around, without having to fork and modify internals. Extend it with TypeScript [Extensions](#extensions), [Skills](#skills), [Prompt Templates](#prompt-templates), and [Themes](#themes). Put your extensions, skills, prompt templates, and themes in [Cave Packages](#cave-packages) and share them with others via npm or git.
@@ -32,24 +24,90 @@ Cave ships with powerful defaults but skips features like sub agents and plan mo
 
 Cave runs in four modes: interactive, print or JSON, RPC for process integration, and an SDK for embedding in your own apps.
 
-## Share your OSS coding agent sessions
+## What's Different From Pi & Claude Code
 
-If you use pi for open source work, please share your coding agent sessions.
+Caveman adds three things on top of pi-mono that neither pi nor Claude Code have:
 
-Public OSS session data helps improve models, prompts, tools, and evaluations using real development workflows.
+| Feature | Cave | Pi | Claude Code |
+|---------|:----:|:--:|:-----------:|
+| Cave Mode (3-layer token compression) | ✓ | ✗ | ✗ |
+| RTK integration (external binary, 60-90% output reduction) | ✓ | ✗ | ✗ |
+| Structured output compression (JSON/XML semantic stripping) | ✓ | ✗ | ✗ |
+| Read deduplication (skip re-reading unchanged files) | ✓ | ✗ | ✗ |
+| `/freeze` checkpoints (labeled compaction saves) | ✓ | ✗ | ✗ |
+| CaveKit extension (DABI structured dev workflow) | ✓ | ✗ | ✗ |
+| `/ck:*` commands (Draft→Architect→Build→Inspect) | ✓ | ✗ | ✗ |
+| Per-tool output budgets (Flint Chipper) | ✓ | ✗ | ✗ |
+| Context kits system (`context/kits/`, `context/plans/`) | ✓ | ✗ | ✗ |
+| Bun binary virtual modules (compiled distribution) | ✓ | ✗ | ✗ |
 
-For the full explanation, see [this post on X](https://x.com/badlogicgames/status/2037811643774652911).
+**vs Claude Code specifically:** Claude Code is opinionated, permission-gated, and tightly coupled to the Anthropic platform. Cave works with any LLM provider, has no permission popups (run in a container or build your own), and every "built-in" Claude Code feature can be replicated or replaced with extensions. Cave mode actively fights context bloat; Claude Code doesn't.
 
-To publish sessions, use [`badlogic/pi-share-hf`](https://github.com/badlogic/pi-share-hf). Read its README.md for setup instructions. All you need is a Hugging Face account, the Hugging Face CLI, and `pi-share-hf`.
+---
 
-You can also watch [this video](https://x.com/badlogicgames/status/2041151967695634619), where I show how I publish my `pi-mono` sessions.
+## Cave Mode
 
-I regularly publish my own `pi-mono` work sessions here:
+Cave mode is a 3-layer token compression system enabled by default. It reduces token usage while preserving full technical accuracy.
 
-- [badlogicgames/pi-mono on Hugging Face](https://huggingface.co/datasets/badlogicgames/pi-mono)
+**Layer 1: System prompt compression** — instructs the model to communicate concisely at three intensities:
+- `lite` — brief responses, skip boilerplate
+- `full` (default) — terse output, compress tool explanations
+- `ultra` — maximum brevity, single-line reasoning
+
+**Layer 2: Tool output compression (Flint Chipper)** — per-tool output budgets with semantic preservation:
+- Strips ANSI codes and collapses blank lines
+- Per-tool line limits: `bash` 80 lines, `read` 300, `grep` 120
+- Long outputs get head+tail slices with a truncation notice, not a hard cut
+- Detects JSON/XML in bash output and applies structural compression (Stone Tablet): extracts relevant keys by command context, compresses arrays, strips namespace boilerplate
+
+**Layer 3: Read deduplication** — session-scoped fingerprint cache. If the same file is read twice with no changes, the second read returns a one-line stub instead of full content. Prevents context bloat in long refactoring sessions.
+
+**RTK integration** — optional external binary that rewrites bash commands before execution for 60–90% output reduction. Runs before Flint Chipper (defense in depth). Falls back silently if `rtk` not installed.
+
+Use `/cave [lite|full|ultra|off]` to change intensity during a session. See [settings](docs/settings.md) for configuration.
+
+---
+
+## CaveKit Extension
+
+CaveKit is a first-class Cave extension implementing the DABI lifecycle for structured software development: **Draft → Architect → Build → Inspect**.
+
+Use `/ck:*` commands to run the full workflow:
+
+| Command | Phase | What It Does |
+|---------|-------|-------------|
+| `/ck:draft` | Draft | Decompose natural language into domain kits (requirement specs with acceptance criteria) |
+| `/ck:research` | Draft | Research phase before drafting |
+| `/ck:design` | Draft | Visual/system design planning |
+| `/ck:architect` | Architect | Generate tiered build sites from approved kits with dependency graphs |
+| `/ck:build` | Build | Execute tasks with tier gating and convergence tracking |
+| `/ck:inspect` | Inspect | Verify work against acceptance criteria (P0–P3 severity findings) |
+| `/ck:progress` | Any | Build progress and tier status |
+| `/ck:config` | Any | CaveKit configuration |
+| `/ck:help` | Any | Context-aware help |
+
+**LLM-callable tools** (injected into agent context): `kit_read`, `build_site_status`, `acceptance_check`, `convergence_check`.
+
+**Context system:** Kits live in `context/kits/`, plans in `context/plans/`, designs in `context/designs/`. CaveKit injects relevant context files automatically at session start. Compaction preserves CaveKit state across context resets.
+
+Kits define **WHAT** to build (requirements + acceptance criteria). Plans define **HOW** (tiered task graph). Never conflate.
+
+---
+
+## Freeze Checkpoints
+
+`/freeze [label]` creates a labeled compaction checkpoint — lighter than `/compact`, optimized for cave mode long sessions.
+
+- Saves a named snapshot of the current context state
+- `/checkpoints` lists all freeze points with token counts and timestamps
+- Cave displays context fullness warnings at 80%+ ("Context 80% full. Consider /compact or /freeze")
 
 ## Table of Contents
 
+- [What's Different From Pi & Claude Code](#whats-different-from-pi--claude-code)
+- [Cave Mode](#cave-mode)
+- [CaveKit Extension](#cavekit-extension)
+- [Freeze Checkpoints](#freeze-checkpoints)
 - [Quick Start](#quick-start)
 - [Providers & Models](#providers--models)
 - [Interactive Mode](#interactive-mode)
@@ -77,7 +135,7 @@ I regularly publish my own `pi-mono` work sessions here:
 ## Quick Start
 
 ```bash
-npm install -g @mariozechner/pi-coding-agent
+npm install -g @cavepi/pi-coding-agent
 ```
 
 Authenticate with an API key:
@@ -133,7 +191,7 @@ For each built-in provider, pi maintains a list of tool-capable models, updated 
 
 See [docs/providers.md](docs/providers.md) for detailed setup instructions.
 
-**Custom providers & models:** Add providers via `~/.pi/agent/models.json` if they speak a supported API (OpenAI, Anthropic, Google). For custom APIs or OAuth, use extensions. See [docs/models.md](docs/models.md) and [docs/custom-provider.md](docs/custom-provider.md).
+**Custom providers & models:** Add providers via `~/.cave/agent/models.json` if they speak a supported API (OpenAI, Anthropic, Google). For custom APIs or OAuth, use extensions. See [docs/models.md](docs/models.md) and [docs/custom-provider.md](docs/custom-provider.md).
 
 ---
 
@@ -189,7 +247,7 @@ Type `/` in the editor to trigger commands. [Extensions](#extensions) can regist
 
 ### Keyboard Shortcuts
 
-See `/hotkeys` for the full list. Customize via `~/.pi/agent/keybindings.json`. See [docs/keybindings.md](docs/keybindings.md).
+See `/hotkeys` for the full list. Customize via `~/.cave/agent/keybindings.json`. See [docs/keybindings.md](docs/keybindings.md).
 
 **Commonly used:**
 
@@ -226,7 +284,7 @@ Sessions are stored as JSONL files with a tree structure. Each entry has an `id`
 
 ### Management
 
-Sessions auto-save to `~/.pi/agent/sessions/` organized by working directory.
+Sessions auto-save to `~/.cave/agent/sessions/` organized by working directory.
 
 ```bash
 pi -c                  # Continue most recent session
@@ -268,8 +326,8 @@ Use `/settings` to modify common options, or edit JSON files directly:
 
 | Location | Scope |
 |----------|-------|
-| `~/.pi/agent/settings.json` | Global (all projects) |
-| `.pi/settings.json` | Project (overrides global) |
+| `~/.cave/agent/settings.json` | Global (all projects) |
+| `.cave/settings.json` | Project (overrides global) |
 
 See [docs/settings.md](docs/settings.md) for all options.
 
@@ -278,7 +336,7 @@ See [docs/settings.md](docs/settings.md) for all options.
 ## Context Files
 
 Pi loads `AGENTS.md` (or `CLAUDE.md`) at startup from:
-- `~/.pi/agent/AGENTS.md` (global)
+- `~/.cave/agent/AGENTS.md` (global)
 - Parent directories (walking up from cwd)
 - Current directory
 
@@ -286,7 +344,7 @@ Use for project instructions, conventions, common commands. All matching files a
 
 ### System Prompt
 
-Replace the default system prompt with `.pi/SYSTEM.md` (project) or `~/.pi/agent/SYSTEM.md` (global). Append without replacing via `APPEND_SYSTEM.md`.
+Replace the default system prompt with `.cave/SYSTEM.md` (project) or `~/.cave/agent/SYSTEM.md` (global). Append without replacing via `APPEND_SYSTEM.md`.
 
 ---
 
@@ -297,19 +355,19 @@ Replace the default system prompt with `.pi/SYSTEM.md` (project) or `~/.pi/agent
 Reusable prompts as Markdown files. Type `/name` to expand.
 
 ```markdown
-<!-- ~/.pi/agent/prompts/review.md -->
+<!-- ~/.cave/agent/prompts/review.md -->
 Review this code for bugs, security issues, and performance problems.
 Focus on: {{focus}}
 ```
 
-Place in `~/.pi/agent/prompts/`, `.pi/prompts/`, or a [pi package](#pi-packages) to share with others. See [docs/prompt-templates.md](docs/prompt-templates.md).
+Place in `~/.cave/agent/prompts/`, `.cave/prompts/`, or a [pi package](#pi-packages) to share with others. See [docs/prompt-templates.md](docs/prompt-templates.md).
 
 ### Skills
 
 On-demand capability packages following the [Agent Skills standard](https://agentskills.io). Invoke via `/skill:name` or let the agent load them automatically.
 
 ```markdown
-<!-- ~/.pi/agent/skills/my-skill/SKILL.md -->
+<!-- ~/.cave/agent/skills/my-skill/SKILL.md -->
 # My Skill
 Use this skill when the user asks about X.
 
@@ -318,7 +376,7 @@ Use this skill when the user asks about X.
 2. Then that
 ```
 
-Place in `~/.pi/agent/skills/`, `~/.agents/skills/`, `.pi/skills/`, or `.agents/skills/` (from `cwd` up through parent directories) or a [pi package](#pi-packages) to share with others. See [docs/skills.md](docs/skills.md).
+Place in `~/.cave/agent/skills/`, `~/.agents/skills/`, `.cave/skills/`, or `.agents/skills/` (from `cwd` up through parent directories) or a [pi package](#pi-packages) to share with others. See [docs/skills.md](docs/skills.md).
 
 ### Extensions
 
@@ -348,13 +406,13 @@ export default function (pi: ExtensionAPI) {
 - Games while waiting (yes, Doom runs)
 - ...anything you can dream up
 
-Place in `~/.pi/agent/extensions/`, `.pi/extensions/`, or a [pi package](#pi-packages) to share with others. See [docs/extensions.md](docs/extensions.md) and [examples/extensions/](examples/extensions/).
+Place in `~/.cave/agent/extensions/`, `.cave/extensions/`, or a [pi package](#pi-packages) to share with others. See [docs/extensions.md](docs/extensions.md) and [examples/extensions/](examples/extensions/).
 
 ### Themes
 
 Built-in: `dark`, `light`. Themes hot-reload: modify the active theme file and pi immediately applies changes.
 
-Place in `~/.pi/agent/themes/`, `.pi/themes/`, or a [pi package](#pi-packages) to share with others. See [docs/themes.md](docs/themes.md).
+Place in `~/.cave/agent/themes/`, `.cave/themes/`, or a [pi package](#pi-packages) to share with others. See [docs/themes.md](docs/themes.md).
 
 ### Pi Packages
 
@@ -380,7 +438,7 @@ pi update                               # skips pinned packages
 pi config                               # enable/disable extensions, skills, prompts, themes
 ```
 
-Packages install to `~/.pi/agent/git/` (git) or global npm. Use `-l` for project-local installs (`.pi/git/`, `.pi/npm/`). If you use a Node version manager and want package installs to reuse a stable npm context, set `npmCommand` in `settings.json`, for example `["mise", "exec", "node@20", "--", "npm"]`.
+Packages install to `~/.cave/agent/git/` (git) or global npm. Use `-l` for project-local installs (`.cave/git/`, `.cave/npm/`). If you use a Node version manager and want package installs to reuse a stable npm context, set `npmCommand` in `settings.json`, for example `["mise", "exec", "node@20", "--", "npm"]`.
 
 Create a package by adding a `pi` key to `package.json`:
 
@@ -408,7 +466,7 @@ See [docs/packages.md](docs/packages.md).
 ### SDK
 
 ```typescript
-import { AuthStorage, createAgentSession, ModelRegistry, SessionManager } from "@mariozechner/pi-coding-agent";
+import { AuthStorage, createAgentSession, ModelRegistry, SessionManager } from "@cavepi/pi-coding-agent";
 
 const authStorage = AuthStorage.create();
 const modelRegistry = ModelRegistry.create(authStorage);
@@ -593,7 +651,7 @@ pi --thinking high "Solve this complex problem"
 
 | Variable | Description |
 |----------|-------------|
-| `PI_CODING_AGENT_DIR` | Override config directory (default: `~/.pi/agent`) |
+| `PI_CODING_AGENT_DIR` | Override config directory (default: `~/.cave/agent`) |
 | `PI_PACKAGE_DIR` | Override package directory (useful for Nix/Guix where store paths tokenize poorly) |
 | `PI_SKIP_VERSION_CHECK` | Skip version check at startup |
 | `PI_CACHE_RETENTION` | Set to `long` for extended prompt cache (Anthropic: 1h, OpenAI: 24h) |
@@ -613,6 +671,6 @@ MIT
 
 ## See Also
 
-- [@mariozechner/pi-ai](https://www.npmjs.com/package/@mariozechner/pi-ai): Core LLM toolkit
-- [@mariozechner/pi-agent](https://www.npmjs.com/package/@mariozechner/pi-agent): Agent framework
-- [@mariozechner/pi-tui](https://www.npmjs.com/package/@mariozechner/pi-tui): Terminal UI components
+- [@cavepi/pi-ai](https://www.npmjs.com/package/@cavepi/pi-ai): Core LLM toolkit
+- [@cavepi/pi-agent-core](https://www.npmjs.com/package/@cavepi/pi-agent-core): Agent framework
+- [@cavepi/pi-tui](https://www.npmjs.com/package/@cavepi/pi-tui): Terminal UI components

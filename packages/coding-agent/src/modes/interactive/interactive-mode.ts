@@ -235,6 +235,25 @@ export class InteractiveMode {
 	private widgetContainerAbove!: Container;
 	private widgetContainerBelow!: Container;
 
+	// Smoke Signal: per-turn token tracking for cave mode dashboard
+	private smokeSignalTurnCount = 0;
+	private smokeSignalTotalTokens = 0;
+
+	// Tribal Signal: context drift warning state
+	private tribalSignalAmberFired = false;
+	private tribalSignalRecentTurnTokens: number[] = [];
+
+	// Mammoth Freeze: manual compaction checkpoints
+	private freezeCheckpoints: Array<{ label?: string; tokensBefore: number; tokensAfter: number; savedAt: string }> =
+		[];
+
+	// Fire Starter: preemptive compaction state
+	private fireStarterTurnDeltas: number[] = [];
+	private fireStarterLastCompactionTime = 0;
+	private static readonly FIRE_STARTER_MIN_GAP_MS = 60_000; // 1 minute minimum between compactions
+	private static readonly FIRE_STARTER_TURNS_AHEAD = 3;
+	private static readonly FIRE_STARTER_MIN_FILL_PCT = 55;
+
 	// Custom footer from extension (undefined = use built-in footer)
 	private customFooter: (Component & { dispose?(): void }) | undefined = undefined;
 
@@ -386,6 +405,16 @@ export class InteractiveMode {
 					label: item.id,
 					description: item.provider,
 				}));
+			};
+		}
+
+		const caveCommand = slashCommands.find((command) => command.name === "cave");
+		if (caveCommand) {
+			caveCommand.getArgumentCompletions = (prefix: string): AutocompleteItem[] | null => {
+				const options = ["on", "off", "lite", "full", "ultra", "stats"];
+				const filtered = prefix ? options.filter((o) => o.startsWith(prefix.toLowerCase())) : options;
+				if (filtered.length === 0) return null;
+				return filtered.map((o) => ({ value: o, label: o }));
 			};
 		}
 
@@ -2214,6 +2243,17 @@ export class InteractiveMode {
 				await this.handleCompactCommand(customInstructions);
 				return;
 			}
+			if (text === "/freeze" || text.startsWith("/freeze ")) {
+				const label = text.startsWith("/freeze ") ? text.slice(8).trim() : undefined;
+				this.editor.setText("");
+				await this.handleFreezeCommand(label);
+				return;
+			}
+			if (text === "/checkpoints") {
+				this.editor.setText("");
+				this.handleCheckpointsCommand();
+				return;
+			}
 			if (text === "/cave" || text.startsWith("/cave ")) {
 				this.editor.setText("");
 				this.handleCaveCommand(text);
@@ -2500,6 +2540,9 @@ export class InteractiveMode {
 
 				await this.checkShutdownRequested();
 
+				this.updateSmokeSignal();
+				this.updateTribalSignal();
+				await this.checkPreemptiveCompaction();
 				this.ui.requestRender();
 				break;
 
@@ -2536,6 +2579,12 @@ export class InteractiveMode {
 					this.autoCompactionLoader = undefined;
 					this.statusContainer.clear();
 				}
+				// Reset tribal signal state — context shrinks after compaction
+				this.tribalSignalAmberFired = false;
+				this.tribalSignalRecentTurnTokens = [];
+				// Reset fire starter state — compaction just happened
+				this.fireStarterTurnDeltas = [];
+				this.fireStarterLastCompactionTime = Date.now();
 				if (event.aborted) {
 					if (event.reason === "manual") {
 						this.showError("Compaction cancelled");
@@ -4722,6 +4771,79 @@ export class InteractiveMode {
 		}
 	}
 
+	private async handleFreezeCommand(label?: string): Promise<void> {
+		const entries = this.sessionManager.getEntries();
+		const messageCount = entries.filter((e) => e.type === "message").length;
+
+		if (messageCount < 2) {
+			this.showWarning("Nothing to freeze (no messages yet)");
+			return;
+		}
+
+		const statsBefore = this.session.getSessionStats();
+		const tokensBefore = statsBefore.tokens.total;
+
+		const caveInstructions =
+			"Only preserve: active task, open files, pending decisions, unresolved errors. Drop: completed work, tangents, tool call histories.";
+		const customInstructions = label ? `${caveInstructions} Label: ${label}` : caveInstructions;
+
+		if (this.loadingAnimation) {
+			this.loadingAnimation.stop();
+			this.loadingAnimation = undefined;
+		}
+		this.statusContainer.clear();
+
+		try {
+			await this.session.compact(customInstructions);
+			const statsAfter = this.session.getSessionStats();
+			const tokensAfter = statsAfter.tokens.total;
+			const saved = tokensBefore - tokensAfter;
+			const savedPct = tokensBefore > 0 ? Math.round((saved / tokensBefore) * 100) : 0;
+
+			this.freezeCheckpoints.push({
+				label,
+				tokensBefore,
+				tokensAfter,
+				savedAt: new Date().toISOString(),
+			});
+
+			this.chatContainer.addChild(new Spacer(1));
+			const msg =
+				saved > 0
+					? `Mammoth frozen${label ? ` [${label}]` : ""}. Saved ${saved.toLocaleString()} tokens (-${savedPct}%).`
+					: `Mammoth frozen${label ? ` [${label}]` : ""}.`;
+			this.chatContainer.addChild(new Text(theme.fg("accent", msg), 1, 0));
+			this.ui.requestRender();
+		} catch {
+			// Ignore, will be emitted as an event
+		}
+	}
+
+	private handleCheckpointsCommand(): void {
+		if (this.freezeCheckpoints.length === 0) {
+			this.chatContainer.addChild(new Spacer(1));
+			this.chatContainer.addChild(
+				new Text(theme.fg("muted", "No freeze checkpoints yet. Use /freeze to create one."), 1, 0),
+			);
+			this.ui.requestRender();
+			return;
+		}
+
+		const lines: string[] = [theme.fg("accent", "Freeze Checkpoints")];
+		for (let i = 0; i < this.freezeCheckpoints.length; i++) {
+			const cp = this.freezeCheckpoints[i]!;
+			const saved = cp.tokensBefore - cp.tokensAfter;
+			const pct = cp.tokensBefore > 0 ? Math.round((saved / cp.tokensBefore) * 100) : 0;
+			const labelStr = cp.label ? ` [${cp.label}]` : "";
+			const timeStr = new Date(cp.savedAt).toLocaleTimeString();
+			lines.push(`  #${i + 1}${labelStr}  ${timeStr}  ${saved.toLocaleString()} tokens saved (-${pct}%)`);
+		}
+
+		this.chatContainer.addChild(new Spacer(1));
+		this.chatContainer.addChild(new Text(lines.join("\n"), 1, 0));
+		this.ui.requestRender();
+	}
+
 	private handleCaveCommand(text: string): void {
 		const arg = text.startsWith("/cave ") ? text.slice(6).trim().toLowerCase() : "";
 
@@ -4731,6 +4853,14 @@ export class InteractiveMode {
 			const status = state.enabled ? `on (intensity: ${state.intensity})` : "off";
 			this.chatContainer.addChild(new Spacer(1));
 			this.chatContainer.addChild(new Text(theme.fg("muted", `Cave mode: ${status}`), 1, 0));
+			this.ui.requestRender();
+			return;
+		}
+
+		if (arg === "on") {
+			this.session.setCaveModeSessionIntensity(this.settingsManager.getCaveModeIntensity());
+			this.chatContainer.addChild(new Spacer(1));
+			this.chatContainer.addChild(new Text(theme.fg("muted", "Cave mode: on (session)"), 1, 0));
 			this.ui.requestRender();
 			return;
 		}
@@ -4753,7 +4883,183 @@ export class InteractiveMode {
 			return;
 		}
 
-		this.showWarning(`/cave: unknown argument '${arg}'. Usage: /cave [lite|full|ultra|off]`);
+		if (arg === "stats") {
+			this.handleCaveStatsCommand();
+			return;
+		}
+
+		this.showWarning(`/cave: unknown argument '${arg}'. Usage: /cave [on|off|lite|full|ultra|stats]`);
+	}
+
+	private handleCaveStatsCommand(): void {
+		const state = this.session.getCaveModeSessionState();
+		const stats = this.session.getSessionStats();
+		const contextUsage = stats.contextUsage;
+
+		const lines: string[] = [];
+		lines.push(theme.fg("accent", "Cave Mode Stats"));
+		lines.push(`  Mode: ${state.enabled ? "on" : "off"}`);
+		lines.push(`  Intensity: ${state.intensity}`);
+		lines.push(`  Tool compression: ${this.settingsManager.getCaveModeToolCompression() ? "on" : "off"}`);
+		lines.push("");
+		lines.push(theme.fg("accent", "Session Tokens"));
+		lines.push(`  Input: ${stats.tokens.input.toLocaleString()}`);
+		lines.push(`  Output: ${stats.tokens.output.toLocaleString()}`);
+		lines.push(`  Cache read: ${stats.tokens.cacheRead.toLocaleString()}`);
+		lines.push(`  Cache write: ${stats.tokens.cacheWrite.toLocaleString()}`);
+		lines.push(`  Total: ${stats.tokens.total.toLocaleString()}`);
+		lines.push(`  Cost: $${stats.cost.toFixed(4)}`);
+		if (contextUsage) {
+			const pct = contextUsage.percent != null ? `${Math.round(contextUsage.percent)}%` : "unknown";
+			const tokens = contextUsage.tokens != null ? contextUsage.tokens.toLocaleString() : "unknown";
+			lines.push("");
+			lines.push(theme.fg("accent", "Context Window"));
+			lines.push(`  Used: ${tokens} / ${contextUsage.contextWindow.toLocaleString()} (${pct})`);
+		}
+
+		this.chatContainer.addChild(new Spacer(1));
+		this.chatContainer.addChild(new Text(lines.join("\n"), 1, 0));
+		this.ui.requestRender();
+	}
+
+	private updateSmokeSignal(): void {
+		const caveState = this.session.getCaveModeSessionState();
+		if (!caveState.enabled) {
+			this.setExtensionWidget("smoke-signal", undefined);
+			return;
+		}
+
+		const stats = this.session.getSessionStats();
+		this.smokeSignalTurnCount++;
+		this.smokeSignalTotalTokens += stats.tokens.input + stats.tokens.output;
+
+		const avgPerTurn =
+			this.smokeSignalTurnCount > 0 ? Math.round(this.smokeSignalTotalTokens / this.smokeSignalTurnCount) : 0;
+		const avgStr = avgPerTurn >= 1000 ? `${(avgPerTurn / 1000).toFixed(1)}k` : `${avgPerTurn}`;
+		const costStr = `$${stats.cost.toFixed(3)}`;
+
+		const contextUsage = stats.contextUsage;
+		const ctxStr = contextUsage?.percent != null ? `${Math.round(contextUsage.percent)}%` : "?";
+
+		const line = theme.fg("dim", `avg ${avgStr}/turn  cost ${costStr}  ctx ${ctxStr}  cave:${caveState.intensity}`);
+		this.setExtensionWidget("smoke-signal", [line], { placement: "belowEditor" });
+	}
+
+	private updateTribalSignal(): void {
+		const contextUsage = this.session.getContextUsage();
+
+		// Auto-clear when context drops below 60% (after compaction)
+		if (!contextUsage || contextUsage.percent === null || contextUsage.percent < 60) {
+			this.tribalSignalAmberFired = false;
+			this.setExtensionWidget("tribal-signal", undefined, { placement: "aboveEditor" });
+			this.setExtensionStatus("drift", undefined);
+			return;
+		}
+
+		const pct = contextUsage.percent;
+
+		// Track recent turn tokens for rate detection
+		if (contextUsage.tokens !== null) {
+			this.tribalSignalRecentTurnTokens.push(contextUsage.tokens);
+			if (this.tribalSignalRecentTurnTokens.length > 5) {
+				this.tribalSignalRecentTurnTokens.shift();
+			}
+		}
+
+		// Rate warning: 3 consecutive turns each >= 1.5x previous
+		if (this.tribalSignalRecentTurnTokens.length >= 3) {
+			const recent = this.tribalSignalRecentTurnTokens.slice(-3);
+			const accelerating = recent[1]! >= recent[0]! * 1.5 && recent[2]! >= recent[1]! * 1.5;
+			if (accelerating) {
+				this.setExtensionWidget(
+					"tribal-signal",
+					[theme.fg("warning", "Context burning fast. Rate accelerating. Consider /compact")],
+					{ placement: "aboveEditor" },
+				);
+				return;
+			}
+		}
+
+		// Red widget at 85%+
+		if (pct >= 85) {
+			this.tribalSignalAmberFired = true;
+			this.setExtensionStatus("drift", undefined);
+			this.setExtensionWidget(
+				"tribal-signal",
+				[theme.fg("error", `Context ${Math.round(pct)}% full. Consider /compact or /freeze`)],
+				{ placement: "aboveEditor" },
+			);
+			return;
+		}
+
+		// Clear red widget if below 85
+		this.setExtensionWidget("tribal-signal", undefined, { placement: "aboveEditor" });
+
+		// Amber status at 70%+, fire once
+		if (pct >= 70 && !this.tribalSignalAmberFired) {
+			this.tribalSignalAmberFired = true;
+			this.setExtensionStatus("drift", `ctx:${Math.round(pct)}%`);
+		} else if (pct < 70) {
+			this.tribalSignalAmberFired = false;
+			this.setExtensionStatus("drift", undefined);
+		}
+	}
+
+	/**
+	 * Fire Starter — preemptive compaction based on token burn rate projection.
+	 * Triggers early compaction when projected context fill < TURNS_AHEAD turns
+	 * AND current fill > MIN_FILL_PCT.
+	 */
+	private async checkPreemptiveCompaction(): Promise<void> {
+		const caveState = this.session.getCaveModeSessionState();
+		if (!caveState.enabled) return;
+
+		const contextUsage = this.session.getContextUsage();
+		if (!contextUsage || contextUsage.percent === null || contextUsage.tokens === null) return;
+
+		const pct = contextUsage.percent;
+
+		// Track turn deltas
+		this.fireStarterTurnDeltas.push(contextUsage.tokens);
+		if (this.fireStarterTurnDeltas.length > 6) {
+			this.fireStarterTurnDeltas.shift();
+		}
+
+		// Need at least 3 data points to compute rate
+		if (this.fireStarterTurnDeltas.length < 3) return;
+
+		// Below minimum fill — no need
+		if (pct < InteractiveMode.FIRE_STARTER_MIN_FILL_PCT) return;
+
+		// Minimum gap between compactions
+		if (Date.now() - this.fireStarterLastCompactionTime < InteractiveMode.FIRE_STARTER_MIN_GAP_MS) return;
+
+		// Don't trigger if already compacting
+		if (this.session.isCompacting) return;
+
+		// Compute average delta per turn from the rolling window
+		const deltas = this.fireStarterTurnDeltas;
+		let totalDelta = 0;
+		for (let i = 1; i < deltas.length; i++) {
+			totalDelta += deltas[i]! - deltas[i - 1]!;
+		}
+		const avgDeltaPerTurn = totalDelta / (deltas.length - 1);
+
+		// Only trigger on positive burn rate (context growing)
+		if (avgDeltaPerTurn <= 0) return;
+
+		// Project turns until full
+		const remainingTokens = contextUsage.contextWindow - contextUsage.tokens;
+		const projectedTurnsToFull = remainingTokens / avgDeltaPerTurn;
+
+		if (projectedTurnsToFull < InteractiveMode.FIRE_STARTER_TURNS_AHEAD) {
+			this.fireStarterLastCompactionTime = Date.now();
+			try {
+				await this.session.compact("Preemptive compaction (high burn rate). Preserve active task context.");
+			} catch {
+				// Compaction may fail if session is too small — ignore
+			}
+		}
 	}
 
 	stop(): void {

@@ -1,11 +1,11 @@
 # Settings
 
-Pi uses JSON settings files with project settings overriding global settings.
+Cave uses JSON settings files with project settings overriding global settings.
 
 | Location | Scope |
 |----------|-------|
-| `~/.pi/agent/settings.json` | Global (all projects) |
-| `.pi/settings.json` | Project (current directory) |
+| `~/.cave/agent/settings.json` | Global (all projects) |
+| `.cave/settings.json` | Project (current directory) |
 
 Edit directly or use `/settings` for common options.
 
@@ -64,6 +64,58 @@ Edit directly or use `/settings` for common options.
   }
 }
 ```
+
+### Cave Mode
+
+Cave mode is a 3-layer token compression system that reduces token usage while preserving technical accuracy.
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `caveMode.enabled` | boolean | `true` | Enable cave mode communication compression |
+| `caveMode.intensity` | string | `"full"` | Compression level: `"lite"`, `"full"`, or `"ultra"` |
+| `caveMode.toolCompression` | boolean | `true` | Compress tool output (strip ANSI, collapse blanks, truncate long output) |
+
+**Intensity levels:**
+- **lite** — Light compression. Drops obvious filler words but preserves most natural language.
+- **full** — Standard compression. Drops articles, filler, pleasantries. Leads with answers.
+- **ultra** — Maximum compression. Terse technical documentation style. Uses abbreviations and symbols.
+
+All intensity levels preserve full English for: code blocks, commit messages, PR descriptions, and security warnings.
+
+```json
+{
+  "caveMode": {
+    "enabled": true,
+    "intensity": "full",
+    "toolCompression": true
+  }
+}
+```
+
+Tool compression applies three steps to all tool output:
+1. Strip ANSI escape codes (colors, cursor movement)
+2. Collapse 3+ consecutive blank lines to a single blank line
+3. Truncate output exceeding 500 lines (keeps first 200 + last 100 lines)
+
+Use `/cave [lite|full|ultra|off]` to change intensity during a session without editing settings.
+
+### RTK (Rust Token Killer)
+
+RTK is an optional external binary that rewrites bash commands to produce more compact output.
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `rtk.enabled` | boolean | `true` | Enable RTK command rewriting (requires `rtk` binary on PATH) |
+
+```json
+{
+  "rtk": {
+    "enabled": true
+  }
+}
+```
+
+RTK is detected automatically at startup. If the `rtk` binary is not installed, the setting has no effect.
 
 ### Branch Summary
 
@@ -134,7 +186,7 @@ When a provider requests a retry delay longer than `maxDelayMs` (e.g., Google's 
 | `sessionDir` | string | - | Directory where session files are stored. Accepts absolute or relative paths. |
 
 ```json
-{ "sessionDir": ".pi/sessions" }
+{ "sessionDir": ".cave/sessions" }
 ```
 
 When multiple sources specify a session directory, `--session-dir` CLI flag takes precedence over `sessionDir` in settings.json.
@@ -161,7 +213,7 @@ When multiple sources specify a session directory, `--session-dir` CLI flag take
 
 These settings define where to load extensions, skills, prompts, and themes from.
 
-Paths in `~/.pi/agent/settings.json` resolve relative to `~/.pi/agent`. Paths in `.pi/settings.json` resolve relative to `.pi`. Absolute paths and `~` are supported.
+Paths in `~/.cave/agent/settings.json` resolve relative to `~/.cave/agent`. Paths in `.cave/settings.json` resolve relative to `.cave`. Absolute paths and `~` are supported.
 
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
@@ -208,6 +260,14 @@ See [packages.md](packages.md) for package management details.
   "defaultModel": "claude-sonnet-4-20250514",
   "defaultThinkingLevel": "medium",
   "theme": "dark",
+  "caveMode": {
+    "enabled": true,
+    "intensity": "full",
+    "toolCompression": true
+  },
+  "rtk": {
+    "enabled": true
+  },
   "compaction": {
     "enabled": true,
     "reserveTokens": 16384,
@@ -224,16 +284,16 @@ See [packages.md](packages.md) for package management details.
 
 ## Project Overrides
 
-Project settings (`.pi/settings.json`) override global settings. Nested objects are merged:
+Project settings (`.cave/settings.json`) override global settings. Nested objects are merged:
 
 ```json
-// ~/.pi/agent/settings.json (global)
+// ~/.cave/agent/settings.json (global)
 {
   "theme": "dark",
   "compaction": { "enabled": true, "reserveTokens": 16384 }
 }
 
-// .pi/settings.json (project)
+// .cave/settings.json (project)
 {
   "compaction": { "reserveTokens": 8192 }
 }

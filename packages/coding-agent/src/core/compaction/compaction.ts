@@ -16,6 +16,7 @@ import {
 } from "../messages.js";
 import { buildSessionContext, type CompactionEntry, type SessionEntry } from "../session-manager.js";
 import {
+	CAVE_SUMMARIZATION_SYSTEM_PROMPT,
 	computeFileLists,
 	createFileOps,
 	extractFileOpsFromMessage,
@@ -582,11 +583,8 @@ export async function generateSummary(
 		? { maxTokens, signal, apiKey, headers, reasoning: "high" as const }
 		: { maxTokens, signal, apiKey, headers };
 
-	const response = await completeSimple(
-		model,
-		{ systemPrompt: SUMMARIZATION_SYSTEM_PROMPT, messages: summarizationMessages },
-		completionOptions,
-	);
+	const systemPrompt = caveModeEnabled ? CAVE_SUMMARIZATION_SYSTEM_PROMPT : SUMMARIZATION_SYSTEM_PROMPT;
+	const response = await completeSimple(model, { systemPrompt, messages: summarizationMessages }, completionOptions);
 
 	if (response.stopReason === "error") {
 		throw new Error(`Summarization failed: ${response.errorMessage || "Unknown error"}`);

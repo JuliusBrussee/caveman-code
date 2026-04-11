@@ -1,0 +1,900 @@
+[1mdiff --git a/packages/CLAUDE.md b/packages/CLAUDE.md[m
+[1mnew file mode 100644[m
+[1mindex 00000000..9cb7a46a[m
+[1m--- /dev/null[m
+[1m+++ b/packages/CLAUDE.md[m
+[36m@@ -0,0 +1,23 @@[m
+[32m+[m[32m# Packages[m
+[32m+[m
+[32m+[m[32mTypeScript monorepo under `@cavepi/` and `@cavekit/` scopes.[m
+[32m+[m
+[32m+[m[32m## Package Map[m
+[32m+[m
+[32m+[m[32m| Dir | Package | Binary | Role |[m
+[32m+[m[32m|-----|---------|--------|------|[m
+[32m+[m[32m| `coding-agent/` | `@cavepi/pi-coding-agent` | `cave` | Main coding agent CLI |[m
+[32m+[m[32m| `ai/` | `@cavepi/pi-ai` | `pi-ai` | Multi-provider LLM unified API |[m
+[32m+[m[32m| `agent/` | `@cavepi/pi-agent-core` | — | Agent runtime: tool calling, state |[m
+[32m+[m[32m| `tui/` | `@cavepi/pi-tui` | — | Terminal UI: differential rendering |[m
+[32m+[m[32m| `web-ui/` | `@cavepi/pi-web-ui` | — | Web components for AI chat |[m
+[32m+[m[32m| `mom/` | `@cavepi/pi-mom` | `mom` | Slack bot → coding agent delegate |[m
+[32m+[m[32m| `pods/` | `@cavepi/pi` | `pi-pods` | vLLM deployment on GPU pods |[m
+[32m+[m[32m| `cavekit-extension/` | `@cavekit/pi-extension` | — | CaveKit SDD: Draft→Architect→Build→Inspect |[m
+[32m+[m
+[32m+[m[32m## Conventions[m
+[32m+[m
+[32m+[m[32m- Read package-level README.md before modifying.[m
+[32m+[m[32m- Shared TypeScript config: `../tsconfig.base.json`.[m
+[32m+[m[32m- Biome for lint/format (not ESLint/Prettier).[m
+[32m+[m[32m- See `context/kits/` for requirements, `context/plans/` for tasks.[m
+[1mdiff --git a/packages/ai/src/models.generated.ts b/packages/ai/src/models.generated.ts[m
+[1mindex 4154e956..3bf69fec 100644[m
+[1m--- a/packages/ai/src/models.generated.ts[m
+[1m+++ b/packages/ai/src/models.generated.ts[m
+[36m@@ -7990,13 +7990,13 @@[m [mexport const MODELS = {[m
+ 			reasoning: true,[m
+ 			input: ["text"],[m
+ 			cost: {[m
+[31m-				input: 0.27,[m
+[32m+[m				[32minput: 0.29,[m
+ 				output: 0.95,[m
+[31m-				cacheRead: 0.0290000007,[m
+[32m+[m				[32mcacheRead: 0.03,[m
+ 				cacheWrite: 0,[m
+ 			},[m
+ 			contextWindow: 196608,[m
+[31m-			maxTokens: 4096,[m
+[32m+[m			[32mmaxTokens: 196608,[m
+ 		} satisfies Model<"openai-completions">,[m
+ 		"minimax/minimax-m2.5": {[m
+ 			id: "minimax/minimax-m2.5",[m
+[36m@@ -10999,13 +10999,13 @@[m [mexport const MODELS = {[m
+ 			reasoning: true,[m
+ 			input: ["text"],[m
+ 			cost: {[m
+[31m-				input: 1.26,[m
+[31m-				output: 3.9600000000000004,[m
+[31m-				cacheRead: 0,[m
+[32m+[m				[32minput: 1.395,[m
+[32m+[m				[32moutput: 4.4,[m
+[32m+[m				[32mcacheRead: 0.26,[m
+ 				cacheWrite: 0,[m
+ 			},[m
+ 			contextWindow: 202752,[m
+[31m-			maxTokens: 4096,[m
+[32m+[m			[32mmaxTokens: 131072,[m
+ 		} satisfies Model<"openai-completions">,[m
+ 		"z-ai/glm-5v-turbo": {[m
+ 			id: "z-ai/glm-5v-turbo",[m
+[1mdiff --git a/packages/cavekit-extension/src/commands/architect.ts b/packages/cavekit-extension/src/commands/architect.ts[m
+[1mindex d88fa1fd..991900be 100644[m
+[1m--- a/packages/cavekit-extension/src/commands/architect.ts[m
+[1m+++ b/packages/cavekit-extension/src/commands/architect.ts[m
+[36m@@ -78,6 +78,8 @@[m [mexport function registerArchitectCommand(pi: ExtensionAPI, _config: CaveKitConfi[m
+ 			// AC-2 + AC-4: Build prompt with approved kit data, requiring domain/RN refs[m
+ 			const prompt = buildArchitectPrompt(approvedKits, outputPath, sourceDir);[m
+ 			pi.sendUserMessage([{ type: "text", text: prompt }]);[m
+[32m+[m
+[32m+[m			[32mctx.ui.notify("Build site will be written to context/plans/. Preview with: /ck:preview plan", "info");[m
+ 		},[m
+ 	});[m
+ }[m
+[1mdiff --git a/packages/cavekit-extension/src/commands/design.ts b/packages/cavekit-extension/src/commands/design.ts[m
+[1mindex 7708da8d..2dccf279 100644[m
+[1m--- a/packages/cavekit-extension/src/commands/design.ts[m
+[1m+++ b/packages/cavekit-extension/src/commands/design.ts[m
+[36m@@ -69,6 +69,8 @@[m [masync function handleDesignCreate(pi: ExtensionAPI, ctx: ExtensionCommandContext[m
+ 			text: buildDesignCreatePrompt(designPath, blueprintContext),[m
+ 		},[m
+ 	]);[m
+[32m+[m
+[32m+[m	[32mctx.ui.notify("DESIGN.md will be created. Preview with: /ck:preview design", "info");[m
+ }[m
+ [m
+ async function handleDesignAudit(pi: ExtensionAPI, ctx: ExtensionCommandContext, designPath: string): Promise<void> {[m
+[1mdiff --git a/packages/cavekit-extension/src/commands/draft.ts b/packages/cavekit-extension/src/commands/draft.ts[m
+[1mindex 15b150f5..10d70fa0 100644[m
+[1m--- a/packages/cavekit-extension/src/commands/draft.ts[m
+[1m+++ b/packages/cavekit-extension/src/commands/draft.ts[m
+[36m@@ -43,6 +43,8 @@[m [mexport function registerDraftCommand(pi: ExtensionAPI, _config: CaveKitConfig):[m
+ [m
+ 			// After the agent completes, the kit files will be written to context/kits/[m
+ 			// The /ck:architect command reads from there.[m
+[32m+[m			[32m// Hint: preview kits with /ck:preview[m
+[32m+[m			[32mctx.ui.notify("Kits will be written to context/kits/. Preview with: /ck:preview <domain>", "info");[m
+ 		},[m
+ 	});[m
+ }[m
+[1mdiff --git a/packages/cavekit-extension/src/commands/index.ts b/packages/cavekit-extension/src/commands/index.ts[m
+[1mindex bcc11876..542613f2 100644[m
+[1m--- a/packages/cavekit-extension/src/commands/index.ts[m
+[1m+++ b/packages/cavekit-extension/src/commands/index.ts[m
+[36m@@ -12,6 +12,7 @@[m [mimport { registerDesignCommand } from "./design.js";[m
+ import { registerDraftCommand } from "./draft.js";[m
+ import { registerHelpCommand } from "./help.js";[m
+ import { registerInspectCommand } from "./inspect.js";[m
+[32m+[m[32mimport { registerPreviewCommand } from "./preview.js";[m
+ import { registerProgressCommand } from "./progress.js";[m
+ import { registerResearchCommand } from "./research.js";[m
+ [m
+[36m@@ -26,4 +27,5 @@[m [mexport function registerCommands(pi: ExtensionAPI, config: CaveKitConfig): void[m
+ 	registerHelpCommand(pi, config);[m
+ 	registerProgressCommand(pi, config);[m
+ 	registerConvergenceCommand(pi, config);[m
+[32m+[m	[32mregisterPreviewCommand(pi, config);[m
+ }[m
+[1mdiff --git a/packages/cavekit-extension/src/commands/inspect.ts b/packages/cavekit-extension/src/commands/inspect.ts[m
+[1mindex bf7d2115..4a8f7d1f 100644[m
+[1m--- a/packages/cavekit-extension/src/commands/inspect.ts[m
+[1m+++ b/packages/cavekit-extension/src/commands/inspect.ts[m
+[36m@@ -102,7 +102,7 @@[m [mexport function registerInspectCommand(pi: ExtensionAPI, _config: CaveKitConfig)[m
+ 			const { totalMet, totalAC, coveragePct } = analysis;[m
+ 			const notifyLevel = coveragePct >= 80 ? "info" : coveragePct >= 50 ? "warning" : "error";[m
+ 			ctx.ui.notify([m
+[31m-				`Inspect complete: ${totalMet}/${totalAC} AC met (${coveragePct}%). Report saved to ${path.relative(cwd, reportPath)}`,[m
+[32m+[m				[32m`Inspect complete: ${totalMet}/${totalAC} AC met (${coveragePct}%). Report saved to ${path.relative(cwd, reportPath)}. Preview: /ck:preview gap`,[m
+ 				notifyLevel,[m
+ 			);[m
+ [m
+[1mdiff --git a/packages/cavekit-extension/src/commands/preview.ts b/packages/cavekit-extension/src/commands/preview.ts[m
+[1mnew file mode 100644[m
+[1mindex 00000000..b6c6655a[m
+[1m--- /dev/null[m
+[1m+++ b/packages/cavekit-extension/src/commands/preview.ts[m
+[36m@@ -0,0 +1,225 @@[m
+[32m+[m[32m/**[m
+[32m+[m[32m * /ck:preview — Preview CaveKit artifacts with rendered markdown.[m
+[32m+[m[32m *[m
+[32m+[m[32m * Resolves shorthand names to file paths and dispatches a preview request[m
+[32m+[m[32m * via custom message. The markdown-preview extension listens for the[m
+[32m+[m[32m * "ck:preview-request" custom type and renders the file.[m
+[32m+[m[32m *[m
+[32m+[m[32m * Falls back gracefully if markdown-preview is not installed.[m
+[32m+[m[32m */[m
+[32m+[m
+[32m+[m[32mimport * as fs from "node:fs";[m
+[32m+[m[32mimport * as path from "node:path";[m
+[32m+[m[32mimport type { ExtensionAPI } from "@cavepi/pi-coding-agent";[m
+[32m+[m[32mimport type { CaveKitConfig } from "../config/index.js";[m
+[32m+[m
+[32m+[m[32mtype PreviewTarget = "terminal" | "browser" | "pdf";[m
+[32m+[m
+[32m+[m[32minterface ParsedArgs {[m
+[32m+[m	[32mshorthand: string;[m
+[32m+[m	[32mtarget: PreviewTarget;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mfunction parseArgs(args: string): ParsedArgs {[m
+[32m+[m	[32mconst parts = args.trim().split(/\s+/);[m
+[32m+[m	[32mlet target: PreviewTarget = "terminal";[m
+[32m+[m	[32mconst nonFlags: string[] = [];[m
+[32m+[m
+[32m+[m	[32mfor (const part of parts) {[m
+[32m+[m		[32mif (part === "--browser" || part === "browser") target = "browser";[m
+[32m+[m		[32melse if (part === "--pdf" || part === "pdf") target = "pdf";[m
+[32m+[m		[32melse if (part === "--terminal" || part === "terminal") target = "terminal";[m
+[32m+[m		[32melse nonFlags.push(part);[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32mreturn { shorthand: nonFlags.join(" "), target };[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m/**[m
+[32m+[m[32m * Resolve a CaveKit shorthand to an absolute file path.[m
+[32m+[m[32m *[m
+[32m+[m[32m * - "kit-auth" → context/kits/kit-auth.md or context/blueprints/kit-auth.md[m
+[32m+[m[32m * - "plan" / "build-site" → latest context/plans/*.md[m
+[32m+[m[32m * - "gap" → latest context/reports/gap-analysis-*.md[m
+[32m+[m[32m * - "design" → DESIGN.md[m
+[32m+[m[32m * - "T-001" → context/impl/T-001.md[m
+[32m+[m[32m * - "ref-<name>" → context/refs/<name>.md[m
+[32m+[m[32m * - Path with "/" → treat as relative path[m
+[32m+[m[32m */[m
+[32m+[m[32mfunction resolveShorthand(cwd: string, shorthand: string): string | null {[m
+[32m+[m	[32m// Direct relative/absolute path[m
+[32m+[m	[32mif (shorthand.includes("/") || shorthand.includes("\\")) {[m
+[32m+[m		[32mconst resolved = path.resolve(cwd, shorthand);[m
+[32m+[m		[32mreturn fs.existsSync(resolved) ? resolved : null;[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32m// "design" → DESIGN.md[m
+[32m+[m	[32mif (shorthand === "design") {[m
+[32m+[m		[32mconst p = path.join(cwd, "DESIGN.md");[m
+[32m+[m		[32mreturn fs.existsSync(p) ? p : null;[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32m// "plan" or "build-site" → latest context/plans/*.md[m
+[32m+[m	[32mif (shorthand === "plan" || shorthand === "build-site") {[m
+[32m+[m		[32mreturn findLatestMd(path.join(cwd, "context", "plans"));[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32m// "gap" or "gap-analysis" → latest context/reports/gap-analysis-*.md[m
+[32m+[m	[32mif (shorthand === "gap" || shorthand === "gap-analysis") {[m
+[32m+[m		[32mreturn findLatestMd(path.join(cwd, "context", "reports"), "gap-analysis-");[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32m// "T-NNN" → context/impl/T-NNN.md[m
+[32m+[m	[32mif (/^T-\d+$/i.test(shorthand)) {[m
+[32m+[m		[32mconst p = path.join(cwd, "context", "impl", `${shorthand.toUpperCase()}.md`);[m
+[32m+[m		[32mreturn fs.existsSync(p) ? p : null;[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32m// "ref-<name>" → context/refs/<name>.md[m
+[32m+[m	[32mif (shorthand.startsWith("ref-")) {[m
+[32m+[m		[32mconst name = shorthand.slice(4);[m
+[32m+[m		[32mconst p = path.join(cwd, "context", "refs", `${name}.md`);[m
+[32m+[m		[32mreturn fs.existsSync(p) ? p : null;[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32m// "kit-<name>" or bare "<name>" → context/blueprints/kit-<name>.md or context/kits/kit-<name>.md[m
+[32m+[m	[32mconst kitName = shorthand.startsWith("kit-") ? shorthand : `kit-${shorthand}`;[m
+[32m+[m	[32mconst blueprintPath = path.join(cwd, "context", "blueprints", `${kitName}.md`);[m
+[32m+[m	[32mif (fs.existsSync(blueprintPath)) return blueprintPath;[m
+[32m+[m	[32mconst kitPath = path.join(cwd, "context", "kits", `${kitName}.md`);[m
+[32m+[m	[32mif (fs.existsSync(kitPath)) return kitPath;[m
+[32m+[m
+[32m+[m	[32m// Try as a direct filename under context/[m
+[32m+[m	[32mconst directPath = path.join(cwd, "context", `${shorthand}.md`);[m
+[32m+[m	[32mif (fs.existsSync(directPath)) return directPath;[m
+[32m+[m
+[32m+[m	[32mreturn null;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mfunction findLatestMd(dir: string, prefix?: string): string | null {[m
+[32m+[m	[32mif (!fs.existsSync(dir)) return null;[m
+[32m+[m	[32mconst files = fs.readdirSync(dir)[m
+[32m+[m		[32m.filter((f) => f.endsWith(".md") && (!prefix || f.startsWith(prefix)))[m
+[32m+[m		[32m.map((f) => ({ name: f, mtime: fs.statSync(path.join(dir, f)).mtimeMs }))[m
+[32m+[m		[32m.sort((a, b) => b.mtime - a.mtime);[m
+[32m+[m	[32mreturn files.length > 0 ? path.join(dir, files[0]!.name) : null;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mfunction collectArtifacts(cwd: string): Array<{ value: string; label: string; path: string }> {[m
+[32m+[m	[32mconst artifacts: Array<{ value: string; label: string; path: string }> = [];[m
+[32m+[m
+[32m+[m	[32m// DESIGN.md[m
+[32m+[m	[32mconst designPath = path.join(cwd, "DESIGN.md");[m
+[32m+[m	[32mif (fs.existsSync(designPath)) {[m
+[32m+[m		[32martifacts.push({ value: "design", label: "design — DESIGN.md", path: designPath });[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32m// Kits (blueprints first, then kits)[m
+[32m+[m	[32mfor (const dir of ["context/blueprints", "context/kits"]) {[m
+[32m+[m		[32mconst fullDir = path.join(cwd, dir);[m
+[32m+[m		[32mif (!fs.existsSync(fullDir)) continue;[m
+[32m+[m		[32mfor (const f of fs.readdirSync(fullDir).filter((f) => f.startsWith("kit-") && f.endsWith(".md"))) {[m
+[32m+[m			[32mconst name = f.replace(/\.md$/, "");[m
+[32m+[m			[32mif (!artifacts.some((a) => a.value === name)) {[m
+[32m+[m				[32martifacts.push({ value: name, label: `${name} — ${dir}/${f}`, path: path.join(fullDir, f) });[m
+[32m+[m			[32m}[m
+[32m+[m		[32m}[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32m// Plans[m
+[32m+[m	[32mconst plansDir = path.join(cwd, "context", "plans");[m
+[32m+[m	[32mif (fs.existsSync(plansDir)) {[m
+[32m+[m		[32mfor (const f of fs.readdirSync(plansDir).filter((f) => f.endsWith(".md"))) {[m
+[32m+[m			[32martifacts.push({ value: "plan", label: `plan — context/plans/${f}`, path: path.join(plansDir, f) });[m
+[32m+[m		[32m}[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32m// Gap analyses[m
+[32m+[m	[32mconst reportsDir = path.join(cwd, "context", "reports");[m
+[32m+[m	[32mif (fs.existsSync(reportsDir)) {[m
+[32m+[m		[32mconst gaps = fs.readdirSync(reportsDir)[m
+[32m+[m			[32m.filter((f) => f.startsWith("gap-analysis-") && f.endsWith(".md"))[m
+[32m+[m			[32m.sort().reverse();[m
+[32m+[m		[32mif (gaps.length > 0) {[m
+[32m+[m			[32martifacts.push({ value: "gap", label: `gap — context/reports/${gaps[0]}`, path: path.join(reportsDir, gaps[0]!) });[m
+[32m+[m		[32m}[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32m// Impl records[m
+[32m+[m	[32mconst implDir = path.join(cwd, "context", "impl");[m
+[32m+[m	[32mif (fs.existsSync(implDir)) {[m
+[32m+[m		[32mfor (const f of fs.readdirSync(implDir).filter((f) => /^T-\d+\.md$/.test(f)).sort()) {[m
+[32m+[m			[32mconst id = f.replace(/\.md$/, "");[m
+[32m+[m			[32martifacts.push({ value: id, label: `${id} — context/impl/${f}`, path: path.join(implDir, f) });[m
+[32m+[m		[32m}[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32m// Refs[m
+[32m+[m	[32mconst refsDir = path.join(cwd, "context", "refs");[m
+[32m+[m	[32mif (fs.existsSync(refsDir)) {[m
+[32m+[m		[32mfor (const f of fs.readdirSync(refsDir).filter((f) => f.endsWith(".md"))) {[m
+[32m+[m			[32mconst name = f.replace(/\.md$/, "");[m
+[32m+[m			[32martifacts.push({ value: `ref-${name}`, label: `ref-${name} — context/refs/${f}`, path: path.join(refsDir, f) });[m
+[32m+[m		[32m}[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32mreturn artifacts;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mexport function registerPreviewCommand(pi: ExtensionAPI, _config: CaveKitConfig): void {[m
+[32m+[m	[32mpi.registerCommand("ck:preview", {[m
+[32m+[m		[32mdescription: "Preview a CaveKit artifact (kit, plan, gap analysis, design, impl record)",[m
+[32m+[m		[32mgetArgumentCompletions: (prefix) => {[m
+[32m+[m			[32mconst cwd = process.cwd();[m
+[32m+[m			[32mconst artifacts = collectArtifacts(cwd);[m
+[32m+[m			[32mconst matches = artifacts.filter((a) => a.value.startsWith(prefix));[m
+[32m+[m			[32mreturn matches.length > 0 ? matches : null;[m
+[32m+[m		[32m},[m
+[32m+[m		[32mhandler: async (args, ctx) => {[m
+[32m+[m			[32mconst cwd = ctx.cwd;[m
+[32m+[m			[32mconst { shorthand, target } = parseArgs(args);[m
+[32m+[m
+[32m+[m			[32m// Check if markdown-preview is available[m
+[32m+[m			[32mconst hasPreview = pi.getCommands().some((c) => c.name === "preview");[m
+[32m+[m
+[32m+[m			[32mlet filePath: string | null = null;[m
+[32m+[m
+[32m+[m			[32mif (!shorthand) {[m
+[32m+[m				[32m// Interactive picker[m
+[32m+[m				[32mconst artifacts = collectArtifacts(cwd);[m
+[32m+[m				[32mif (artifacts.length === 0) {[m
+[32m+[m					[32mctx.ui.notify("No CaveKit artifacts found. Run /ck:draft to generate kits.", "warning");[m
+[32m+[m					[32mreturn;[m
+[32m+[m				[32m}[m
+[32m+[m
+[32m+[m				[32mconst options = artifacts.map((a) => a.label);[m
+[32m+[m				[32mconst selected = await ctx.ui.select("Preview CaveKit Artifact", options);[m
+[32m+[m				[32mif (!selected) return;[m
+[32m+[m				[32mfilePath = artifacts.find((a) => a.label === selected)?.path ?? null;[m
+[32m+[m			[32m} else {[m
+[32m+[m				[32mfilePath = resolveShorthand(cwd, shorthand);[m
+[32m+[m			[32m}[m
+[32m+[m
+[32m+[m			[32mif (!filePath) {[m
+[32m+[m				[32mctx.ui.notify(`Could not resolve "${shorthand}" to a CaveKit artifact.`, "error");[m
+[32m+[m				[32mreturn;[m
+[32m+[m			[32m}[m
+[32m+[m
+[32m+[m			[32mif (!hasPreview) {[m
+[32m+[m				[32mctx.ui.notify([m
+[32m+[m					[32m`markdown-preview not installed. Run: cave install npm:pi-markdown-preview\nOr manually: /preview ${path.relative(cwd, filePath)}`,[m
+[32m+[m					[32m"warning",[m
+[32m+[m				[32m);[m
+[32m+[m				[32mreturn;[m
+[32m+[m			[32m}[m
+[32m+[m
+[32m+[m			[32m// Dispatch preview request via custom message protocol[m
+[32m+[m			[32mpi.sendMessage<{ filePath: string; target: string }>({[m
+[32m+[m				[32mcustomType: "ck:preview-request",[m
+[32m+[m				[32mcontent: `Preview: ${path.relative(cwd, filePath)}`,[m
+[32m+[m				[32mdisplay: false,[m
+[32m+[m				[32mdetails: { filePath, target },[m
+[32m+[m			[32m});[m
+[32m+[m		[32m},[m
+[32m+[m	[32m});[m
+[32m+[m[32m}[m
+[1mdiff --git a/packages/coding-agent/README.md b/packages/coding-agent/README.md[m
+[1mindex 3ea62ff9..038d0f53 100644[m
+[1m--- a/packages/coding-agent/README.md[m
+[1m+++ b/packages/coding-agent/README.md[m
+[36m@@ -3,27 +3,19 @@[m
+ [m
+ **Issue tracker reopens Monday, April 13, 2026.**[m
+ [m
+[31m-OSS weekend runs Thursday, April 2, 2026 through Monday, April 13, 2026. New issues and PRs from unapproved contributors are auto-closed during this time. Approved contributors can still open issues and PRs if something is genuinely urgent, but please keep that to pressing matters only. For support, join [Discord](https://discord.com/invite/3cU7Bz4UPx).[m
+[32m+[m[32mOSS weekend runs Thursday, April 2, 2026 through Monday, April 13, 2026. New issues and PRs from unapproved contributors are auto-closed during this time. Approved contributors can still open issues and PRs if something is genuinely urgent, but please keep that to pressing matters only. For support, join [Discord](https://discord.com/invite/nKXTsAcmbT).[m
+ [m
+ > _Current focus: at the moment i'm deep in refactoring internals, and need to focus._[m
+ <!-- OSS_WEEKEND_END -->[m
+ [m
+ ---[m
+ [m
+[32m+[m[32m<h1 align="center">Cave</h1>[m
+[32m+[m[32m<p align="center">Minimal terminal coding harness with token-saving cave mode</p>[m
+ <p align="center">[m
+[31m-  <a href="https://shittycodingagent.ai">[m
+[31m-    <img src="https://shittycodingagent.ai/logo.svg" alt="pi logo" width="128">[m
+[31m-  </a>[m
+[31m-</p>[m
+[31m-<p align="center">[m
+[31m-  <a href="https://discord.com/invite/3cU7Bz4UPx"><img alt="Discord" src="https://img.shields.io/badge/discord-community-5865F2?style=flat-square&logo=discord&logoColor=white" /></a>[m
+[31m-  <a href="https://www.npmjs.com/package/@mariozechner/pi-coding-agent"><img alt="npm" src="https://img.shields.io/npm/v/@mariozechner/pi-coding-agent?style=flat-square" /></a>[m
+[31m-  <a href="https://github.com/badlogic/pi-mono/actions/workflows/ci.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/badlogic/pi-mono/ci.yml?style=flat-square&branch=main" /></a>[m
+[31m-</p>[m
+[31m-<p align="center">[m
+[31m-  <a href="https://pi.dev">pi.dev</a> domain graciously donated by[m
+[31m-  <br /><br />[m
+[31m-  <a href="https://exe.dev"><img src="docs/images/exy.png" alt="Exy mascot" width="48" /><br />exe.dev</a>[m
+[32m+[m[32m  <a href="https://discord.com/invite/nKXTsAcmbT"><img alt="Discord" src="https://img.shields.io/badge/discord-community-5865F2?style=flat-square&logo=discord&logoColor=white" /></a>[m
+[32m+[m[32m  <a href="https://www.npmjs.com/package/@cavepi/pi-coding-agent"><img alt="npm" src="https://img.shields.io/npm/v/@cavepi/pi-coding-agent?style=flat-square" /></a>[m
+[32m+[m[32m  <a href="https://github.com/JuliusBrussee/caveman-cli/actions/workflows/ci.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/JuliusBrussee/caveman-cli/ci.yml?style=flat-square&branch=main" /></a>[m
+ </p>[m
+ [m
+ Cave is a minimal terminal coding harness, forked from [pi-mono](https://github.com/badlogic/pi-mono) by Mario Zechner (badlogic). Adapt Cave to your workflows, not the other way around, without having to fork and modify internals. Extend it with TypeScript [Extensions](#extensions), [Skills](#skills), [Prompt Templates](#prompt-templates), and [Themes](#themes). Put your extensions, skills, prompt templates, and themes in [Cave Packages](#cave-packages) and share them with others via npm or git.[m
+[36m@@ -32,21 +24,15 @@[m [mCave ships with powerful defaults but skips features like sub agents and plan mo[m
+ [m
+ Cave runs in four modes: interactive, print or JSON, RPC for process integration, and an SDK for embedding in your own apps.[m
+ [m
+[31m-## Share your OSS coding agent sessions[m
+[31m-[m
+[31m-If you use pi for open source work, please share your coding agent sessions.[m
+[31m-[m
+[31m-Public OSS session data helps improve models, prompts, tools, and evaluations using real development workflows.[m
+[31m-[m
+[31m-For the full explanation, see [this post on X](https://x.com/badlogicgames/status/2037811643774652911).[m
+[31m-[m
+[31m-To publish sessions, use [`badlogic/pi-share-hf`](https://github.com/badlogic/pi-share-hf). Read its README.md for setup instructions. All you need is a Hugging Face account, the Hugging Face CLI, and `pi-share-hf`.[m
+[32m+[m[32m## Cave Mode[m
+ [m
+[31m-You can also watch [this video](https://x.com/badlogicgames/status/2041151967695634619), where I show how I publish my `pi-mono` sessions.[m
+[32m+[m[32mCave mode is a 3-layer token compression system enabled by default. It reduces token usage while preserving full technical accuracy.[m
+ [m
+[31m-I regularly publish my own `pi-mono` work sessions here:[m
+[32m+[m[32m- **System prompt compression** — instructs the model to communicate concisely (lite/full/ultra intensities)[m
+[32m+[m[32m- **Tool output compression** — strips ANSI codes, collapses blank lines, truncates long output[m
+[32m+[m[32m- **RTK integration** — optional external binary that rewrites bash commands for compact output[m
+ [m
+[31m-- [badlogicgames/pi-mono on Hugging Face](https://huggingface.co/datasets/badlogicgames/pi-mono)[m
+[32m+[m[32mUse `/cave [lite|full|ultra|off]` to change intensity during a session. See [settings](docs/settings.md) for configuration.[m
+ [m
+ ## Table of Contents[m
+ [m
+[36m@@ -77,7 +63,7 @@[m [mI regularly publish my own `pi-mono` work sessions here:[m
+ ## Quick Start[m
+ [m
+ ```bash[m
+[31m-npm install -g @mariozechner/pi-coding-agent[m
+[32m+[m[32mnpm install -g @cavepi/pi-coding-agent[m
+ ```[m
+ [m
+ Authenticate with an API key:[m
+[36m@@ -133,7 +119,7 @@[m [mFor each built-in provider, pi maintains a list of tool-capable models, updated[m
+ [m
+ See [docs/providers.md](docs/providers.md) for detailed setup instructions.[m
+ [m
+[31m-**Custom providers & models:** Add providers via `~/.pi/agent/models.json` if they speak a supported API (OpenAI, Anthropic, Google). For custom APIs or OAuth, use extensions. See [docs/models.md](docs/models.md) and [docs/custom-provider.md](docs/custom-provider.md).[m
+[32m+[m[32m**Custom providers & models:** Add providers via `~/.cave/agent/models.json` if they speak a supported API (OpenAI, Anthropic, Google). For custom APIs or OAuth, use extensions. See [docs/models.md](docs/models.md) and [docs/custom-provider.md](docs/custom-provider.md).[m
+ [m
+ ---[m
+ [m
+[36m@@ -189,7 +175,7 @@[m [mType `/` in the editor to trigger commands. [Extensions](#extensions) can regist[m
+ [m
+ ### Keyboard Shortcuts[m
+ [m
+[31m-See `/hotkeys` for the full list. Customize via `~/.pi/agent/keybindings.json`. See [docs/keybindings.md](docs/keybindings.md).[m
+[32m+[m[32mSee `/hotkeys` for the full list. Customize via `~/.cave/agent/keybindings.json`. See [docs/keybindings.md](docs/keybindings.md).[m
+ [m
+ **Commonly used:**[m
+ [m
+[36m@@ -226,7 +212,7 @@[m [mSessions are stored as JSONL files with a tree structure. Each entry has an `id`[m
+ [m
+ ### Management[m
+ [m
+[31m-Sessions auto-save to `~/.pi/agent/sessions/` organized by working directory.[m
+[32m+[m[32mSessions auto-save to `~/.cave/agent/sessions/` organized by working directory.[m
+ [m
+ ```bash[m
+ pi -c                  # Continue most recent session[m
+[36m@@ -268,8 +254,8 @@[m [mUse `/settings` to modify common options, or edit JSON files directly:[m
+ [m
+ | Location | Scope |[m
+ |----------|-------|[m
+[31m-| `~/.pi/agent/settings.json` | Global (all projects) |[m
+[31m-| `.pi/settings.json` | Project (overrides global) |[m
+[32m+[m[32m| `~/.cave/agent/settings.json` | Global (all projects) |[m
+[32m+[m[32m| `.cave/settings.json` | Project (overrides global) |[m
+ [m
+ See [docs/settings.md](docs/settings.md) for all options.[m
+ [m
+[36m@@ -278,7 +264,7 @@[m [mSee [docs/settings.md](docs/settings.md) for all options.[m
+ ## Context Files[m
+ [m
+ Pi loads `AGENTS.md` (or `CLAUDE.md`) at startup from:[m
+[31m-- `~/.pi/agent/AGENTS.md` (global)[m
+[32m+[m[32m- `~/.cave/agent/AGENTS.md` (global)[m
+ - Parent directories (walking up from cwd)[m
+ - Current directory[m
+ [m
+[36m@@ -286,7 +272,7 @@[m [mUse for project instructions, conventions, common commands. All matching files a[m
+ [m
+ ### System Prompt[m
+ [m
+[31m-Replace the default system prompt with `.pi/SYSTEM.md` (project) or `~/.pi/agent/SYSTEM.md` (global). Append without replacing via `APPEND_SYSTEM.md`.[m
+[32m+[m[32mReplace the default system prompt with `.cave/SYSTEM.md` (project) or `~/.cave/agent/SYSTEM.md` (global). Append without replacing via `APPEND_SYSTEM.md`.[m
+ [m
+ ---[m
+ [m
+[36m@@ -297,19 +283,19 @@[m [mReplace the default system prompt with `.pi/SYSTEM.md` (project) or `~/.pi/agent[m
+ Reusable prompts as Markdown files. Type `/name` to expand.[m
+ [m
+ ```markdown[m
+[31m-<!-- ~/.pi/agent/prompts/review.md -->[m
+[32m+[m[32m<!-- ~/.cave/agent/prompts/review.md -->[m
+ Review this code for bugs, security issues, and performance problems.[m
+ Focus on: {{focus}}[m
+ ```[m
+ [m
+[31m-Place in `~/.pi/agent/prompts/`, `.pi/prompts/`, or a [pi package](#pi-packages) to share with others. See [docs/prompt-templates.md](docs/prompt-templates.md).[m
+[32m+[m[32mPlace in `~/.cave/agent/prompts/`, `.cave/prompts/`, or a [pi package](#pi-packages) to share with others. See [docs/prompt-templates.md](docs/prompt-templates.md).[m
+ [m
+ ### Skills[m
+ [m
+ On-demand capability packages following the [Agent Skills standard](https://agentskills.io). Invoke via `/skill:name` or let the agent load them automatically.[m
+ [m
+ ```markdown[m
+[31m-<!-- ~/.pi/agent/skills/my-skill/SKILL.md -->[m
+[32m+[m[32m<!-- ~/.cave/agent/skills/my-skill/SKILL.md -->[m
+ # My Skill[m
+ Use this skill when the user asks about X.[m
+ [m
+[36m@@ -318,7 +304,7 @@[m [mUse this skill when the user asks about X.[m
+ 2. Then that[m
+ ```[m
+ [m
+[31m-Place in `~/.pi/agent/skills/`, `~/.agents/skills/`, `.pi/skills/`, or `.agents/skills/` (from `cwd` up through parent directories) or a [pi package](#pi-packages) to share with others. See [docs/skills.md](docs/skills.md).[m
+[32m+[m[32mPlace in `~/.cave/agent/skills/`, `~/.agents/skills/`, `.cave/skills/`, or `.agents/skills/` (from `cwd` up through parent directories) or a [pi package](#pi-packages) to share with others. See [docs/skills.md](docs/skills.md).[m
+ [m
+ ### Extensions[m
+ [m
+[36m@@ -348,13 +334,13 @@[m [mexport default function (pi: ExtensionAPI) {[m
+ - Games while waiting (yes, Doom runs)[m
+ - ...anything you can dream up[m
+ [m
+[31m-Place in `~/.pi/agent/extensions/`, `.pi/extensions/`, or a [pi package](#pi-packages) to share with others. See [docs/extensions.md](docs/extensions.md) and [examples/extensions/](examples/extensions/).[m
+[32m+[m[32mPlace in `~/.cave/agent/extensions/`, `.cave/extensions/`, or a [pi package](#pi-packages) to share with others. See [docs/extensions.md](docs/extensions.md) and [examples/extensions/](examples/extensions/).[m
+ [m
+ ### Themes[m
+ [m
+ Built-in: `dark`, `light`. Themes hot-reload: modify the active theme file and pi immediately applies changes.[m
+ [m
+[31m-Place in `~/.pi/agent/themes/`, `.pi/themes/`, or a [pi package](#pi-packages) to share with others. See [docs/themes.md](docs/themes.md).[m
+[32m+[m[32mPlace in `~/.cave/agent/themes/`, `.cave/themes/`, or a [pi package](#pi-packages) to share with others. See [docs/themes.md](docs/themes.md).[m
+ [m
+ ### Pi Packages[m
+ [m
+[36m@@ -380,7 +366,7 @@[m [mpi update                               # skips pinned packages[m
+ pi config                               # enable/disable extensions, skills, prompts, themes[m
+ ```[m
+ [m
+[31m-Packages install to `~/.pi/agent/git/` (git) or global npm. Use `-l` for project-local installs (`.pi/git/`, `.pi/npm/`). If you use a Node version manager and want package installs to reuse a stable npm context, set `npmCommand` in `settings.json`, for example `["mise", "exec", "node@20", "--", "npm"]`.[m
+[32m+[m[32mPackages install to `~/.cave/agent/git/` (git) or global npm. Use `-l` for project-local installs (`.cave/git/`, `.cave/npm/`). If you use a Node version manager and want package installs to reuse a stable npm context, set `npmCommand` in `settings.json`, for example `["mise", "exec", "node@20", "--", "npm"]`.[m
+ [m
+ Create a package by adding a `pi` key to `package.json`:[m
+ [m
+[36m@@ -408,7 +394,7 @@[m [mSee [docs/packages.md](docs/packages.md).[m
+ ### SDK[m
+ [m
+ ```typescript[m
+[31m-import { AuthStorage, createAgentSession, ModelRegistry, SessionManager } from "@mariozechner/pi-coding-agent";[m
+[32m+[m[32mimport { AuthStorage, createAgentSession, ModelRegistry, SessionManager } from "@cavepi/pi-coding-agent";[m
+ [m
+ const authStorage = AuthStorage.create();[m
+ const modelRegistry = ModelRegistry.create(authStorage);[m
+[36m@@ -593,7 +579,7 @@[m [mpi --thinking high "Solve this complex problem"[m
+ [m
+ | Variable | Description |[m
+ |----------|-------------|[m
+[31m-| `PI_CODING_AGENT_DIR` | Override config directory (default: `~/.pi/agent`) |[m
+[32m+[m[32m| `PI_CODING_AGENT_DIR` | Override config directory (default: `~/.cave/agent`) |[m
+ | `PI_PACKAGE_DIR` | Override package directory (useful for Nix/Guix where store paths tokenize poorly) |[m
+ | `PI_SKIP_VERSION_CHECK` | Skip version check at startup |[m
+ | `PI_CACHE_RETENTION` | Set to `long` for extended prompt cache (Anthropic: 1h, OpenAI: 24h) |[m
+[36m@@ -613,6 +599,6 @@[m [mMIT[m
+ [m
+ ## See Also[m
+ [m
+[31m-- [@mariozechner/pi-ai](https://www.npmjs.com/package/@mariozechner/pi-ai): Core LLM toolkit[m
+[31m-- [@mariozechner/pi-agent](https://www.npmjs.com/package/@mariozechner/pi-agent): Agent framework[m
+[31m-- [@mariozechner/pi-tui](https://www.npmjs.com/package/@mariozechner/pi-tui): Terminal UI components[m
+[32m+[m[32m- [@cavepi/pi-ai](https://www.npmjs.com/package/@cavepi/pi-ai): Core LLM toolkit[m
+[32m+[m[32m- [@cavepi/pi-agent-core](https://www.npmjs.com/package/@cavepi/pi-agent-core): Agent framework[m
+[32m+[m[32m- [@cavepi/pi-tui](https://www.npmjs.com/package/@cavepi/pi-tui): Terminal UI components[m
+[1mdiff --git a/packages/coding-agent/docs/settings.md b/packages/coding-agent/docs/settings.md[m
+[1mindex 1405d61c..d4c46e5a 100644[m
+[1m--- a/packages/coding-agent/docs/settings.md[m
+[1m+++ b/packages/coding-agent/docs/settings.md[m
+[36m@@ -1,11 +1,11 @@[m
+ # Settings[m
+ [m
+[31m-Pi uses JSON settings files with project settings overriding global settings.[m
+[32m+[m[32mCave uses JSON settings files with project settings overriding global settings.[m
+ [m
+ | Location | Scope |[m
+ |----------|-------|[m
+[31m-| `~/.pi/agent/settings.json` | Global (all projects) |[m
+[31m-| `.pi/settings.json` | Project (current directory) |[m
+[32m+[m[32m| `~/.cave/agent/settings.json` | Global (all projects) |[m
+[32m+[m[32m| `.cave/settings.json` | Project (current directory) |[m
+ [m
+ Edit directly or use `/settings` for common options.[m
+ [m
+[36m@@ -65,6 +65,58 @@[m [mEdit directly or use `/settings` for common options.[m
+ }[m
+ ```[m
+ [m
+[32m+[m[32m### Cave Mode[m
+[32m+[m
+[32m+[m[32mCave mode is a 3-layer token compression system that reduces token usage while preserving technical accuracy.[m
+[32m+[m
+[32m+[m[32m| Setting | Type | Default | Description |[m
+[32m+[m[32m|---------|------|---------|-------------|[m
+[32m+[m[32m| `caveMode.enabled` | boolean | `true` | Enable cave mode communication compression |[m
+[32m+[m[32m| `caveMode.intensity` | string | `"full"` | Compression level: `"lite"`, `"full"`, or `"ultra"` |[m
+[32m+[m[32m| `caveMode.toolCompression` | boolean | `true` | Compress tool output (strip ANSI, collapse blanks, truncate long output) |[m
+[32m+[m
+[32m+[m[32m**Intensity levels:**[m
+[32m+[m[32m- **lite** — Light compression. Drops obvious filler words but preserves most natural language.[m
+[32m+[m[32m- **full** — Standard compression. Drops articles, filler, pleasantries. Leads with answers.[m
+[32m+[m[32m- **ultra** — Maximum compression. Terse technical documentation style. Uses abbreviations and symbols.[m
+[32m+[m
+[32m+[m[32mAll intensity levels preserve full English for: code blocks, commit messages, PR descriptions, and security warnings.[m
+[32m+[m
+[32m+[m[32m```json[m
+[32m+[m[32m{[m
+[32m+[m[32m  "caveMode": {[m
+[32m+[m[32m    "enabled": true,[m
+[32m+[m[32m    "intensity": "full",[m
+[32m+[m[32m    "toolCompression": true[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+[32m+[m[32m```[m
+[32m+[m
+[32m+[m[32mTool compression applies three steps to all tool output:[m
+[32m+[m[32m1. Strip ANSI escape codes (colors, cursor movement)[m
+[32m+[m[32m2. Collapse 3+ consecutive blank lines to a single blank line[m
+[32m+[m[32m3. Truncate output exceeding 500 lines (keeps first 200 + last 100 lines)[m
+[32m+[m
+[32m+[m[32mUse `/cave [lite|full|ultra|off]` to change intensity during a session without editing settings.[m
+[32m+[m
+[32m+[m[32m### RTK (Rust Token Killer)[m
+[32m+[m
+[32m+[m[32mRTK is an optional external binary that rewrites bash commands to produce more compact output.[m
+[32m+[m
+[32m+[m[32m| Setting | Type | Default | Description |[m
+[32m+[m[32m|---------|------|---------|-------------|[m
+[32m+[m[32m| `rtk.enabled` | boolean | `true` | Enable RTK command rewriting (requires `rtk` binary on PATH) |[m
+[32m+[m
+[32m+[m[32m```json[m
+[32m+[m[32m{[m
+[32m+[m[32m  "rtk": {[m
+[32m+[m[32m    "enabled": true[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+[32m+[m[32m```[m
+[32m+[m
+[32m+[m[32mRTK is detected automatically at startup. If the `rtk` binary is not installed, the setting has no effect.[m
+[32m+[m
+ ### Branch Summary[m
+ [m
+ | Setting | Type | Default | Description |[m
+[36m@@ -134,7 +186,7 @@[m [mWhen a provider requests a retry delay longer than `maxDelayMs` (e.g., Google's[m
+ | `sessionDir` | string | - | Directory where session files are stored. Accepts absolute or relative paths. |[m
+ [m
+ ```json[m
+[31m-{ "sessionDir": ".pi/sessions" }[m
+[32m+[m[32m{ "sessionDir": ".cave/sessions" }[m
+ ```[m
+ [m
+ When multiple sources specify a session directory, `--session-dir` CLI flag takes precedence over `sessionDir` in settings.json.[m
+[36m@@ -161,7 +213,7 @@[m [mWhen multiple sources specify a session directory, `--session-dir` CLI flag take[m
+ [m
+ These settings define where to load extensions, skills, prompts, and themes from.[m
+ [m
+[31m-Paths in `~/.pi/agent/settings.json` resolve relative to `~/.pi/agent`. Paths in `.pi/settings.json` resolve relative to `.pi`. Absolute paths and `~` are supported.[m
+[32m+[m[32mPaths in `~/.cave/agent/settings.json` resolve relative to `~/.cave/agent`. Paths in `.cave/settings.json` resolve relative to `.cave`. Absolute paths and `~` are supported.[m
+ [m
+ | Setting | Type | Default | Description |[m
+ |---------|------|---------|-------------|[m
+[36m@@ -208,6 +260,14 @@[m [mSee [packages.md](packages.md) for package management details.[m
+   "defaultModel": "claude-sonnet-4-20250514",[m
+   "defaultThinkingLevel": "medium",[m
+   "theme": "dark",[m
+[32m+[m[32m  "caveMode": {[m
+[32m+[m[32m    "enabled": true,[m
+[32m+[m[32m    "intensity": "full",[m
+[32m+[m[32m    "toolCompression": true[m
+[32m+[m[32m  },[m
+[32m+[m[32m  "rtk": {[m
+[32m+[m[32m    "enabled": true[m
+[32m+[m[32m  },[m
+   "compaction": {[m
+     "enabled": true,[m
+     "reserveTokens": 16384,[m
+[36m@@ -224,16 +284,16 @@[m [mSee [packages.md](packages.md) for package management details.[m
+ [m
+ ## Project Overrides[m
+ [m
+[31m-Project settings (`.pi/settings.json`) override global settings. Nested objects are merged:[m
+[32m+[m[32mProject settings (`.cave/settings.json`) override global settings. Nested objects are merged:[m
+ [m
+ ```json[m
+[31m-// ~/.pi/agent/settings.json (global)[m
+[32m+[m[32m// ~/.cave/agent/settings.json (global)[m
+ {[m
+   "theme": "dark",[m
+   "compaction": { "enabled": true, "reserveTokens": 16384 }[m
+ }[m
+ [m
+[31m-// .pi/settings.json (project)[m
+[32m+[m[32m// .cave/settings.json (project)[m
+ {[m
+   "compaction": { "reserveTokens": 8192 }[m
+ }[m
+[1mdiff --git a/packages/coding-agent/src/core/extensions/loader.ts b/packages/coding-agent/src/core/extensions/loader.ts[m
+[1mindex 397d6438..d7e6efe2 100644[m
+[1m--- a/packages/coding-agent/src/core/extensions/loader.ts[m
+[1m+++ b/packages/coding-agent/src/core/extensions/loader.ts[m
+[36m@@ -385,6 +385,13 @@[m [mexport async function loadExtensions(paths: string[], cwd: string, eventBus?: Ev[m
+ 		}[m
+ [m
+ 		if (extension) {[m
+[32m+[m			[32mconst resolvedDir = path.resolve(cwd);[m
+[32m+[m			[32mif (extension.resolvedPath.startsWith(resolvedDir + path.sep)) {[m
+[32m+[m				[32mconsole.warn([m
+[32m+[m					[32m`[cave] Loading project-local extension: ${path.relative(cwd, extension.resolvedPath)}\n` +[m
+[32m+[m						[32m`  Extensions execute arbitrary code. Review source before trusting.`,[m
+[32m+[m				[32m);[m
+[32m+[m			[32m}[m
+ 			extensions.push(extension);[m
+ 		}[m
+ 	}[m
+[1mdiff --git a/packages/coding-agent/src/core/settings-manager.ts b/packages/coding-agent/src/core/settings-manager.ts[m
+[1mindex c5875cdd..8ec77d60 100644[m
+[1m--- a/packages/coding-agent/src/core/settings-manager.ts[m
+[1m+++ b/packages/coding-agent/src/core/settings-manager.ts[m
+[36m@@ -85,6 +85,7 @@[m [mexport interface Settings {[m
+ 	hideThinkingBlock?: boolean;[m
+ 	shellPath?: string; // Custom shell path (e.g., for Cygwin users on Windows)[m
+ 	quietStartup?: boolean;[m
+[32m+[m	[32mquietResourceListing?: boolean; // Hide Skills/Extensions/Themes/Conflicts listing at startup (keeps ASCII header)[m
+ 	shellCommandPrefix?: string; // Prefix prepended to every bash command (e.g., "shopt -s expand_aliases" for alias support)[m
+ 	npmCommand?: string[]; // Command used for npm package lookup/install operations, argv-style (e.g., ["mise", "exec", "node@20", "--", "npm"])[m
+ 	collapseChangelog?: boolean; // Show condensed changelog after update (use /changelog for full)[m
+[36m@@ -718,6 +719,16 @@[m [mexport class SettingsManager {[m
+ 		this.save();[m
+ 	}[m
+ [m
+[32m+[m	[32mgetQuietResourceListing(): boolean {[m
+[32m+[m		[32mreturn this.settings.quietResourceListing ?? false;[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32msetQuietResourceListing(quiet: boolean): void {[m
+[32m+[m		[32mthis.globalSettings.quietResourceListing = quiet;[m
+[32m+[m		[32mthis.markModified("quietResourceListing");[m
+[32m+[m		[32mthis.save();[m
+[32m+[m	[32m}[m
+[32m+[m
+ 	getShellCommandPrefix(): string | undefined {[m
+ 		return this.settings.shellCommandPrefix;[m
+ 	}[m
+[1mdiff --git a/packages/coding-agent/src/modes/interactive/components/action-bar.ts b/packages/coding-agent/src/modes/interactive/components/action-bar.ts[m
+[1mnew file mode 100644[m
+[1mindex 00000000..7fd1f389[m
+[1m--- /dev/null[m
+[1m+++ b/packages/coding-agent/src/modes/interactive/components/action-bar.ts[m
+[36m@@ -0,0 +1,135 @@[m
+[32m+[m[32mimport { type Component, truncateToWidth, visibleWidth } from "@cavepi/pi-tui";[m
+[32m+[m[32mimport { theme } from "../theme/theme.js";[m
+[32m+[m[32mimport { keyText } from "./keybinding-hints.js";[m
+[32m+[m
+[32m+[m[32mexport interface ActionBarState {[m
+[32m+[m	[32misStreaming: boolean;[m
+[32m+[m	[32mthinkingLevel: string;[m
+[32m+[m	[32mmodelName: string;[m
+[32m+[m	[32mtoolsExpanded: boolean;[m
+[32m+[m	[32mcaveModeEnabled: boolean;[m
+[32m+[m	[32mcaveModeIntensity: string;[m
+[32m+[m	[32mqueuedMessageCount: number;[m
+[32m+[m	[32misBashMode: boolean;[m
+[32m+[m	[32mcavekitActive: boolean;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32minterface Chip {[m
+[32m+[m	[32mtext: string;[m
+[32m+[m	[32mwidth: number;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mfunction chip(key: string, value: string, valueColor: "accent" | "muted" | "dim" = "muted"): Chip {[m
+[32m+[m	[32mconst text = `${theme.fg("dim", key)} ${theme.fg(valueColor, value)}`;[m
+[32m+[m	[32mconst width = visibleWidth(text);[m
+[32m+[m	[32mreturn { text, width };[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mfunction labelChip(label: string, color: "accent" | "muted" | "dim" = "muted"): Chip {[m
+[32m+[m	[32mconst text = theme.fg(color, label);[m
+[32m+[m	[32mconst width = visibleWidth(text);[m
+[32m+[m	[32mreturn { text, width };[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m/**[m
+[32m+[m[32m * Contextual action bar rendered between the editor and footer.[m
+[32m+[m[32m * Shows keybinding hints and actions based on the current interaction state.[m
+[32m+[m[32m */[m
+[32m+[m[32mexport class ActionBarComponent implements Component {[m
+[32m+[m	[32mconstructor(private stateAccessor: () => ActionBarState) {}[m
+[32m+[m
+[32m+[m	[32minvalidate(): void {[m
+[32m+[m		[32m// No cached state to invalidate - renders fresh from stateAccessor each time[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32mrender(width: number): string[] {[m
+[32m+[m		[32mconst state = this.stateAccessor();[m
+[32m+[m		[32mconst chips = this.buildChips(state);[m
+[32m+[m		[32mif (chips.length === 0) return [];[m
+[32m+[m
+[32m+[m		[32mconst sep = ` ${theme.fg("border", "│")} `;[m
+[32m+[m		[32mconst sepWidth = 3; // " │ "[m
+[32m+[m
+[32m+[m		[32m// Build the line by adding chips left-to-right until we run out of space[m
+[32m+[m		[32mconst parts: string[] = [];[m
+[32m+[m		[32mlet usedWidth = 1; // leading space[m
+[32m+[m
+[32m+[m		[32mfor (let i = 0; i < chips.length; i++) {[m
+[32m+[m			[32mconst c = chips[i]!;[m
+[32m+[m			[32mconst needsSep = parts.length > 0;[m
+[32m+[m			[32mconst addedWidth = c.width + (needsSep ? sepWidth : 0);[m
+[32m+[m
+[32m+[m			[32mif (usedWidth + addedWidth > width) break;[m
+[32m+[m
+[32m+[m			[32mif (needsSep) parts.push(sep);[m
+[32m+[m			[32mparts.push(c.text);[m
+[32m+[m			[32musedWidth += addedWidth;[m
+[32m+[m		[32m}[m
+[32m+[m
+[32m+[m		[32mconst line = ` ${parts.join("")}`;[m
+[32m+[m		[32mreturn [truncateToWidth(line, width, theme.fg("dim", "..."))];[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32mprivate buildChips(state: ActionBarState): Chip[] {[m
+[32m+[m		[32mif (state.isStreaming) {[m
+[32m+[m			[32mreturn this.buildStreamingChips();[m
+[32m+[m		[32m}[m
+[32m+[m		[32mif (state.isBashMode) {[m
+[32m+[m			[32mreturn this.buildBashChips();[m
+[32m+[m		[32m}[m
+[32m+[m		[32mreturn this.buildIdleChips(state);[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32mprivate buildStreamingChips(): Chip[] {[m
+[32m+[m		[32mreturn [[m
+[32m+[m			[32mchip(keyText("app.interrupt"), "stop", "accent"),[m
+[32m+[m			[32mchip(keyText("app.tools.expand"), "toggle tools"),[m
+[32m+[m			[32mchip(keyText("app.thinking.toggle"), "toggle thinking"),[m
+[32m+[m		[32m];[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32mprivate buildBashChips(): Chip[] {[m
+[32m+[m		[32mreturn [[m
+[32m+[m			[32mchip("enter", "run"),[m
+[32m+[m			[32mlabelChip("!! no-context"),[m
+[32m+[m			[32mchip(keyText("app.editor.external"), "external editor"),[m
+[32m+[m			[32mchip(keyText("app.interrupt"), "exit bash"),[m
+[32m+[m		[32m];[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32mprivate buildIdleChips(state: ActionBarState): Chip[] {[m
+[32m+[m		[32mconst chips: Chip[] = [];[m
+[32m+[m
+[32m+[m		[32m// Thinking level - colored by level[m
+[32m+[m		[32mconst thinkingColor = state.thinkingLevel !== "off" ? "accent" : "muted";[m
+[32m+[m		[32mchips.push(chip(keyText("app.thinking.cycle"), state.thinkingLevel, thinkingColor));[m
+[32m+[m
+[32m+[m		[32m// Model[m
+[32m+[m		[32mchips.push(chip(keyText("app.model.cycleForward"), state.modelName));[m
+[32m+[m
+[32m+[m		[32m// Queued messages indicator[m
+[32m+[m		[32mif (state.queuedMessageCount > 0) {[m
+[32m+[m			[32mchips.push(chip(`${state.queuedMessageCount} queued`, `${keyText("app.message.dequeue")} edit`, "accent"));[m
+[32m+[m		[32m} else {[m
+[32m+[m			[32m// Tools toggle[m
+[32m+[m			[32mchips.push(chip(keyText("app.tools.expand"), state.toolsExpanded ? "tools:on" : "tools"));[m
+[32m+[m		[32m}[m
+[32m+[m
+[32m+[m		[32m// Cave mode[m
+[32m+[m		[32mif (state.caveModeEnabled) {[m
+[32m+[m			[32mchips.push(labelChip(`cave:${state.caveModeIntensity}`, "accent"));[m
+[32m+[m		[32m}[m
+[32m+[m
+[32m+[m		[32m// Cavekit commands when active[m
+[32m+[m		[32mif (state.cavekitActive) {[m
+[32m+[m			[32mchips.push(labelChip("/ck:progress", "dim"));[m
+[32m+[m			[32mchips.push(labelChip("/ck:check", "dim"));[m
+[32m+[m			[32mchips.push(labelChip("/ck:make", "dim"));[m
+[32m+[m		[32m} else {[m
+[32m+[m			[32m// Slash commands hint[m
+[32m+[m			[32mchips.push(labelChip("/ commands", "dim"));[m
+[32m+[m		[32m}[m
