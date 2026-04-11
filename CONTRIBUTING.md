@@ -58,7 +58,7 @@ If you're adding a new provider to `packages/ai`, see `AGENTS.md` for required t
 
 ## Philosophy
 
-pi's core is minimal. If your feature doesn't belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.
+Cave's core is minimal. If your feature doesn't belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.
 
 ## Questions?
 
