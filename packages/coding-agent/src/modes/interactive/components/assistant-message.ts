@@ -60,30 +60,20 @@ export class AssistantMessageComponent extends Container {
 		// Clear content container
 		this.contentContainer.clear();
 
-		const hasVisibleContent = message.content.some(
-			(c) => (c.type === "text" && c.text.trim()) || (c.type === "thinking" && c.thinking.trim()),
-		);
-
-		if (hasVisibleContent) {
-			this.contentContainer.addChild(new Spacer(1));
-		}
-
 		// Render content in order
 		for (let i = 0; i < message.content.length; i++) {
 			const content = message.content[i];
 			if (content.type === "text" && content.text.trim()) {
-				// Assistant text messages with no background - trim the text
-				// Set paddingY=0 to avoid extra spacing before tool executions
+				// Assistant text messages — plain markdown, no background
 				this.contentContainer.addChild(new Markdown(content.text.trim(), 1, 0, this.markdownTheme));
 			} else if (content.type === "thinking" && content.thinking.trim()) {
-				// Add spacing only when another visible assistant content block follows.
-				// This avoids a superfluous blank line before separately-rendered tool execution blocks.
+				// Add spacing only when another visible assistant content block follows
 				const hasVisibleContentAfter = message.content
 					.slice(i + 1)
 					.some((c) => (c.type === "text" && c.text.trim()) || (c.type === "thinking" && c.thinking.trim()));
 
 				if (this.hideThinkingBlock) {
-					// Show static thinking label when hidden
+					// Collapsed thinking label
 					this.contentContainer.addChild(
 						new Text(theme.italic(theme.fg("thinkingText", this.hiddenThinkingLabel)), 1, 0),
 					);
@@ -91,13 +81,18 @@ export class AssistantMessageComponent extends Container {
 						this.contentContainer.addChild(new Spacer(1));
 					}
 				} else {
-					// Thinking traces in thinkingText color, italic
-					this.contentContainer.addChild(
-						new Markdown(content.thinking.trim(), 1, 0, this.markdownTheme, {
-							color: (text: string) => theme.fg("thinkingText", text),
-							italic: true,
-						}),
-					);
+					// Visible thinking — left-bordered block
+					const thinkingMd = new Markdown(content.thinking.trim(), 1, 0, this.markdownTheme, {
+						color: (text: string) => theme.fg("thinkingText", text),
+						italic: true,
+					});
+					this.contentContainer.addChild({
+						render: (width: number) => {
+							const prefix = theme.fg("dim", "│") + " ";
+							return thinkingMd.render(width - 2).map((line) => prefix + line);
+						},
+						invalidate: () => thinkingMd.invalidate(),
+					});
 					if (hasVisibleContentAfter) {
 						this.contentContainer.addChild(new Spacer(1));
 					}
@@ -105,8 +100,7 @@ export class AssistantMessageComponent extends Container {
 			}
 		}
 
-		// Check if aborted - show after partial content
-		// But only if there are no tool calls (tool execution components will show the error)
+		// Check if aborted — show after partial content
 		const hasToolCalls = message.content.some((c) => c.type === "toolCall");
 		if (!hasToolCalls) {
 			if (message.stopReason === "aborted") {
@@ -114,15 +108,9 @@ export class AssistantMessageComponent extends Container {
 					message.errorMessage && message.errorMessage !== "Request was aborted"
 						? message.errorMessage
 						: "Operation aborted";
-				if (hasVisibleContent) {
-					this.contentContainer.addChild(new Spacer(1));
-				} else {
-					this.contentContainer.addChild(new Spacer(1));
-				}
 				this.contentContainer.addChild(new Text(theme.fg("error", abortMessage), 1, 0));
 			} else if (message.stopReason === "error") {
 				const errorMsg = message.errorMessage || "Unknown error";
-				this.contentContainer.addChild(new Spacer(1));
 				this.contentContainer.addChild(new Text(theme.fg("error", `Error: ${errorMsg}`), 1, 0));
 			}
 		}

@@ -1,19 +1,18 @@
-import { Box, Markdown, type MarkdownTheme, Spacer, Text } from "@cave/tui";
+import { type Component, Markdown, type MarkdownTheme, Text } from "@cave/tui";
 import type { BranchSummaryMessage } from "../../../core/messages.js";
 import { getMarkdownTheme, theme } from "../theme/theme.js";
 import { keyText } from "./keybinding-hints.js";
 
 /**
- * Component that renders a branch summary message with collapsed/expanded state.
- * Uses same background color as custom messages for visual consistency.
+ * Compact branch summary — collapsed single line, expanded with left border.
  */
-export class BranchSummaryMessageComponent extends Box {
+export class BranchSummaryMessageComponent implements Component {
 	private expanded = false;
 	private message: BranchSummaryMessage;
 	private markdownTheme: MarkdownTheme;
+	private currentContent?: Component;
 
 	constructor(message: BranchSummaryMessage, markdownTheme: MarkdownTheme = getMarkdownTheme()) {
-		super(1, 1, (t) => theme.bg("customMessageBg", t));
 		this.message = message;
 		this.markdownTheme = markdownTheme;
 		this.updateDisplay();
@@ -24,35 +23,31 @@ export class BranchSummaryMessageComponent extends Box {
 		this.updateDisplay();
 	}
 
-	override invalidate(): void {
-		super.invalidate();
+	invalidate(): void {
+		this.currentContent?.invalidate?.();
 		this.updateDisplay();
 	}
 
-	private updateDisplay(): void {
-		this.clear();
-
-		const label = theme.fg("customMessageLabel", `\x1b[1m[branch]\x1b[22m`);
-		this.addChild(new Text(label, 0, 0));
-		this.addChild(new Spacer(1));
+	render(width: number): string[] {
+		if (!this.currentContent) return [];
 
 		if (this.expanded) {
+			const prefix = theme.fg("customMessageLabel", "│") + " ";
+			return this.currentContent.render(width - 2).map((line) => prefix + line);
+		}
+		return this.currentContent.render(width);
+	}
+
+	private updateDisplay(): void {
+		if (this.expanded) {
 			const header = "**Branch Summary**\n\n";
-			this.addChild(
-				new Markdown(header + this.message.summary, 0, 0, this.markdownTheme, {
-					color: (text: string) => theme.fg("customMessageText", text),
-				}),
-			);
+			this.currentContent = new Markdown(header + this.message.summary, 1, 0, this.markdownTheme);
 		} else {
-			this.addChild(
-				new Text(
-					theme.fg("customMessageText", "Branch summary (") +
-						theme.fg("dim", keyText("app.tools.expand")) +
-						theme.fg("customMessageText", " to expand)"),
-					0,
-					0,
-				),
-			);
+			const line =
+				theme.fg("customMessageLabel", "[branch]") +
+				theme.fg("dim", " Branch summary") +
+				theme.fg("dim", ` (${keyText("app.tools.expand")} to expand)`);
+			this.currentContent = new Text(line, 1, 0);
 		}
 	}
 }

@@ -1,9 +1,7 @@
 # Build Site: CaveKit Extension Delivery
-**Generated:** 2026-04-11
-**Source:** /Users/julb/Desktop/GitHub/caveman-cli/context/blueprints
-**Total Tasks:** 25
-**Tiers:** 5
-**Coverage:** 167/167 ACs mapped
+**Generated:** 2026-04-12
+**Status:** Ready for BUILD phase
+
 
 ## Tier 0 — Foundation (no dependencies)
 
@@ -13,7 +11,7 @@
 **Complexity:** M
 **Status:** pending
 
-Establish fork-facing identity primitives that every later feature assumes: binary naming, package scope rename, default configuration directory, and preservation of upstream license obligations. This task creates single source-of-truth identifiers so commands, config discovery, packaging, and startup surfaces all resolve to consistent fork identity semantics.
+Establish fork-facing identity primitives: binary naming, package scope rename, config directory, upstream license preservation. Creates single source-of-truth for all commands and config discovery.
 
 ---
 
@@ -23,7 +21,7 @@ Establish fork-facing identity primitives that every later feature assumes: bina
 **Complexity:** S
 **Status:** pending
 
-Define repository-level upstream tracking expectations so fork maintenance remains explicit and auditable. This task covers remote naming, tracking references, and discoverable sync metadata needed to keep fork relationship intact without leaking ambiguity into user-facing identity.
+Define repository-level upstream tracking for explicit fork maintenance and auditable sync semantics without leaking ambiguity into user identity.
 
 ---
 
@@ -33,7 +31,7 @@ Define repository-level upstream tracking expectations so fork maintenance remai
 **Complexity:** L
 **Status:** pending
 
-Create extension runtime foundation: loadable entry point, configuration resolution, and strongly typed shared contracts used across commands, UI, and runtime hooks. This task is prerequisite for nearly every other extension capability because it defines how features register, how settings flow, and how data structures stay consistent across boundaries.
+Create extension runtime foundation: loadable entry point, config resolution, strongly typed contracts. Prerequisites for all other extension features.
 
 ---
 
@@ -43,7 +41,7 @@ Create extension runtime foundation: loadable entry point, configuration resolut
 **Complexity:** M
 **Status:** pending
 
-Provide packaging and compatibility layer for bundled CaveKit resources while preserving operation in vanilla Pi-compatible environments. This task ensures skills and related assets can be discovered reliably, and that extension behavior degrades cleanly when host capability surface is narrower than full CaveKit mode.
+Provide packaging layer for bundled CaveKit resources with clean degradation when running on vanilla Pi.
 
 ---
 
@@ -53,7 +51,7 @@ Provide packaging and compatibility layer for bundled CaveKit resources while pr
 **Complexity:** L
 **Status:** pending
 
-Implement canonical parsing and path resolution for kit files and build sites, including consistency rules for draft output and generated plan locations. This task creates deterministic structured IO contracts that later commands rely on for reading kits, generating plans, and keeping file layout stable across phases.
+Implement canonical parsing for kit files and build sites with deterministic path resolution and output consistency.
 
 ---
 
@@ -63,11 +61,12 @@ Implement canonical parsing and path resolution for kit files and build sites, i
 **Complexity:** M
 **Status:** pending
 
-Define subagent process invocation baseline, including binary name selection, git-safe staging constraints for build commits, and robust stderr capture behavior. This task is isolated early because build execution, retry, and tool-call workflows all depend on reliable subprocess semantics and non-destructive git operations.
+Define subagent process invocation baseline with git-safe staging and robust stderr capture for all downstream execution.
 
 ---
 
-## Tier 1 — Runtime hooks and parsing
+
+## Tier 1
 
 ### T-005: Compaction protection and subagent context injection hooks
 **Kit Refs:** extension-core/R5 (AC-1, AC-2, AC-3), extension-core/R7 (AC-1, AC-2, AC-3, AC-4)
@@ -75,7 +74,7 @@ Define subagent process invocation baseline, including binary name selection, gi
 **Complexity:** M
 **Status:** pending
 
-Add runtime hooks that protect critical CaveKit context from compaction loss and inject scoped build context into subagent execution. This task closes core lifecycle gaps between static configuration and actual runtime behavior, enabling downstream command orchestration and cave-mode behavior to operate with correct contextual guarantees.
+Add runtime hooks protecting CaveKit context from compaction loss and injecting scoped build context into subagent execution.
 
 ---
 
@@ -85,7 +84,7 @@ Add runtime hooks that protect critical CaveKit context from compaction loss and
 **Complexity:** M
 **Status:** pending
 
-Implement `/ck:draft` end-to-end flow from natural-language prompt to generated kit artifacts, using canonical parser-facing output format and configured project paths. This task owns user-visible draft lifecycle behavior, including input handling, kit generation contract, write targets, and command-level completion semantics.
+Implement /ck:draft end-to-end: natural-language prompt to kit artifacts with canonical parser format and configured paths.
 
 ---
 
@@ -95,7 +94,7 @@ Implement `/ck:draft` end-to-end flow from natural-language prompt to generated 
 **Complexity:** L
 **Status:** pending
 
-Implement `/ck:architect` so approved kits can be transformed into dependency-ordered build sites using parser-backed plan format and stable output paths. This task turns specification artifacts into execution-ready plans and creates data consumed later by build execution, graph visualization, and inspection.
+Implement /ck:architect to transform approved kits into dependency-ordered build sites with stable plan format.
 
 ---
 
@@ -105,7 +104,7 @@ Implement `/ck:architect` so approved kits can be transformed into dependency-or
 **Complexity:** S
 **Status:** pending
 
-Deliver lightweight command surfaces for configuration inspection, build/session progress reporting, and user help. This task provides operator visibility and discoverability around extension state without depending on full build orchestration, making it safe to parallelize after shared config/types exist.
+Deliver lightweight config inspection, progress reporting, and help commands for operator visibility.
 
 ---
 
@@ -115,7 +114,7 @@ Deliver lightweight command surfaces for configuration inspection, build/session
 **Complexity:** M
 **Status:** pending
 
-Implement `/ck:research` and `/ck:design` command workflows as structured, parser-compatible generators for discovery and design artifacts. This task expands non-build authoring capabilities while reusing common command foundation, path resolution, and structured output contracts.
+Implement /ck:research and /ck:design as structured, parser-compatible discovery and design generators.
 
 ---
 
@@ -125,7 +124,7 @@ Implement `/ck:research` and `/ck:design` command workflows as structured, parse
 **Complexity:** L
 **Status:** pending
 
-Build scoped-context assembly and expose LLM-callable tools that let agents inspect kit/build state through bounded, deterministic interfaces. This task is central integration glue between specs, build execution, subagents, and UI because it defines what context is handed to automation and how programmatic access remains structured.
+Build scoped-context assembly and expose LLM-callable tools for bounded programmatic kit/build state inspection.
 
 ---
 
@@ -135,7 +134,7 @@ Build scoped-context assembly and expose LLM-callable tools that let agents insp
 **Complexity:** M
 **Status:** pending
 
-Implement cave-mode runtime behavior for system prompt injection while ensuring fail-open degradation when cave-specific facilities are unavailable. This task defines baseline cave-mode semantics and fallback behavior so later controls, compaction features, and tool compression can layer on top without threatening host stability.
+Implement cave-mode system prompt injection with fail-open degradation for safety and compatibility.
 
 ---
 
@@ -145,7 +144,7 @@ Implement cave-mode runtime behavior for system prompt injection while ensuring 
 **Complexity:** M
 **Status:** pending
 
-Add user-facing controls for cave-mode intensity and settings management so mode selection is discoverable, persistent, and command-accessible. This task covers command/UI-adjacent control flow, setting persistence, and state exposure needed for practical adoption of cave-mode beyond hardcoded defaults.
+Add user-facing controls for cave-mode intensity with persistent settings and command-line discoverability.
 
 ---
 
@@ -155,11 +154,12 @@ Add user-facing controls for cave-mode intensity and settings management so mode
 **Complexity:** S
 **Status:** pending
 
-Implement startup banner and branded launch presentation aligned with fork identity primitives established earlier. This task is isolated from deeper command/runtime behavior because it only needs finalized naming and should be able to ship independently of full extension feature completion.
+Implement startup banner aligned with fork identity, shipped independently of full extension feature completion.
 
 ---
 
-## Tier 2 — Execution and UI base
+
+## Tier 2
 
 ### T-015: Caveman compaction and tool-result compression pipeline
 **Kit Refs:** cave-mode/R4 (AC-1, AC-2, AC-3, AC-4), cave-mode/R5 (AC-1, AC-2, AC-3, AC-4, AC-5)
@@ -167,7 +167,7 @@ Implement startup banner and branded launch presentation aligned with fork ident
 **Complexity:** L
 **Status:** pending
 
-Implement caveman-aware compaction and tool-result compression pipeline so prompt budget savings apply both to model context and tool output flows. This task depends on runtime cave-mode semantics and callable tool/context plumbing because compression must integrate safely with actual agent execution surfaces rather than operate as isolated text transforms.
+Implement caveman-aware compaction and tool-result compression integrated with actual agent execution surfaces.
 
 ---
 
@@ -177,7 +177,7 @@ Implement caveman-aware compaction and tool-result compression pipeline so promp
 **Complexity:** L
 **Status:** pending
 
-Implement `/ck:build` as orchestration engine that reads build sites, dispatches wave/tier execution, coordinates subagents, and persists progress/status. This task is main execution backbone for CaveKit and is intentionally separated from review, convergence, and retry so core run loop can stabilize before adjacent control logic is added.
+Implement /ck:build as main execution backbone: reads build sites, dispatches tiers, coordinates subagents, persists progress.
 
 ---
 
@@ -187,7 +187,7 @@ Implement `/ck:build` as orchestration engine that reads build sites, dispatches
 **Complexity:** M
 **Status:** pending
 
-Deliver persistent build dashboard widget plus shortcut registration so active build state is visible and quickly accessible during sessions. This task depends on build orchestration because dashboard content and toggle behavior need live execution data rather than placeholder wiring.
+Deliver persistent build dashboard widget and keyboard shortcut registration for session visibility.
 
 ---
 
@@ -197,7 +197,7 @@ Deliver persistent build dashboard widget plus shortcut registration so active b
 **Complexity:** M
 **Status:** pending
 
-Implement interactive kit review overlay and wire it into draft-to-architect handoff so approval decisions directly determine which kits proceed to planning. This task sits after both draft and architect workflows exist because it mediates real artifacts between those phases rather than mocking either side.
+Implement interactive kit review overlay wired into draft-to-architect handoff for approval-based kit filtering.
 
 ---
 
@@ -207,11 +207,12 @@ Implement interactive kit review overlay and wire it into draft-to-architect han
 **Complexity:** M
 **Status:** pending
 
-Implement dependency graph visualization for architected build sites, showing task grouping by tier and directional dependency edges. This task depends on build-site generation and shared UI contracts because graph structure must reflect real plan data rather than inferred placeholders.
+Implement dependency graph visualization for architected build sites showing task tiers and directional edges.
 
 ---
 
-## Tier 3 — Execution control and review
+
+## Tier 3
 
 ### T-017: Tier gate review engine
 **Kit Refs:** extension-commands/R4 (AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7)
@@ -219,7 +220,7 @@ Implement dependency graph visualization for architected build sites, showing ta
 **Complexity:** L
 **Status:** pending
 
-Add tier gate review process that evaluates completed build tiers, produces severity-ranked findings, and returns machine-actionable outcomes for continue, fix, or abort paths. This task sits after base build orchestration because gate reviews consume build artifacts and scoped evidence produced during actual execution.
+Add tier gate review process producing severity-ranked findings with machine-actionable continue/fix/abort outcomes.
 
 ---
 
@@ -229,7 +230,7 @@ Add tier gate review process that evaluates completed build tiers, produces seve
 **Complexity:** M
 **Status:** pending
 
-Implement convergence analysis over build iterations and expose it through dedicated monitoring and command surfaces. This task turns raw build history into actionable signal about progress vs. plateau, supporting operator decisions and automation loops without being coupled to individual task implementation details.
+Implement convergence analysis over build iterations with dedicated monitoring and command surfaces.
 
 ---
 
@@ -239,7 +240,7 @@ Implement convergence analysis over build iterations and expose it through dedic
 **Complexity:** M
 **Status:** pending
 
-Implement retry handling for failed build tasks with correct dependency checks, subprocess semantics, and safe git behavior. This task extends base build engine with recovery capability once failure states and dispatch contracts are already established.
+Implement retry handling for failed build tasks with correct dependency checks and safe git behavior.
 
 ---
 
@@ -249,11 +250,12 @@ Implement retry handling for failed build tasks with correct dependency checks, 
 **Complexity:** M
 **Status:** pending
 
-Build UI overlay for tier gate findings so users can inspect severity-ranked review output and explicitly choose continue, fix, or abort. This task depends on review engine completion because overlay semantics and actions are driven by actual gate outcomes.
+Build UI overlay for tier gate findings with severity ranking and explicit continue/fix/abort selection.
 
 ---
 
-## Tier 4 — Inspection and verification
+
+## Tier 4
 
 ### T-020: Inspect command and spec-to-build gap analysis
 **Kit Refs:** extension-commands/R6 (AC-1, AC-2, AC-3, AC-4, AC-5)
@@ -261,13 +263,15 @@ Build UI overlay for tier gate findings so users can inspect severity-ranked rev
 **Complexity:** L
 **Status:** pending
 
-Implement `/ck:inspect` to compare specification artifacts against build output, synthesize findings, and report implementation gaps with traceability. This task intentionally lands last because meaningful inspection requires stable plan generation, completed build evidence, gate review output, and convergence history.
+Implement /ck:inspect to compare specs against build output with implementation gap synthesis and traceability.
 
 ---
 
+
 ## Coverage Matrix
-| Req | AC | Task |
-|-----|----|------|
+
+| Requirement | AC | Task |
+|---|---|---|
 | cave-mode/R1 | AC-1 | T-013 |
 | cave-mode/R1 | AC-2 | T-013 |
 | cave-mode/R1 | AC-3 | T-013 |
@@ -436,42 +440,114 @@ Implement `/ck:inspect` to compare specification artifacts against build output,
 | fork-identity/R6 | AC-1 | T-001 |
 | fork-identity/R6 | AC-2 | T-001 |
 
-## Tier 0
+## Machine-Readable Task List
 
-- T-001: Fork identity naming, scope, config dir, and license baseline --> fork-identity/R1, fork-identity/R2, fork-identity/R3, fork-identity/R6
-- T-002: Upstream remote tracking and fork sync metadata --> fork-identity/R5
-- T-003: Extension entry point, configuration system, and shared types --> extension-core/R1, extension-core/R2, extension-core/R3
-- T-004: Skill bundling, resource discovery, and vanilla Pi compatibility --> extension-core/R4, extension-core/R6, extension-core/R8
-- T-006: Kit parser, build-site parser, and format/path consistency --> extension-commands/R12, extension-commands/R13, extension-commands/R18, extension-commands/R19
-- T-007: Subagent dispatch baseline, safe staging, and stderr handling --> extension-commands/R20, extension-commands/R21, extension-commands/R22
+### Tier 0
 
-## Tier 1
+- T-001: Fork identity naming, scope, config dir, and license baseline
+  **Kits:** fork-identity/R1, fork-identity/R2, fork-identity/R3, fork-identity/R6
+  **Complexity:** M
 
-- T-005: Compaction protection and subagent context injection hooks (blockedBy: T-003) --> extension-core/R5, extension-core/R7
-- T-008: Draft command workflow (blockedBy: T-003, T-006) --> extension-commands/R1
-- T-009: Architect command and build-site generation workflow (blockedBy: T-003, T-006) --> extension-commands/R2
-- T-010: Config, progress, and help command suite (blockedBy: T-003) --> extension-commands/R9, extension-commands/R10, extension-commands/R11
-- T-011: Research and design command surfaces (blockedBy: T-003, T-006) --> extension-commands/R7, extension-commands/R8
-- T-012: Scoped context builder and LLM-callable tool surface (blockedBy: T-003, T-006, T-007) --> extension-commands/R14, extension-commands/R16
-- T-013: Cave-mode runtime injection and graceful degradation (blockedBy: T-003, T-005) --> cave-mode/R1, cave-mode/R6
-- T-014: Cave-mode intensity toggle and settings manager integration (blockedBy: T-003, T-013) --> cave-mode/R2, cave-mode/R3
-- T-025: Startup banner and branded launch surface (blockedBy: T-001) --> fork-identity/R4
+- T-002: Upstream remote tracking and fork sync metadata
+  **Kits:** fork-identity/R5
+  **Complexity:** S
 
-## Tier 2
+- T-003: Extension entry point, configuration system, and shared types
+  **Kits:** extension-core/R1, extension-core/R2, extension-core/R3
+  **Complexity:** L
 
-- T-015: Caveman compaction and tool-result compression pipeline (blockedBy: T-012, T-013) --> cave-mode/R4, cave-mode/R5
-- T-016: Build command orchestration engine (blockedBy: T-008, T-009, T-012, T-007) --> extension-commands/R3
-- T-021: Build dashboard widget and keyboard shortcuts (blockedBy: T-003, T-016) --> extension-ui/R1, extension-ui/R5
-- T-022: Kit reviewer overlay and draft/architect integration (blockedBy: T-003, T-008, T-009) --> extension-ui/R2, extension-ui/R6
-- T-024: Dependency graph visualization (blockedBy: T-003, T-009) --> extension-ui/R4
+- T-004: Skill bundling, resource discovery, and vanilla Pi compatibility
+  **Kits:** extension-core/R4, extension-core/R6, extension-core/R8
+  **Complexity:** M
 
-## Tier 3
+- T-006: Kit parser, build-site parser, and format/path consistency
+  **Kits:** extension-commands/R12, extension-commands/R13, extension-commands/R18, extension-commands/R19
+  **Complexity:** L
 
-- T-017: Tier gate review engine (blockedBy: T-016, T-012) --> extension-commands/R4
-- T-018: Convergence monitoring and convergence command (blockedBy: T-016) --> extension-commands/R5, extension-commands/R15
-- T-019: Failed task retry workflow (blockedBy: T-016, T-007) --> extension-commands/R17
-- T-023: Tier gate findings overlay (blockedBy: T-003, T-017) --> extension-ui/R3
+- T-007: Subagent dispatch baseline, safe staging, and stderr handling
+  **Kits:** extension-commands/R20, extension-commands/R21, extension-commands/R22
+  **Complexity:** M
 
-## Tier 4
+### Tier 1
 
-- T-020: Inspect command and spec-to-build gap analysis (blockedBy: T-009, T-016, T-017, T-018) --> extension-commands/R6
+- T-005: Compaction protection and subagent context injection hooks (blockedBy: T-003)
+  **Kits:** extension-core/R5, extension-core/R7
+  **Complexity:** M
+
+- T-008: Draft command workflow (blockedBy: T-003, T-006)
+  **Kits:** extension-commands/R1
+  **Complexity:** M
+
+- T-009: Architect command and build-site generation workflow (blockedBy: T-003, T-006)
+  **Kits:** extension-commands/R2
+  **Complexity:** L
+
+- T-010: Config, progress, and help command suite (blockedBy: T-003)
+  **Kits:** extension-commands/R9, extension-commands/R10, extension-commands/R11
+  **Complexity:** S
+
+- T-011: Research and design command surfaces (blockedBy: T-003, T-006)
+  **Kits:** extension-commands/R7, extension-commands/R8
+  **Complexity:** M
+
+- T-012: Scoped context builder and LLM-callable tool surface (blockedBy: T-003, T-006, T-007)
+  **Kits:** extension-commands/R14, extension-commands/R16
+  **Complexity:** L
+
+- T-013: Cave-mode runtime injection and graceful degradation (blockedBy: T-003, T-005)
+  **Kits:** cave-mode/R1, cave-mode/R6
+  **Complexity:** M
+
+- T-014: Cave-mode intensity toggle and settings manager integration (blockedBy: T-003, T-013)
+  **Kits:** cave-mode/R2, cave-mode/R3
+  **Complexity:** M
+
+- T-025: Startup banner and branded launch surface (blockedBy: T-001)
+  **Kits:** fork-identity/R4
+  **Complexity:** S
+
+### Tier 2
+
+- T-015: Caveman compaction and tool-result compression pipeline (blockedBy: T-012, T-013)
+  **Kits:** cave-mode/R4, cave-mode/R5
+  **Complexity:** L
+
+- T-016: Build command orchestration engine (blockedBy: T-008, T-009, T-012, T-007)
+  **Kits:** extension-commands/R3
+  **Complexity:** L
+
+- T-021: Build dashboard widget and keyboard shortcuts (blockedBy: T-003, T-016)
+  **Kits:** extension-ui/R1, extension-ui/R5
+  **Complexity:** M
+
+- T-022: Kit reviewer overlay and draft/architect integration (blockedBy: T-003, T-008, T-009)
+  **Kits:** extension-ui/R2, extension-ui/R6
+  **Complexity:** M
+
+- T-024: Dependency graph visualization (blockedBy: T-003, T-009)
+  **Kits:** extension-ui/R4
+  **Complexity:** M
+
+### Tier 3
+
+- T-017: Tier gate review engine (blockedBy: T-016, T-012)
+  **Kits:** extension-commands/R4
+  **Complexity:** L
+
+- T-018: Convergence monitoring and convergence command (blockedBy: T-016)
+  **Kits:** extension-commands/R5, extension-commands/R15
+  **Complexity:** M
+
+- T-019: Failed task retry workflow (blockedBy: T-016, T-007)
+  **Kits:** extension-commands/R17
+  **Complexity:** M
+
+- T-023: Tier gate findings overlay (blockedBy: T-003, T-017)
+  **Kits:** extension-ui/R3
+  **Complexity:** M
+
+### Tier 4
+
+- T-020: Inspect command and spec-to-build gap analysis (blockedBy: T-009, T-016, T-017, T-018)
+  **Kits:** extension-commands/R6
+  **Complexity:** L

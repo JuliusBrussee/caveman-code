@@ -1,19 +1,18 @@
-import { Box, Markdown, type MarkdownTheme, Spacer, Text } from "@cave/tui";
+import { type Component, Markdown, type MarkdownTheme, Text } from "@cave/tui";
 import type { CompactionSummaryMessage } from "../../../core/messages.js";
 import { getMarkdownTheme, theme } from "../theme/theme.js";
 import { keyText } from "./keybinding-hints.js";
 
 /**
- * Component that renders a compaction message with collapsed/expanded state.
- * Uses same background color as custom messages for visual consistency.
+ * Compact compaction summary — collapsed single line, expanded with left border.
  */
-export class CompactionSummaryMessageComponent extends Box {
+export class CompactionSummaryMessageComponent implements Component {
 	private expanded = false;
 	private message: CompactionSummaryMessage;
 	private markdownTheme: MarkdownTheme;
+	private currentContent?: Component;
 
 	constructor(message: CompactionSummaryMessage, markdownTheme: MarkdownTheme = getMarkdownTheme()) {
-		super(1, 1, (t) => theme.bg("customMessageBg", t));
 		this.message = message;
 		this.markdownTheme = markdownTheme;
 		this.updateDisplay();
@@ -24,36 +23,33 @@ export class CompactionSummaryMessageComponent extends Box {
 		this.updateDisplay();
 	}
 
-	override invalidate(): void {
-		super.invalidate();
+	invalidate(): void {
+		this.currentContent?.invalidate?.();
 		this.updateDisplay();
 	}
 
-	private updateDisplay(): void {
-		this.clear();
+	render(width: number): string[] {
+		if (!this.currentContent) return [];
 
+		if (this.expanded) {
+			const prefix = theme.fg("customMessageLabel", "│") + " ";
+			return this.currentContent.render(width - 2).map((line) => prefix + line);
+		}
+		return this.currentContent.render(width);
+	}
+
+	private updateDisplay(): void {
 		const tokenStr = this.message.tokensBefore.toLocaleString();
-		const label = theme.fg("customMessageLabel", `\x1b[1m[compaction]\x1b[22m`);
-		this.addChild(new Text(label, 0, 0));
-		this.addChild(new Spacer(1));
 
 		if (this.expanded) {
 			const header = `**Compacted from ${tokenStr} tokens**\n\n`;
-			this.addChild(
-				new Markdown(header + this.message.summary, 0, 0, this.markdownTheme, {
-					color: (text: string) => theme.fg("customMessageText", text),
-				}),
-			);
+			this.currentContent = new Markdown(header + this.message.summary, 1, 0, this.markdownTheme);
 		} else {
-			this.addChild(
-				new Text(
-					theme.fg("customMessageText", `Compacted from ${tokenStr} tokens (`) +
-						theme.fg("dim", keyText("app.tools.expand")) +
-						theme.fg("customMessageText", " to expand)"),
-					0,
-					0,
-				),
-			);
+			const line =
+				theme.fg("customMessageLabel", "[compaction]") +
+				theme.fg("dim", ` ${tokenStr} tokens`) +
+				theme.fg("dim", ` (${keyText("app.tools.expand")} to expand)`);
+			this.currentContent = new Text(line, 1, 0);
 		}
 	}
 }

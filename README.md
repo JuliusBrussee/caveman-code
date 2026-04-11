@@ -5,8 +5,8 @@
 <h1 align="center">Caveman Code</h1>
 
 <p align="center">
-  <strong>Caveman Code is the open-source terminal coding agent that works with every LLM.</strong><br/>
-  One tool. Every provider. Your workflow.
+  <strong>The most token-efficient coding CLI.</strong><br/>
+  A lightweight Claude Code alternative with spec-driven development built in.
 </p>
 
 <p align="center">
@@ -17,11 +17,11 @@
 
 ---
 
-Most terminal coding agents lock you into a single provider. Cave doesn't. Use Claude, GPT, Gemini, Mistral, Bedrock, or any OpenAI-compatible endpoint — and switch between them mid-conversation. Bring your API key, use your existing subscription (Claude Pro, ChatGPT Plus, Copilot, Gemini), or plug in a custom provider. Your context, sessions, and tools travel with you.
+Caveman Code (`cave`) is a terminal coding agent that treats tokens like a scarce resource. Every layer of the stack — prompt construction, tool output, file reads, structured data — is compressed before it hits your context window. The result: you get the same work done with a fraction of the tokens.
 
-Cave is built for developers who want a coding agent they can actually own: extend it, theme it, script it, and share packages with others — all without touching a fork.
+It works with every major LLM provider, but the point isn't just multi-provider support. The point is doing more with less. Cave mode is always on by default, RTK rewrites tool calls to cut output by ~60%, read deduplication prevents wasted context on repeated file reads, and per-tool budgets keep structured output tight. Spec-driven development (CaveKit) is built in so you can go from description to validated code through a structured pipeline instead of open-ended chat.
 
-Forked from [pi-mono](https://github.com/badlogic/pi-mono) by badlogic. Maintained in [JuliusBrussee/caveman-cli](https://github.com/JuliusBrussee/caveman-cli).
+Forked from [pi-mono](https://github.com/badlogic/pi-mono) by badlogic. Maintained at [JuliusBrussee/caveman-cli](https://github.com/JuliusBrussee/caveman-cli).
 
 ```bash
 npm install -g cave
@@ -30,26 +30,51 @@ cave
 
 ---
 
-## Why Cave
+## Why Cave Over Claude Code
 
-**Provider freedom** — 15+ providers built in. OAuth subscriptions and API keys both work. Switch models at any time with `/model` or `Ctrl+L`. No vendor lock-in, ever.
+| | Caveman Code | Claude Code |
+|---|---|---|
+| **Token usage** | Cave mode + RTK + read dedup = ~60% fewer tokens per session | No built-in compression |
+| **Communication style** | Caveman mode: terse, technical, no filler — configurable (`lite`/`full`/`ultra`/`off`) | Standard verbose output |
+| **Spec-driven dev** | CaveKit built in: Draft → Architect → Build → Inspect with tier gates | No structured workflow |
+| **Provider lock-in** | 15+ providers, switch mid-conversation, OAuth or API key | Anthropic only |
+| **Tool output** | Per-tool budgets, structured compression, ANSI stripping, head/tail truncation | Full output passed through |
+| **File reads** | Fingerprinted deduplication — re-reads return stubs | Full content every time |
+| **Extensibility** | TypeScript extensions, skills, themes, prompt templates, packages | Limited |
+| **Cost** | Your API key, your subscription, your rates | Anthropic pricing only |
 
-**Real extensibility** — Extensions are TypeScript modules that hook into everything: tools, commands, keyboard shortcuts, event handlers, UI components, sub-agents, permission gates, MCP servers. Not a plugin API bolted on after the fact — it's the core architecture.
+---
 
-**Session intelligence** — Sessions are persistent, tree-structured, and branchable. Navigate your full conversation history with `/tree`, fork from any point, label bookmarks, and resume across restarts. Automatic context compaction keeps you in flow without losing history.
+## How Token Savings Work
 
-**Spec-driven development** — The CaveKit extension (`/ck:*`) takes you from natural language description to built, validated code through a structured pipeline: Draft specs → Architect a task graph → Build with parallel dispatch → Inspect against acceptance criteria. Tier gates and convergence monitoring keep the build honest.
+Cave doesn't just talk shorter. It compresses at every layer of the stack:
 
-**Package ecosystem** — Bundle and share extensions, skills, prompt templates, and themes via npm or git. Install with `cave install`, manage with `cave config`. Build once, use everywhere.
+### Layer 1: Caveman Mode (prompt compression)
+The model responds in terse, technical fragments. No filler, no pleasantries, no hedging. All technical accuracy preserved. Three intensity levels:
+- **`lite`** — brief responses, still mostly natural
+- **`full`** (default) — caveman fragments, drops articles and filler
+- **`ultra`** — maximum brevity, telegraphic
 
-**Programmable** — Full SDK for embedding Cave in your own tools. RPC mode for non-Node integrations. JSON mode for scripting. Pipe stdin, pass files with `@`, or run non-interactively with `-p`.
+### Layer 2: Tool Output Compression (Flint Chipper + Stone Tablet)
+Every tool call result gets compressed before entering context:
+- **Per-tool budgets** — bash gets 80 lines, read gets 300, grep gets 120, each with head/tail preservation
+- **Structured compression** — JSON and XML outputs are semantically compressed, extracting relevant keys
+- **ANSI stripping** — terminal escape codes removed
+- **Blank line collapse** — consecutive empty lines merged
+
+### Layer 3: Read Deduplication
+Files are fingerprinted within a session. When the same unchanged file is read again, a stub is returned instead of the full content. During refactors where files get re-read repeatedly, this alone saves significant context.
+
+### Layer 4: RTK (Rust Token Killer)
+Optional external binary. When installed, bash commands are rewritten through `rtk rewrite` before execution, producing more compact output. Combined with Cave mode compression, tool calls see ~60% token reduction.
+
+Change level anytime: `/cave [lite|full|ultra|off]`
 
 ---
 
 ## Quick Start
 
 ### Requirements
-
 - Node.js 20+
 - An API key or active subscription for at least one supported provider
 
@@ -91,11 +116,34 @@ Add any OpenAI/Anthropic/Google-compatible endpoint via `~/.cave/agent/models.js
 
 ---
 
+## CaveKit — Spec-Driven Development
+
+Instead of open-ended chat, CaveKit gives you a structured pipeline from description to validated code. Built in as `/ck:*` commands.
+
+| Command | Phase | What it does |
+|---------|-------|-------------|
+| `/ck:draft` | Draft | Turn a description into kits with requirements + acceptance criteria |
+| `/ck:research` | Draft | Parallel subagent research with consolidated summary |
+| `/ck:design` | Draft | Create or audit a structured design system |
+| `/ck:architect` | Architect | Build a tiered task graph from approved kits |
+| `/ck:build` | Build | Execute tasks with wave-based parallel dispatch |
+| `/ck:inspect` | Inspect | Verify work against acceptance criteria |
+| `/ck:progress` | Any | Show task statuses, wave progress, convergence metrics |
+| `/ck:config` | Any | Read or update CaveKit config |
+
+**Tier gates** — at each tier boundary, an adversarial reviewer evaluates completed work. P0/P1 findings pause the build.
+
+**Convergence monitoring** — tracks lines changed per iteration and test pass rates. Detects when further iteration is unproductive.
+
+**Scoped context** — each dispatched subagent only receives the kit sections relevant to its tasks, keeping context focused and costs low.
+
+---
+
 ## Features
 
 ### Interactive TUI
 
-A full terminal interface — not just streaming text. Startup header, message history with tool calls and thinking blocks, live editor, and a footer with cost/token/context stats.
+Full terminal interface with startup header, message history, tool calls, thinking blocks, live editor, and a cost/token/context footer.
 
 | Feature | How |
 |---------|-----|
@@ -121,19 +169,19 @@ Type `/` to see all available commands. Extensions can register their own.
 | `/settings` | Thinking level, theme, transport, compaction |
 | `/resume` | Browse previous sessions |
 | `/new` | Start a new session |
-| `/tree` | Navigate the full session tree and branch from any point |
-| `/fork` | Create a new session from a selected branch point |
+| `/tree` | Navigate session tree and branch from any point |
+| `/fork` | Create a new session from a branch point |
 | `/compact [prompt]` | Manually compact context |
 | `/copy` | Copy last assistant message to clipboard |
 | `/export [file]` | Export session to HTML |
 | `/share` | Upload session as a private GitHub Gist |
-| `/reload` | Reload extensions, skills, prompts, keybindings, and context files |
+| `/reload` | Reload extensions, skills, prompts, keybindings, context |
 | `/hotkeys` | Show all keyboard shortcuts |
 | `/changelog` | View version history |
 
 ### Sessions
 
-Sessions auto-save to `~/.cave/agent/sessions/`, organised by working directory. Each session is a JSONL file with a full tree structure — branching never overwrites history.
+Sessions auto-save to `~/.cave/agent/sessions/`, organized by working directory. Each session is a JSONL file with full tree structure — branching never overwrites history.
 
 ```bash
 cave -c                    # continue most recent session
@@ -143,9 +191,9 @@ cave --fork <path|id>      # fork a session into a new file
 cave --no-session          # ephemeral mode
 ```
 
-**`/tree`** — navigate and branch in-place. Search, fold, page, and filter (default / no-tools / user-only / labeled-only). Press `Shift+L` to label bookmarks, `Shift+T` to toggle timestamps.
+**`/tree`** — navigate and branch in-place. Search, fold, page, filter. `Shift+L` to label bookmarks, `Shift+T` to toggle timestamps.
 
-**Compaction** — automatic context compaction triggers on overflow. Use `/compact` for manual control with optional custom instructions. Full history remains in the JSONL file.
+**Compaction** — automatic on overflow. `/compact` for manual control. Full history always in the JSONL file.
 
 ---
 
@@ -189,29 +237,6 @@ cave list
 cave update
 cave config   # enable/disable package resources
 ```
-
----
-
-## CaveKit — Spec-Driven Development
-
-The built-in CaveKit extension (`@cave/cavekit`) integrates a full spec-driven development workflow as `/ck:*` commands.
-
-| Command | Description |
-|---------|-------------|
-| `/ck:draft <description>` | Decompose a description into domain kits with requirements and acceptance criteria |
-| `/ck:architect` | Generate a tiered task graph from kits, with dependency edges and coverage matrix |
-| `/ck:build` | Execute the task graph via wave-based parallel dispatch |
-| `/ck:inspect` | Gap analysis — classify each acceptance criterion as met / partial / not met |
-| `/ck:research <topic>` | Parallel subagent research with consolidated summary |
-| `/ck:design [create\|audit]` | Create or audit a structured design system (`DESIGN.md`) |
-| `/ck:progress` | Build state: task statuses, wave progress, convergence metrics |
-| `/ck:config` | Read or write CaveKit configuration |
-
-**Tier Gate Review** — at each tier boundary, an adversarial reviewer evaluates completed work. P0/P1 findings pause the build and prompt: approve, generate fix tasks, or abort.
-
-**Convergence Monitoring** — tracks lines changed per iteration and test pass rates. Detects healthy convergence vs. iteration ceiling and recommends stopping when further iteration is unproductive.
-
-**Scoped Context** — each dispatched subagent receives only the kit sections relevant to its assigned tasks, keeping context focused and costs low.
 
 ---
 

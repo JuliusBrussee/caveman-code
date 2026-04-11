@@ -56,12 +56,10 @@ export class ToolExecutionComponent extends Container {
 		this.ui = ui;
 		this.cwd = cwd;
 
-		this.addChild(new Spacer(1));
-
-		// Always create both. contentBox is used for tools with renderer-based call/result composition.
+		// contentBox is used for tools with renderer-based call/result composition.
 		// contentText is reserved for generic fallback rendering when no tool definition exists.
-		this.contentBox = new Box(1, 1, (text: string) => theme.bg("toolPendingBg", text));
-		this.contentText = new Text("", 1, 1, (text: string) => theme.bg("toolPendingBg", text));
+		this.contentBox = new Box(1, 0, (text: string) => theme.bg("toolPendingBg", text));
+		this.contentText = new Text("", 1, 0, (text: string) => theme.bg("toolPendingBg", text));
 
 		if (this.hasRendererDefinition()) {
 			this.addChild(this.contentBox);

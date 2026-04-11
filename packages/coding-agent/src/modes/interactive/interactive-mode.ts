@@ -2708,10 +2708,11 @@ export class InteractiveMode {
 			case "user": {
 				const textContent = this.getUserMessageText(message);
 				if (textContent) {
+					// Turn boundary spacer before user messages
+					this.chatContainer.addChild(new Spacer(1));
 					const skillBlock = parseSkillBlock(textContent);
 					if (skillBlock) {
 						// Render skill block (collapsible)
-						this.chatContainer.addChild(new Spacer(1));
 						const component = new SkillInvocationMessageComponent(
 							skillBlock,
 							this.getMarkdownThemeWithSettings(),

@@ -47,8 +47,8 @@ export class ActionBarComponent implements Component {
 		const chips = this.buildChips(state);
 		if (chips.length === 0) return [];
 
-		const sep = ` ${theme.fg("border", "│")} `;
-		const sepWidth = 3; // " │ "
+		const sep = ` ${theme.fg("dim", "·")} `;
+		const sepWidth = 3; // " · "
 
 		// Build the line by adding chips left-to-right until we run out of space
 		const parts: string[] = [];
@@ -125,9 +125,6 @@ export class ActionBarComponent implements Component {
 			chips.push(labelChip("/ck:progress", "dim"));
 			chips.push(labelChip("/ck:check", "dim"));
 			chips.push(labelChip("/ck:make", "dim"));
-		} else {
-			// Slash commands hint
-			chips.push(labelChip("/ commands", "dim"));
 		}
 
 		return chips;

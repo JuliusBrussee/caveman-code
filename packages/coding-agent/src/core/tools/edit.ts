@@ -285,6 +285,12 @@ export function createEditToolDefinition(
 			return text;
 		},
 		renderResult(result, _options, theme, context) {
+			if (!context.expanded && !context.isError) {
+				// Collapsed: show nothing (header already shows file path)
+				const component = (context.lastComponent as Container | undefined) ?? new Container();
+				component.clear();
+				return component;
+			}
 			const output = formatEditResult(context.args, result as any, theme, context.isError);
 			if (!output) {
 				const component = (context.lastComponent as Container | undefined) ?? new Container();

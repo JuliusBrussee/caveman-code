@@ -90,12 +90,11 @@ function formatReadResult(
 	const lang = rawPath ? getLanguageFromPath(rawPath) : undefined;
 	const renderedLines = lang ? highlightCode(replaceTabs(output), lang) : output.split("\n");
 	const lines = trimTrailingEmptyLines(renderedLines);
-	const maxLines = options.expanded ? lines.length : 10;
-	const displayLines = lines.slice(0, maxLines);
-	const remaining = lines.length - maxLines;
-	let text = `\n${displayLines.map((line) => (lang ? replaceTabs(line) : theme.fg("toolOutput", replaceTabs(line)))).join("\n")}`;
-	if (remaining > 0) {
-		text += `${theme.fg("muted", `\n... (${remaining} more lines,`)} ${keyHint("app.tools.expand", "to expand")})`;
+	let text: string;
+	if (options.expanded) {
+		text = `\n${lines.map((line) => (lang ? replaceTabs(line) : theme.fg("toolOutput", replaceTabs(line)))).join("\n")}`;
+	} else {
+		text = ` ${theme.fg("muted", `(${lines.length} lines)`)} ${theme.fg("dim", `(${keyHint("app.tools.expand", "to expand")})`)}`;
 	}
 
 	const truncation = result.details?.truncation;

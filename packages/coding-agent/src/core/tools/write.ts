@@ -149,12 +149,10 @@ function formatWriteCall(
 			: normalizeDisplayText(fileContent).split("\n");
 		const lines = trimTrailingEmptyLines(renderedLines);
 		const totalLines = lines.length;
-		const maxLines = options.expanded ? lines.length : 10;
-		const displayLines = lines.slice(0, maxLines);
-		const remaining = lines.length - maxLines;
-		text += `\n\n${displayLines.map((line) => (lang ? line : theme.fg("toolOutput", replaceTabs(line)))).join("\n")}`;
-		if (remaining > 0) {
-			text += `${theme.fg("muted", `\n... (${remaining} more lines, ${totalLines} total,`)} ${keyHint("app.tools.expand", "to expand")})`;
+		if (options.expanded) {
+			text += `\n\n${lines.map((line) => (lang ? line : theme.fg("toolOutput", replaceTabs(line)))).join("\n")}`;
+		} else {
+			text += ` ${theme.fg("muted", `(${totalLines} lines)`)} ${theme.fg("dim", `(${keyHint("app.tools.expand", "to expand")})`)}`;
 		}
 	}
 

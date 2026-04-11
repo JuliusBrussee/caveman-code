@@ -1,37 +1,28 @@
 import type { TextContent } from "@cave/ai";
-import type { Component } from "@cave/tui";
-import { Box, Container, Markdown, type MarkdownTheme, Spacer, Text } from "@cave/tui";
+import { type Component, Container, Markdown, type MarkdownTheme, Text } from "@cave/tui";
 import type { MessageRenderer } from "../../../core/extensions/types.js";
 import type { CustomMessage } from "../../../core/messages.js";
 import { getMarkdownTheme, theme } from "../theme/theme.js";
 
 /**
  * Component that renders a custom message entry from extensions.
- * Uses distinct styling to differentiate from user messages.
+ * Uses left-border style consistent with other message types.
  */
-export class CustomMessageComponent extends Container {
+export class CustomMessageComponent implements Component {
 	private message: CustomMessage<unknown>;
 	private customRenderer?: MessageRenderer;
-	private box: Box;
-	private customComponent?: Component;
 	private markdownTheme: MarkdownTheme;
 	private _expanded = false;
+	private currentContent?: Component;
 
 	constructor(
 		message: CustomMessage<unknown>,
 		customRenderer?: MessageRenderer,
 		markdownTheme: MarkdownTheme = getMarkdownTheme(),
 	) {
-		super();
 		this.message = message;
 		this.customRenderer = customRenderer;
 		this.markdownTheme = markdownTheme;
-
-		this.addChild(new Spacer(1));
-
-		// Create box with purple background (used for default rendering)
-		this.box = new Box(1, 1, (t) => theme.bg("customMessageBg", t));
-
 		this.rebuild();
 	}
 
@@ -42,27 +33,31 @@ export class CustomMessageComponent extends Container {
 		}
 	}
 
-	override invalidate(): void {
-		super.invalidate();
+	invalidate(): void {
+		this.currentContent?.invalidate?.();
 		this.rebuild();
 	}
 
-	private rebuild(): void {
-		// Remove previous content component
-		if (this.customComponent) {
-			this.removeChild(this.customComponent);
-			this.customComponent = undefined;
-		}
-		this.removeChild(this.box);
+	render(width: number): string[] {
+		if (!this.currentContent) return [];
 
-		// Try custom renderer first - it handles its own styling
+		// Custom renderers handle their own styling
+		if (this.customRenderer) {
+			return this.currentContent.render(width);
+		}
+
+		// Default rendering: left-bordered
+		const prefix = theme.fg("customMessageLabel", "│") + " ";
+		return this.currentContent.render(width - 2).map((line) => prefix + line);
+	}
+
+	private rebuild(): void {
+		// Try custom renderer first
 		if (this.customRenderer) {
 			try {
 				const component = this.customRenderer(this.message, { expanded: this._expanded }, theme);
 				if (component) {
-					// Custom renderer provides its own styled component
-					this.customComponent = component;
-					this.addChild(component);
+					this.currentContent = component;
 					return;
 				}
 			} catch {
@@ -70,16 +65,11 @@ export class CustomMessageComponent extends Container {
 			}
 		}
 
-		// Default rendering uses our box
-		this.addChild(this.box);
-		this.box.clear();
-
 		// Default rendering: label + content
-		const label = theme.fg("customMessageLabel", `\x1b[1m[${this.message.customType}]\x1b[22m`);
-		this.box.addChild(new Text(label, 0, 0));
-		this.box.addChild(new Spacer(1));
+		const container = new Container();
+		const label = theme.fg("customMessageLabel", `[${this.message.customType}]`);
+		container.addChild(new Text(label, 0, 0));
 
-		// Extract text content
 		let text: string;
 		if (typeof this.message.content === "string") {
 			text = this.message.content;
@@ -90,10 +80,7 @@ export class CustomMessageComponent extends Container {
 				.join("\n");
 		}
 
-		this.box.addChild(
-			new Markdown(text, 0, 0, this.markdownTheme, {
-				color: (text: string) => theme.fg("customMessageText", text),
-			}),
-		);
+		container.addChild(new Markdown(text, 0, 0, this.markdownTheme));
+		this.currentContent = container;
 	}
 }
