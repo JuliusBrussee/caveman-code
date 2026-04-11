@@ -1,0 +1,428 @@
+import { EventEmitter } from "node:events";
+import type { IncomingMessage, ServerResponse } from "node:http";
+import { createServer } from "node:http";
+import { parse as parseUrl } from "node:url";
+
+// ============================================================================
+// Types
+// ============================================================================
+
+export interface Route {
+	method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+	path: string;
+	handler: RouteHandler;
+	middleware?: Middleware[];
+}
+
+export type RouteHandler = (ctx: RequestContext) => Promise<Response | void>;
+
+export type Middleware = (ctx: RequestContext, next: () => Promise<void>) => Promise<void>;
+
+export interface RequestContext {
+	req: IncomingMessage;
+	res: ServerResponse;
+	params: Record<string, string>;
+	query: Record<string, string | string[]>;
+	body: unknown;
+	state: Map<string, unknown>;
+	requestId: string;
+	startTime: number;
+}
+
+export interface ServerOptions {
+	port?: number;
+	host?: string;
+	maxBodySize?: number;
+	requestTimeout?: number;
+	cors?: CorsOptions;
+	logger?: Logger;
+}
+
+export interface CorsOptions {
+	origins: string[];
+	methods?: string[];
+	headers?: string[];
+	credentials?: boolean;
+	maxAge?: number;
+}
+
+export interface Logger {
+	info(msg: string, data?: Record<string, unknown>): void;
+	warn(msg: string, data?: Record<string, unknown>): void;
+	error(msg: string, data?: Record<string, unknown>): void;
+	debug(msg: string, data?: Record<string, unknown>): void;
+}
+
+export interface Response {
+	status: number;
+	headers?: Record<string, string>;
+	body?: unknown;
+}
+
+// ============================================================================
+// Router
+// ============================================================================
+
+interface RouteMatch {
+	route: Route;
+	params: Record<string, string>;
+}
+
+class Router {
+	private routes: Route[] = [];
+	private paramRegexCache = new Map<string, RegExp>();
+
+	add(route: Route): void {
+		this.routes.push(route);
+		// Pre-compile path regex
+		if (route.path.includes(":")) {
+			const pattern = route.path.replace(/:(\w+)/g, "(?<$1>[^/]+)");
+			this.paramRegexCache.set(route.path, new RegExp(`^${pattern}$`));
+		}
+	}
+
+	match(method: string, path: string): RouteMatch | undefined {
+		for (const route of this.routes) {
+			if (route.method !== method) continue;
+
+			// Exact match (no params)
+			if (!route.path.includes(":")) {
+				if (route.path === path) {
+					return { route, params: {} };
+				}
+				continue;
+			}
+
+			// Param match
+			const regex = this.paramRegexCache.get(route.path);
+			if (!regex) continue;
+
+			const match = path.match(regex);
+			if (match?.groups) {
+				return { route, params: match.groups };
+			}
+		}
+
+		return undefined;
+	}
+
+	getRoutes(): Route[] {
+		return [...this.routes];
+	}
+}
+
+// ============================================================================
+// Request Body Parser
+// ============================================================================
+
+async function parseBody(req: IncomingMessage, maxSize: number): Promise<unknown> {
+	return new Promise((resolve, reject) => {
+		const chunks: Buffer[] = [];
+		let totalSize = 0;
+
+		req.on("data", (chunk: Buffer) => {
+			totalSize += chunk.length;
+			if (totalSize > maxSize) {
+				req.destroy();
+				reject(new Error(`Request body exceeds maximum size of ${maxSize} bytes`));
+				return;
+			}
+			chunks.push(chunk);
+		});
+
+		req.on("end", () => {
+			if (totalSize === 0) {
+				resolve(undefined);
+				return;
+			}
+
+			const raw = Buffer.concat(chunks).toString("utf-8");
+			const contentType = req.headers["content-type"] ?? "";
+
+			if (contentType.includes("application/json")) {
+				try {
+					resolve(JSON.parse(raw));
+				} catch {
+					reject(new Error("Invalid JSON in request body"));
+				}
+			} else if (contentType.includes("application/x-www-form-urlencoded")) {
+				resolve(Object.fromEntries(new URLSearchParams(raw)));
+			} else {
+				resolve(raw);
+			}
+		});
+
+		req.on("error", reject);
+	});
+}
+
+// ============================================================================
+// Middleware Helpers
+// ============================================================================
+
+function generateRequestId(): string {
+	const timestamp = Date.now().toString(36);
+	const random = Math.random().toString(36).substring(2, 10);
+	return `${timestamp}-${random}`;
+}
+
+export function corsMiddleware(options: CorsOptions): Middleware {
+	const allowedOrigins = new Set(options.origins);
+	const methods = options.methods ?? ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"];
+	const headers = options.headers ?? ["Content-Type", "Authorization", "X-Request-ID"];
+
+	return async (ctx, next) => {
+		const origin = ctx.req.headers.origin ?? "";
+
+		if (allowedOrigins.has(origin) || allowedOrigins.has("*")) {
+			ctx.res.setHeader("Access-Control-Allow-Origin", origin);
+			ctx.res.setHeader("Access-Control-Allow-Methods", methods.join(", "));
+			ctx.res.setHeader("Access-Control-Allow-Headers", headers.join(", "));
+
+			if (options.credentials) {
+				ctx.res.setHeader("Access-Control-Allow-Credentials", "true");
+			}
+
+			if (options.maxAge) {
+				ctx.res.setHeader("Access-Control-Max-Age", String(options.maxAge));
+			}
+		}
+
+		if (ctx.req.method === "OPTIONS") {
+			ctx.res.writeHead(204);
+			ctx.res.end();
+			return;
+		}
+
+		await next();
+	};
+}
+
+export function loggingMiddleware(logger: Logger): Middleware {
+	return async (ctx, next) => {
+		const start = Date.now();
+		logger.info("Request started", {
+			method: ctx.req.method,
+			path: ctx.req.url,
+			requestId: ctx.requestId,
+		});
+
+		try {
+			await next();
+		} finally {
+			const duration = Date.now() - start;
+			logger.info("Request completed", {
+				method: ctx.req.method,
+				path: ctx.req.url,
+				requestId: ctx.requestId,
+				duration,
+				status: ctx.res.statusCode,
+			});
+		}
+	};
+}
+
+export function rateLimitMiddleware(maxRequests: number, windowMs: number): Middleware {
+	const requests = new Map<string, { count: number; resetAt: number }>();
+
+	return async (ctx, next) => {
+		const ip = ctx.req.socket.remoteAddress ?? "unknown";
+		const now = Date.now();
+
+		let entry = requests.get(ip);
+		if (!entry || now > entry.resetAt) {
+			entry = { count: 0, resetAt: now + windowMs };
+			requests.set(ip, entry);
+		}
+
+		entry.count++;
+
+		ctx.res.setHeader("X-RateLimit-Limit", String(maxRequests));
+		ctx.res.setHeader("X-RateLimit-Remaining", String(Math.max(0, maxRequests - entry.count)));
+		ctx.res.setHeader("X-RateLimit-Reset", String(Math.ceil(entry.resetAt / 1000)));
+
+		if (entry.count > maxRequests) {
+			ctx.res.writeHead(429, { "Content-Type": "application/json" });
+			ctx.res.end(JSON.stringify({ error: "Too many requests", retryAfter: Math.ceil((entry.resetAt - now) / 1000) }));
+			return;
+		}
+
+		await next();
+	};
+}
+
+// ============================================================================
+// Server
+// ============================================================================
+
+export class Server extends EventEmitter {
+	private router = new Router();
+	private globalMiddleware: Middleware[] = [];
+	private options: Required<ServerOptions>;
+	private httpServer: ReturnType<typeof createServer> | undefined;
+
+	constructor(options: ServerOptions = {}) {
+		super();
+		this.options = {
+			port: options.port ?? 3000,
+			host: options.host ?? "0.0.0.0",
+			maxBodySize: options.maxBodySize ?? 1024 * 1024, // 1MB
+			requestTimeout: options.requestTimeout ?? 30000,
+			cors: options.cors ?? { origins: [] },
+			logger: options.logger ?? console,
+		};
+	}
+
+	use(middleware: Middleware): this {
+		this.globalMiddleware.push(middleware);
+		return this;
+	}
+
+	route(method: Route["method"], path: string, handler: RouteHandler, middleware?: Middleware[]): this {
+		this.router.add({ method, path, handler, middleware });
+		return this;
+	}
+
+	get(path: string, handler: RouteHandler, middleware?: Middleware[]): this {
+		return this.route("GET", path, handler, middleware);
+	}
+
+	post(path: string, handler: RouteHandler, middleware?: Middleware[]): this {
+		return this.route("POST", path, handler, middleware);
+	}
+
+	put(path: string, handler: RouteHandler, middleware?: Middleware[]): this {
+		return this.route("PUT", path, handler, middleware);
+	}
+
+	delete(path: string, handler: RouteHandler, middleware?: Middleware[]): this {
+		return this.route("DELETE", path, handler, middleware);
+	}
+
+	async listen(): Promise<void> {
+		this.httpServer = createServer((req, res) => this.handleRequest(req, res));
+
+		return new Promise((resolve) => {
+			this.httpServer!.listen(this.options.port, this.options.host, () => {
+				this.options.logger.info(`Server listening on ${this.options.host}:${this.options.port}`);
+				this.emit("listening", { port: this.options.port, host: this.options.host });
+				resolve();
+			});
+		});
+	}
+
+	async close(): Promise<void> {
+		if (!this.httpServer) return;
+
+		return new Promise((resolve, reject) => {
+			this.httpServer!.close((err) => {
+				if (err) reject(err);
+				else resolve();
+			});
+		});
+	}
+
+	private async handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
+		const requestId = generateRequestId();
+		const startTime = Date.now();
+
+		// Parse URL
+		const parsed = parseUrl(req.url ?? "/", true);
+		const path = parsed.pathname ?? "/";
+		const method = req.method ?? "GET";
+
+		// Create context
+		const ctx: RequestContext = {
+			req,
+			res,
+			params: {},
+			query: parsed.query as Record<string, string | string[]>,
+			body: undefined,
+			state: new Map(),
+			requestId,
+			startTime,
+		};
+
+		// Set request ID header
+		res.setHeader("X-Request-ID", requestId);
+
+		// Set request timeout
+		const timeout = setTimeout(() => {
+			if (!res.writableEnded) {
+				res.writeHead(408, { "Content-Type": "application/json" });
+				res.end(JSON.stringify({ error: "Request timeout" }));
+			}
+		}, this.options.requestTimeout);
+
+		try {
+			// Parse body for non-GET requests
+			if (method !== "GET" && method !== "HEAD") {
+				ctx.body = await parseBody(req, this.options.maxBodySize);
+			}
+
+			// Match route
+			const match = this.router.match(method, path);
+			if (!match) {
+				res.writeHead(404, { "Content-Type": "application/json" });
+				res.end(JSON.stringify({ error: "Not found", path, method }));
+				return;
+			}
+
+			ctx.params = match.params;
+
+			// Build middleware chain
+			const allMiddleware = [...this.globalMiddleware, ...(match.route.middleware ?? [])];
+
+			// Execute middleware chain
+			let index = 0;
+			const next = async (): Promise<void> => {
+				if (index < allMiddleware.length) {
+					const mw = allMiddleware[index++]!;
+					await mw(ctx, next);
+				} else {
+					// Run handler
+					const response = await match.route.handler(ctx);
+					if (response && !res.writableEnded) {
+						const headers = { "Content-Type": "application/json", ...response.headers };
+						res.writeHead(response.status, headers);
+						res.end(typeof response.body === "string" ? response.body : JSON.stringify(response.body));
+					}
+				}
+			};
+
+			await next();
+		} catch (error) {
+			this.options.logger.error("Request error", {
+				requestId,
+				error: error instanceof Error ? error.message : String(error),
+				path,
+				method,
+			});
+
+			if (!res.writableEnded) {
+				res.writeHead(500, { "Content-Type": "application/json" });
+				res.end(JSON.stringify({ error: "Internal server error", requestId }));
+			}
+		} finally {
+			clearTimeout(timeout);
+		}
+	}
+}
+
+// ============================================================================
+// Factory
+// ============================================================================
+
+export function createApp(options?: ServerOptions): Server {
+	const server = new Server(options);
+
+	if (options?.cors && options.cors.origins.length > 0) {
+		server.use(corsMiddleware(options.cors));
+	}
+
+	if (options?.logger) {
+		server.use(loggingMiddleware(options.logger));
+	}
+
+	return server;
+}

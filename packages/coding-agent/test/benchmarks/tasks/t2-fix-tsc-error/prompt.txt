@@ -1,0 +1,1 @@
+Fix the TypeScript errors in broken.ts. Run tsc --noEmit to verify there are no errors remaining.

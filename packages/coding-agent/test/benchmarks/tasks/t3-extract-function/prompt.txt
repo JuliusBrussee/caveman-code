@@ -1,0 +1,1 @@
+Extract the tax calculation logic from main.ts into a new file called utils.ts. Create a calculateTax(subtotal: number, rate: number) function in utils.ts and update main.ts to import and use it.

@@ -1,0 +1,257 @@
+[
+  {
+    "Id": "sha256:a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+    "Created": "2026-03-15T10:22:33.456789012Z",
+    "Path": "/usr/local/bin/node",
+    "Args": ["server.js"],
+    "State": {
+      "Status": "running",
+      "Running": true,
+      "Paused": false,
+      "Restarting": false,
+      "OOMKilled": false,
+      "Dead": false,
+      "Pid": 42891,
+      "ExitCode": 0,
+      "Error": "",
+      "StartedAt": "2026-03-15T10:22:34.123456789Z",
+      "FinishedAt": "0001-01-01T00:00:00Z"
+    },
+    "Image": "sha256:f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4b5a6f1e2",
+    "ResolvConfPath": "/var/lib/docker/containers/a1b2c3d4e5f6/resolv.conf",
+    "HostnamePath": "/var/lib/docker/containers/a1b2c3d4e5f6/hostname",
+    "HostsPath": "/var/lib/docker/containers/a1b2c3d4e5f6/hosts",
+    "LogPath": "/var/lib/docker/containers/a1b2c3d4e5f6/a1b2c3d4e5f6-json.log",
+    "Name": "/api-gateway",
+    "RestartCount": 0,
+    "Driver": "overlay2",
+    "Platform": "linux",
+    "MountLabel": "",
+    "ProcessLabel": "",
+    "AppArmorProfile": "docker-default",
+    "ExecIDs": null,
+    "HostConfig": {
+      "Binds": ["/app/data:/data:rw", "/app/config:/config:ro"],
+      "ContainerIDFile": "",
+      "LogConfig": {
+        "Type": "json-file",
+        "Config": {
+          "max-file": "3",
+          "max-size": "10m"
+        }
+      },
+      "NetworkMode": "bridge",
+      "PortBindings": {
+        "3000/tcp": [{ "HostIp": "0.0.0.0", "HostPort": "3000" }],
+        "9229/tcp": [{ "HostIp": "127.0.0.1", "HostPort": "9229" }]
+      },
+      "RestartPolicy": {
+        "Name": "unless-stopped",
+        "MaximumRetryCount": 0
+      },
+      "AutoRemove": false,
+      "VolumeDriver": "",
+      "VolumesFrom": null,
+      "ConsoleSize": [0, 0],
+      "CapAdd": null,
+      "CapDrop": ["ALL"],
+      "CgroupnsMode": "private",
+      "Dns": [],
+      "DnsOptions": [],
+      "DnsSearch": [],
+      "ExtraHosts": null,
+      "GroupAdd": null,
+      "IpcMode": "private",
+      "Cgroup": "",
+      "Links": null,
+      "OomScoreAdj": 0,
+      "PidMode": "",
+      "Privileged": false,
+      "PublishAllPorts": false,
+      "ReadonlyRootfs": true,
+      "SecurityOpt": ["no-new-privileges:true"],
+      "UTSMode": "",
+      "UsernsMode": "",
+      "ShmSize": 67108864,
+      "Runtime": "runc",
+      "Isolation": "",
+      "CpuShares": 512,
+      "Memory": 536870912,
+      "NanoCpus": 0,
+      "CgroupParent": "",
+      "BlkioWeight": 0,
+      "BlkioWeightDevice": [],
+      "BlkioDeviceReadBps": [],
+      "BlkioDeviceWriteBps": [],
+      "BlkioDeviceReadIOps": [],
+      "BlkioDeviceWriteIOps": [],
+      "CpuPeriod": 0,
+      "CpuQuota": 0,
+      "CpuRealtimePeriod": 0,
+      "CpuRealtimeRuntime": 0,
+      "CpusetCpus": "",
+      "CpusetMems": "",
+      "Devices": [],
+      "DeviceCgroupRules": null,
+      "DeviceRequests": null,
+      "MemoryReservation": 268435456,
+      "MemorySwap": 1073741824,
+      "MemorySwappiness": null,
+      "OomKillDisable": false,
+      "PidsLimit": 100,
+      "Ulimits": [
+        { "Name": "nofile", "Hard": 65536, "Soft": 65536 },
+        { "Name": "nproc", "Hard": 4096, "Soft": 4096 }
+      ],
+      "CpuCount": 0,
+      "CpuPercent": 0,
+      "IOMaximumIOps": 0,
+      "IOMaximumBandwidth": 0,
+      "MaskedPaths": [
+        "/proc/asound", "/proc/acpi", "/proc/kcore", "/proc/keys",
+        "/proc/latency_stats", "/proc/timer_list", "/proc/timer_stats",
+        "/proc/sched_debug", "/proc/scsi", "/sys/firmware", "/sys/devices/virtual/powercap"
+      ],
+      "ReadonlyPaths": ["/proc/bus", "/proc/fs", "/proc/irq", "/proc/sys", "/proc/sysrq-trigger"]
+    },
+    "GraphDriver": {
+      "Data": {
+        "LowerDir": "/var/lib/docker/overlay2/l1:/var/lib/docker/overlay2/l2:/var/lib/docker/overlay2/l3",
+        "MergedDir": "/var/lib/docker/overlay2/merged",
+        "UpperDir": "/var/lib/docker/overlay2/upper",
+        "WorkDir": "/var/lib/docker/overlay2/work"
+      },
+      "Name": "overlay2"
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/app/data",
+        "Destination": "/data",
+        "Mode": "rw",
+        "RW": true,
+        "Propagation": "rprivate"
+      },
+      {
+        "Type": "bind",
+        "Source": "/app/config",
+        "Destination": "/config",
+        "Mode": "ro",
+        "RW": false,
+        "Propagation": "rprivate"
+      },
+      {
+        "Type": "volume",
+        "Name": "api-logs",
+        "Source": "/var/lib/docker/volumes/api-logs/_data",
+        "Destination": "/var/log/app",
+        "Driver": "local",
+        "Mode": "z",
+        "RW": true,
+        "Propagation": ""
+      }
+    ],
+    "Config": {
+      "Hostname": "a1b2c3d4e5f6",
+      "Domainname": "",
+      "User": "node:node",
+      "AttachStdin": false,
+      "AttachStdout": false,
+      "AttachStderr": false,
+      "ExposedPorts": {
+        "3000/tcp": {},
+        "9229/tcp": {}
+      },
+      "Tty": false,
+      "OpenStdin": false,
+      "StdinOnce": false,
+      "Env": [
+        "NODE_ENV=production",
+        "PORT=3000",
+        "DATABASE_URL=postgres://db:5432/api",
+        "REDIS_URL=redis://cache:6379",
+        "LOG_LEVEL=info",
+        "MAX_CONNECTIONS=100",
+        "CORS_ORIGINS=https://app.example.com,https://admin.example.com",
+        "JWT_ISSUER=https://auth.example.com",
+        "OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317",
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      ],
+      "Cmd": ["server.js"],
+      "Image": "registry.example.com/api-gateway:v2.14.3",
+      "Volumes": {
+        "/var/log/app": {}
+      },
+      "WorkingDir": "/app",
+      "Entrypoint": ["/usr/local/bin/node"],
+      "OnBuild": null,
+      "Labels": {
+        "com.example.service": "api-gateway",
+        "com.example.team": "platform",
+        "com.example.version": "2.14.3",
+        "maintainer": "platform@example.com",
+        "org.opencontainers.image.created": "2026-03-15T10:20:00Z",
+        "org.opencontainers.image.revision": "abc123def456",
+        "org.opencontainers.image.source": "https://github.com/example/api-gateway",
+        "org.opencontainers.image.title": "api-gateway",
+        "org.opencontainers.image.version": "2.14.3"
+      }
+    },
+    "NetworkSettings": {
+      "Bridge": "",
+      "SandboxID": "d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5",
+      "SandboxKey": "/var/run/docker/netns/d4e5f6a1b2c3",
+      "HairpinMode": false,
+      "LinkLocalIPv6Address": "",
+      "LinkLocalIPv6PrefixLen": 0,
+      "Ports": {
+        "3000/tcp": [{ "HostIp": "0.0.0.0", "HostPort": "3000" }],
+        "9229/tcp": [{ "HostIp": "127.0.0.1", "HostPort": "9229" }]
+      },
+      "SecondaryIPAddresses": null,
+      "SecondaryIPv6Addresses": null,
+      "EndpointID": "",
+      "Gateway": "",
+      "GlobalIPv6Address": "",
+      "GlobalIPv6PrefixLen": 0,
+      "IPAddress": "",
+      "IPPrefixLen": 0,
+      "IPv6Gateway": "",
+      "MacAddress": "",
+      "Networks": {
+        "api-network": {
+          "IPAMConfig": null,
+          "Links": null,
+          "Aliases": ["api-gateway", "a1b2c3d4e5f6"],
+          "MacAddress": "02:42:ac:12:00:02",
+          "NetworkID": "b5a6f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4b5a6",
+          "EndpointID": "c4b5a6f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4b5",
+          "Gateway": "172.18.0.1",
+          "IPAddress": "172.18.0.2",
+          "IPPrefixLen": 16,
+          "IPv6Gateway": "",
+          "GlobalIPv6Address": "",
+          "GlobalIPv6PrefixLen": 0,
+          "DriverOpts": null,
+          "DNSNames": ["api-gateway", "a1b2c3d4e5f6"]
+        },
+        "monitoring": {
+          "IPAMConfig": null,
+          "Links": null,
+          "Aliases": ["api-gateway"],
+          "MacAddress": "02:42:ac:13:00:05",
+          "NetworkID": "e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3",
+          "EndpointID": "f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4b5a6f1e2",
+          "Gateway": "172.19.0.1",
+          "IPAddress": "172.19.0.5",
+          "IPPrefixLen": 16,
+          "IPv6Gateway": "",
+          "GlobalIPv6Address": "",
+          "GlobalIPv6PrefixLen": 0,
+          "DriverOpts": null,
+          "DNSNames": ["api-gateway"]
+        }
+      }
+    }
+  }
+]
