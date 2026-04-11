@@ -62,9 +62,62 @@ Cave mode is a 3-layer token compression system enabled by default. It reduces t
 
 **Layer 3: Read deduplication** — session-scoped fingerprint cache. If the same file is read twice with no changes, the second read returns a one-line stub instead of full content. Prevents context bloat in long refactoring sessions.
 
-**RTK integration** — optional external binary that rewrites bash commands before execution for 60–90% output reduction. Runs before Flint Chipper (defense in depth). Falls back silently if `rtk` not installed.
+**RTK integration** — optional external binary that rewrites bash commands before execution for 60–90% output reduction. Runs before Flint Chipper (defense in depth). Falls back silently if `rtk` not installed. See [RTK Integration](#rtk-integration) below.
 
 Use `/cave [lite|full|ultra|off]` to change intensity during a session. See [settings](docs/settings.md) for configuration.
+
+---
+
+## RTK Integration
+
+RTK (Rust Token Killer) is an optional external binary that rewrites bash commands for compact output before the shell executes them. Cave hooks into the bash tool spawn pipeline; RTK runs first, then Flint Chipper runs on RTK's already-compressed output.
+
+### How It Works
+
+Cave detects RTK at session start via `rtk --version`. If found and enabled, every bash tool call is intercepted by a `BashSpawnHook` that calls `rtk rewrite <command>` synchronously (200ms timeout) before spawning the shell process.
+
+**Exit code protocol for `rtk rewrite`:**
+
+| Exit code | Meaning | Cave behavior |
+|-----------|---------|---------------|
+| `0` + stdout | Rewrite found | Use rewritten command |
+| `1` | No RTK equivalent | Pass original through |
+| `2` | Deny rule matched | Pass original through |
+| `3` + stdout | Ask rule matched | Pass original through (no prompt in hook context) |
+| any other | Error / timeout | Pass original through (fail-open) |
+
+Cave never blocks on RTK. Any error — non-zero exit, timeout, binary not found — falls back to the original command transparently.
+
+**Double-rewrite guard:** Commands already starting with `rtk` are passed through unchanged.
+
+### Install RTK
+
+RTK is not bundled with Cave. Install it separately:
+
+```bash
+# Check if available
+rtk --version
+```
+
+### Enable / Disable
+
+RTK is enabled by default when the binary is detected. Disable globally:
+
+```json
+// ~/.cave/agent/settings.json
+{
+  "rtk": { "enabled": false }
+}
+```
+
+Or per-project:
+
+```json
+// .cave/settings.json
+{
+  "rtk": { "enabled": false }
+}
+```
 
 ---
 
@@ -106,6 +159,7 @@ Kits define **WHAT** to build (requirements + acceptance criteria). Plans define
 
 - [What's Different From Pi & Claude Code](#whats-different-from-pi--claude-code)
 - [Cave Mode](#cave-mode)
+- [RTK Integration](#rtk-integration)
 - [CaveKit Extension](#cavekit-extension)
 - [Freeze Checkpoints](#freeze-checkpoints)
 - [Quick Start](#quick-start)
