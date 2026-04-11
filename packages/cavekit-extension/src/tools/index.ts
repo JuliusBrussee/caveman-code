@@ -9,12 +9,14 @@ import { acceptanceCheckTool } from "./acceptance-check.js";
 import { buildSiteStatusTool } from "./build-site-status.js";
 import { convergenceCheckTool } from "./convergence-check.js";
 import { kitReadTool } from "./kit-read.js";
+import { ralphReviewTool } from "./ralph-review.js";
 
 export const CAVEKIT_TOOL_NAMES = [
 	kitReadTool.name,
 	buildSiteStatusTool.name,
 	acceptanceCheckTool.name,
 	convergenceCheckTool.name,
+	ralphReviewTool.name,
 ] as const;
 
 export type CaveKitToolName = (typeof CAVEKIT_TOOL_NAMES)[number];
@@ -24,6 +26,6 @@ export function registerTools(pi: ExtensionAPI, _config: CaveKitConfig): CaveKit
 	pi.registerTool(buildSiteStatusTool);
 	pi.registerTool(acceptanceCheckTool);
 	pi.registerTool(convergenceCheckTool);
-	// codex_review registered separately when Codex is available (Phase 2)
+	pi.registerTool(ralphReviewTool);
 	return [...CAVEKIT_TOOL_NAMES];
 }

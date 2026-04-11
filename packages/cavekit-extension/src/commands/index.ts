@@ -14,6 +14,7 @@ import { registerHelpCommand } from "./help.js";
 import { registerInspectCommand } from "./inspect.js";
 import { registerPreviewCommand } from "./preview.js";
 import { registerProgressCommand } from "./progress.js";
+import { registerRalphCommand } from "./ralph.js";
 import { registerResearchCommand } from "./research.js";
 
 export const CAVEKIT_COMMAND_IDS = [
@@ -28,6 +29,7 @@ export const CAVEKIT_COMMAND_IDS = [
 	"ck:progress",
 	"ck:convergence",
 	"ck:preview",
+	"ck:ralph",
 ] as const;
 
 export type CaveKitCommandId = (typeof CAVEKIT_COMMAND_IDS)[number];
@@ -44,5 +46,6 @@ export function registerCommands(pi: ExtensionAPI, config: CaveKitConfig): CaveK
 	registerProgressCommand(pi, config);
 	registerConvergenceCommand(pi, config);
 	registerPreviewCommand(pi, config);
+	registerRalphCommand(pi, config);
 	return [...CAVEKIT_COMMAND_IDS];
 }
