@@ -4,8 +4,8 @@
  * Exposes /tui to show TUI redraw stats.
  */
 
-import type { ExtensionAPI } from "@cavepi/pi-coding-agent";
-import { Text } from "@cavepi/pi-tui";
+import type { ExtensionAPI } from "cave";
+import { Text } from "@cave/tui";
 
 export default function (pi: ExtensionAPI) {
 	pi.registerCommand("tui", {
