@@ -1,21 +1,17 @@
 /**
- * Kit reviewer overlay — interactive approve/reject UI shown after /ck:draft.
+ * Kit reviewer — interactive two-pane review overlay shown after /ck:draft.
  *
  * T-036 (extension-ui/R2):
  * AC-1: After kit generation, displays a navigable tree of kits > requirements > AC.
- * AC-2: User can approve or reject individual kits via confirm dialogs.
+ * AC-2: User can approve or reject individual kits via the review pane.
  * AC-3: Blocks workflow until the user has confirmed every kit.
  * AC-4: Rejected kits are excluded from the list consumed by /ck:architect.
  */
 
-import type { Kit } from "../types.js";
+import type { Kit, ReviewItem } from "../types.js";
+import { type ReviewOverlayContext, showReviewOverlay } from "./review-pane.js";
 
-export interface KitReviewerContext {
-	ui: {
-		notify: (message: string, type?: "info" | "warning" | "error") => void;
-		confirm: (title: string, message: string) => Promise<boolean>;
-	};
-}
+export type KitReviewerContext = ReviewOverlayContext;
 
 export interface KitReviewResult {
 	/** Kits the user approved — these are the only kits architect should use. */
@@ -27,11 +23,10 @@ export interface KitReviewResult {
 /**
  * Present an interactive kit review overlay.
  *
- * For each kit the reviewer shows the kit's domain, all its requirements, and
- * all acceptance criteria, then asks the user to approve or reject the kit.
- *
- * AC-3: The function awaits every kit before returning — it blocks the caller
- * until the user has made a decision on every kit in the list.
+ * AC-1: Each kit is rendered as markdown with its requirements and acceptance criteria.
+ * AC-2: User can approve or reject each kit in the two-pane review pane.
+ * AC-3: The function awaits every kit before returning — it blocks the caller.
+ * AC-4: Rejected kits are tracked separately and not returned to architect.
  */
 export async function reviewKits(kits: Kit[], ctx: KitReviewerContext): Promise<KitReviewResult> {
 	if (kits.length === 0) {
@@ -39,31 +34,19 @@ export async function reviewKits(kits: Kit[], ctx: KitReviewerContext): Promise<
 		return { approvedKits: [], rejectedKits: [] };
 	}
 
-	ctx.ui.notify(`Kit review: ${kits.length} kit(s) to review. Approve or reject each one.`, "info");
+	const items: ReviewItem[] = kits.map((kit, i) => kitToReviewItem(kit, i, kits.length));
 
-	const approvedKits: Kit[] = [];
-	const rejectedKits: Kit[] = [];
+	const result = await showReviewOverlay(items, ctx, {
+		title: "Kit Review",
+		allowSkip: false,
+	});
 
-	for (let i = 0; i < kits.length; i++) {
-		const kit = kits[i];
-		// AC-1: Build a navigable tree display for this kit
-		const tree = buildKitTree(kit, i + 1, kits.length);
-
-		// AC-2 + AC-3: Confirm dialog — blocks until the user responds
-		const approved = await ctx.ui.confirm(`Kit Review (${i + 1}/${kits.length}): ${kit.domain}`, tree);
-
-		if (approved) {
-			approvedKits.push(kit);
-			ctx.ui.notify(`✓ Approved: ${kit.domain}`, "info");
-		} else {
-			// AC-4: Rejected kits are tracked separately and not returned to architect
-			rejectedKits.push(kit);
-			ctx.ui.notify(`✗ Rejected: ${kit.domain} — excluded from architect`, "warning");
-		}
-	}
+	const approvedIds = new Set(result.items.filter((i) => i.status === "approved").map((i) => i.id));
+	const approvedKits = kits.filter((k) => approvedIds.has(k.domain));
+	const rejectedKits = kits.filter((k) => !approvedIds.has(k.domain));
 
 	const summary = [
-		`Kit review complete.`,
+		"Kit review complete.",
 		`Approved: ${approvedKits.map((k) => k.domain).join(", ") || "none"}`,
 		`Rejected: ${rejectedKits.map((k) => k.domain).join(", ") || "none"}`,
 	].join("  |  ");
@@ -74,62 +57,72 @@ export async function reviewKits(kits: Kit[], ctx: KitReviewerContext): Promise<
 }
 
 /**
- * Build an ASCII tree string for a single kit showing domain, requirements, and ACs.
- * AC-1: kits > requirements > acceptance criteria hierarchy.
- */
-function buildKitTree(kit: Kit, index: number, total: number): string {
-	const lines: string[] = [];
-
-	lines.push(`Kit ${index}/${total}: ${kit.domain}`);
-	lines.push(`${"─".repeat(40)}`);
-
-	for (let ri = 0; ri < kit.requirements.length; ri++) {
-		const req = kit.requirements[ri];
-		const isLastReq = ri === kit.requirements.length - 1;
-		const reqPrefix = isLastReq ? "└─" : "├─";
-
-		lines.push(`${reqPrefix} ${req.id}: ${req.name}`);
-		if (req.description) {
-			const descPrefix = isLastReq ? "   " : "│  ";
-			// Truncate long descriptions to keep the overlay readable
-			const desc = req.description.length > 80 ? `${req.description.slice(0, 77)}…` : req.description;
-			lines.push(`${descPrefix}  ${desc}`);
-		}
-
-		for (let ai = 0; ai < req.acceptanceCriteria.length; ai++) {
-			const ac = req.acceptanceCriteria[ai];
-			const isLastAc = ai === req.acceptanceCriteria.length - 1;
-			const acBranch = isLastReq ? "   " : "│  ";
-			const acPrefix = isLastAc ? "└─" : "├─";
-			const statusMark = ac.status === "pass" ? "[✓]" : "[ ]";
-			lines.push(`${acBranch}  ${acPrefix} ${statusMark} ${ac.id}: ${ac.description}`);
-		}
-	}
-
-	if (kit.outOfScope.length > 0) {
-		lines.push("");
-		lines.push("Out of scope:");
-		for (const item of kit.outOfScope) {
-			lines.push(`  • ${item}`);
-		}
-	}
-
-	lines.push("");
-	lines.push("Approve this kit? (Yes = include in architect, No = reject)");
-
-	return lines.join("\n");
-}
-
-/**
  * Convenience helper: filter a parsed kit list to only the approved ones.
  *
  * AC-4: Use this in the architect command to exclude rejected kits.
- *
- * @example
- * const { approvedKits } = await reviewKits(allKits, ctx);
- * const kitsForArchitect = filterApprovedKits(allKits, approvedKits);
  */
 export function filterApprovedKits(allKits: Kit[], approvedKits: Kit[]): Kit[] {
 	const approvedDomains = new Set(approvedKits.map((k) => k.domain));
 	return allKits.filter((k) => approvedDomains.has(k.domain));
+}
+
+// ---------------------------------------------------------------------------
+// Internal helpers
+// ---------------------------------------------------------------------------
+
+function kitToReviewItem(kit: Kit, index: number, total: number): ReviewItem {
+	const acCount = kit.requirements.reduce((n, r) => n + r.acceptanceCriteria.length, 0);
+
+	return {
+		id: kit.domain,
+		title: `${kit.domain} (${index + 1}/${total})`,
+		markdownContent: buildKitMarkdown(kit),
+		metadata: [
+			{ label: "Domain", value: kit.domain },
+			{ label: "Requirements", value: `${kit.requirements.length}` },
+			{ label: "Acceptance Criteria", value: `${acCount}` },
+			{
+				label: "Out of Scope",
+				value: kit.outOfScope.length > 0 ? kit.outOfScope.join(", ") : "None",
+			},
+		],
+		status: "pending",
+	};
+}
+
+/**
+ * Build proper markdown from a Kit for rendering in the left pane.
+ * Replaces the old ASCII buildKitTree() with real markdown.
+ */
+function buildKitMarkdown(kit: Kit): string {
+	const lines: string[] = [];
+
+	lines.push(`## ${kit.domain}`);
+	lines.push("");
+
+	for (const req of kit.requirements) {
+		lines.push(`### ${req.id}: ${req.name}`);
+		if (req.description) {
+			lines.push("");
+			lines.push(req.description);
+		}
+		lines.push("");
+
+		for (const ac of req.acceptanceCriteria) {
+			const check = ac.status === "pass" ? "x" : " ";
+			lines.push(`- [${check}] **${ac.id}**: ${ac.description}`);
+		}
+		lines.push("");
+	}
+
+	if (kit.outOfScope.length > 0) {
+		lines.push("---");
+		lines.push("");
+		lines.push("**Out of scope:**");
+		for (const item of kit.outOfScope) {
+			lines.push(`- ${item}`);
+		}
+	}
+
+	return lines.join("\n");
 }

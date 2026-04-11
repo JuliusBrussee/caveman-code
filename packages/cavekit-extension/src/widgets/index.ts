@@ -24,6 +24,8 @@ export type { DependencyGraphContext } from "./dependency-graph.js";
 export { buildDependencyGraphLines, renderDependencyGraph } from "./dependency-graph.js";
 export type { KitReviewerContext, KitReviewResult } from "./kit-reviewer.js";
 export { filterApprovedKits, reviewKits } from "./kit-reviewer.js";
+export type { ReviewItem, ReviewItemStatus, ReviewOverlayContext, ReviewResult } from "./review-pane.js";
+export { ReviewPaneComponent, showReviewOverlay } from "./review-pane.js";
 export type { TierGateAction, TierGateOverlayContext } from "./tier-gate-overlay.js";
 export { showTierGateOverlay } from "./tier-gate-overlay.js";
 

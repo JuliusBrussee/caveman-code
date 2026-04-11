@@ -1,25 +1,20 @@
 /**
- * Tier gate overlay — interactive review surface shown after each tier completes.
+ * Tier gate overlay — interactive two-pane review surface shown after each tier.
  *
  * T-037 (extension-ui/R3):
- * AC-1: Displays findings with severity levels (P0–P3).
- * AC-2: Presents approve / fix / abort options to the user.
+ * AC-1: Displays findings with severity levels (P0–P3) as rendered markdown.
+ * AC-2: Presents approve / fix / abort options to the user via the review pane.
  * AC-3: The selected action dismisses the overlay; the build proceeds accordingly.
  * AC-4: Blocks the build loop until the user selects an action.
  */
 
-import type { Finding } from "../types.js";
+import type { Finding, ReviewItem } from "../types.js";
+import { type ReviewOverlayContext, showReviewOverlay } from "./review-pane.js";
 
 /** The three actions the user can take at a tier gate. */
 export type TierGateAction = "approve" | "fix" | "abort";
 
-export interface TierGateOverlayContext {
-	ui: {
-		notify: (message: string, type?: "info" | "warning" | "error") => void;
-		/** confirm() is reused as a two-choice step; we chain two calls for a 3-way choice. */
-		confirm: (title: string, message: string) => Promise<boolean>;
-	};
-}
+export type TierGateOverlayContext = ReviewOverlayContext;
 
 /**
  * Show the tier gate overlay and wait for a user decision.
@@ -27,19 +22,16 @@ export interface TierGateOverlayContext {
  * AC-4: This function awaits user input and returns only after the user acts.
  * AC-3: Returns the TierGateAction the caller should act upon.
  *
- * Decision flow (two confirm dialogs to cover three options):
- *   Step 1 — "Proceed with this tier?" — Yes → approve, No → go to step 2.
- *   Step 2 — "Fix issues before continuing?" — Yes → fix, No → abort.
+ * Action mapping from the review pane:
+ *   approved → "approve" (proceed to next tier)
+ *   rejected → "abort"  (stop the build)
+ *   skipped / dismissed → "fix" (pause build for the user to address findings)
  */
 export async function showTierGateOverlay(
 	tier: number,
 	findings: Finding[],
 	ctx: TierGateOverlayContext,
 ): Promise<TierGateAction> {
-	// AC-1: Build findings display sorted by severity
-	const overlay = buildFindingsDisplay(tier, findings);
-
-	// Notify the user with the full findings summary
 	const notifyLevel = findings.some((f) => f.severity === "P0" || f.severity === "P1")
 		? "error"
 		: findings.length > 0
@@ -47,34 +39,28 @@ export async function showTierGateOverlay(
 			: "info";
 	ctx.ui.notify(`Tier ${tier} gate: ${findings.length} finding(s) — see details below.`, notifyLevel);
 
-	// AC-2 + AC-4: Step 1 — Approve vs. escalate
-	// Confirm message contains the full findings display (AC-1)
-	const proceed = await ctx.ui.confirm(
-		`Tier ${tier} Gate — ${findingsSummary(findings)}`,
-		`${overlay}\n\nProceed to the next tier? (Yes = approve, No = choose fix or abort)`,
-	);
+	const item = buildTierGateReviewItem(tier, findings);
 
-	if (proceed) {
-		// AC-3: Approved — overlay dismissed, build continues
+	const result = await showReviewOverlay([item], ctx, {
+		title: `Tier ${tier} Gate`,
+		allowSkip: true, // "skip" maps to "fix"
+	});
+
+	const status = result.items[0]?.status ?? "skipped";
+
+	if (status === "approved") {
 		ctx.ui.notify(`Tier ${tier}: approved — proceeding.`, "info");
 		return "approve";
 	}
 
-	// AC-2 + AC-4: Step 2 — Fix vs. Abort
-	const fix = await ctx.ui.confirm(
-		`Tier ${tier} Gate — Fix or Abort?`,
-		`You chose not to approve.\n\nDo you want to fix the issues before continuing?\n  Yes = pause build so you can address findings\n  No  = abort the entire build`,
-	);
-
-	if (fix) {
-		// AC-3: Fix — overlay dismissed, build pauses for the user to act
-		ctx.ui.notify(`Tier ${tier}: fix requested — build paused.`, "warning");
-		return "fix";
+	if (status === "rejected") {
+		ctx.ui.notify(`Tier ${tier}: aborted by user.`, "error");
+		return "abort";
 	}
 
-	// AC-3: Abort — overlay dismissed, build stops
-	ctx.ui.notify(`Tier ${tier}: aborted by user.`, "error");
-	return "abort";
+	// skipped, pending, or dismissed → fix
+	ctx.ui.notify(`Tier ${tier}: fix requested — build paused.`, "warning");
+	return "fix";
 }
 
 // ---------------------------------------------------------------------------
@@ -84,27 +70,36 @@ export async function showTierGateOverlay(
 /** Severity ordering for sort (lower index = higher priority). */
 const SEVERITY_ORDER: Record<string, number> = { P0: 0, P1: 1, P2: 2, P3: 3 };
 
+function buildTierGateReviewItem(tier: number, findings: Finding[]): ReviewItem {
+	return {
+		id: `tier-${tier}-gate`,
+		title: `Tier ${tier} Gate — ${findingsSummary(findings)}`,
+		markdownContent: buildFindingsMarkdown(tier, findings),
+		metadata: buildFindingsMetadata(findings),
+		status: "pending",
+	};
+}
+
 /**
- * Build a formatted findings display string sorted by severity.
- * AC-1: Shows severity level alongside each finding description and ref.
+ * Build markdown-formatted findings for the left pane.
  */
-function buildFindingsDisplay(tier: number, findings: Finding[]): string {
+function buildFindingsMarkdown(tier: number, findings: Finding[]): string {
 	const lines: string[] = [];
 
-	lines.push(`Tier ${tier} Gate Review`);
-	lines.push("─".repeat(44));
+	lines.push(`## Tier ${tier} Gate Review`);
+	lines.push("");
 
 	if (findings.length === 0) {
-		lines.push("  No findings — all acceptance criteria appear to be met.");
+		lines.push("No findings — all acceptance criteria appear to be met.");
 		lines.push("");
-		lines.push("  Status: PASS ✓");
+		lines.push("**Status: PASS**");
 		return lines.join("\n");
 	}
 
-	// AC-1: Sort by severity (P0 first)
+	// Sort by severity (P0 first)
 	const sorted = [...findings].sort((a, b) => (SEVERITY_ORDER[a.severity] ?? 9) - (SEVERITY_ORDER[b.severity] ?? 9));
 
-	// Group by severity for readability
+	// Group by severity
 	const groups = new Map<string, Finding[]>();
 	for (const finding of sorted) {
 		const group = groups.get(finding.severity) ?? [];
@@ -113,20 +108,41 @@ function buildFindingsDisplay(tier: number, findings: Finding[]): string {
 	}
 
 	for (const [severity, group] of groups) {
-		const label = severityLabel(severity);
-		lines.push(`\n${label} (${group.length})`);
+		lines.push(`### ${severityLabel(severity)} (${group.length})`);
+		lines.push("");
 		for (const f of group) {
-			const ref = f.requirementRef ? ` [${f.requirementRef}]` : "";
-			// Wrap long descriptions at 72 chars
-			const desc = f.description.length > 72 ? `${f.description.slice(0, 69)}…` : f.description;
-			lines.push(`  •${ref} ${desc}`);
+			const ref = f.requirementRef ? ` \`[${f.requirementRef}]\`` : "";
+			lines.push(`- ${f.description}${ref}`);
 		}
+		lines.push("");
 	}
 
+	lines.push("---");
 	lines.push("");
-	lines.push(findingsSummary(findings));
+	lines.push(`**Summary:** ${findingsSummary(findings)}`);
+	lines.push("");
+	lines.push("**Actions:** Approve = proceed, Reject = abort, Skip = pause & fix");
 
 	return lines.join("\n");
+}
+
+function buildFindingsMetadata(findings: Finding[]): ReviewItem["metadata"] {
+	const counts = { P0: 0, P1: 0, P2: 0, P3: 0 };
+	for (const f of findings) {
+		if (f.severity in counts) counts[f.severity as keyof typeof counts]++;
+	}
+
+	return [
+		{ label: "Total Findings", value: `${findings.length}` },
+		{ label: "P0 — Critical", value: `${counts.P0}` },
+		{ label: "P1 — High", value: `${counts.P1}` },
+		{ label: "P2 — Medium", value: `${counts.P2}` },
+		{ label: "P3 — Low", value: `${counts.P3}` },
+		{
+			label: "Blocking",
+			value: counts.P0 + counts.P1 > 0 ? "Yes (P0/P1 present)" : "No",
+		},
+	];
 }
 
 function findingsSummary(findings: Finding[]): string {
@@ -136,7 +152,7 @@ function findingsSummary(findings: Finding[]): string {
 	}
 	const parts = Object.entries(counts)
 		.filter(([, n]) => n > 0)
-		.map(([sev, n]) => `${sev}×${n}`);
+		.map(([sev, n]) => `${sev}x${n}`);
 	return parts.length > 0 ? parts.join("  ") : "0 findings";
 }
 

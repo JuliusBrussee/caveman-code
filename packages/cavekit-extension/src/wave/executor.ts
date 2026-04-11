@@ -10,6 +10,7 @@ import * as path from "node:path";
 import type { CaveKitConfig } from "../config/index.js";
 import type { TaskStatus } from "../types.js";
 import type { BuildDashboardWidget } from "../widgets/build-dashboard.js";
+import { showTierGateOverlay } from "../widgets/tier-gate-overlay.js";
 import { runTierGateReview } from "./tier-gate.js";
 
 export type { TaskStatus };
@@ -124,6 +125,7 @@ export interface WaveExecutorContext {
 	ui: {
 		notify: (msg: string, type?: "info" | "warning" | "error") => void;
 		confirm: (title: string, msg: string) => Promise<boolean>;
+		custom?: (...args: any[]) => Promise<any>;
 	};
 	signal: AbortSignal | undefined;
 }
@@ -390,11 +392,11 @@ export class WaveExecutor {
 			// AC-4: Block next tier on P0/P1 findings (when mode is "severity" or "strict")
 			if (result.blocked) {
 				blocked = true;
-				const shouldContinue = await this.ctx.ui.confirm(
-					`Tier ${tier} Gate: BLOCKED`,
-					`${result.summary}\n\nP0/P1 findings were found. Proceeding to the next tier may build on broken foundations.\n\nContinue anyway?`,
-				);
-				if (!shouldContinue) {
+
+				// Show the two-pane tier gate overlay for findings review
+				const action = await showTierGateOverlay(tier, result.findings, { ui: this.ctx.ui });
+
+				if (action !== "approve") {
 					// Mark all pending tasks as blocked
 					for (const task of this.tasks) {
 						if (task.status === "pending") {

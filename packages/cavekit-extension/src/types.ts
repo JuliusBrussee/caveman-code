@@ -47,3 +47,30 @@ export interface Finding {
 	severity: FindingSeverity;
 	requirementRef: string;
 }
+
+// ---------------------------------------------------------------------------
+// Review overlay types — used by the two-pane review pane at phase gates.
+// ---------------------------------------------------------------------------
+
+export type ReviewItemStatus = "pending" | "approved" | "rejected" | "skipped";
+
+export interface ReviewItem {
+	/** Unique identifier for navigation and result tracking. */
+	id: string;
+	/** Display title shown in tab bar and right pane header. */
+	title: string;
+	/** Markdown content rendered in the left pane. */
+	markdownContent: string;
+	/** Key-value metadata shown in the right pane. */
+	metadata: Array<{ label: string; value: string }>;
+	/** Current review status. */
+	status: ReviewItemStatus;
+	/** Optional file path associated with this artifact. */
+	filePath?: string;
+}
+
+export interface ReviewResult {
+	items: Array<{ id: string; status: ReviewItemStatus }>;
+	/** True if the user dismissed via Escape without completing all items. */
+	dismissed: boolean;
+}
