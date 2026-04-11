@@ -1,12 +1,16 @@
 /**
  * Shared CaveKit domain model types.
- * Canonical definitions for kits, requirements, build sites, tasks, and findings.
+ * Canonical definitions for kits, requirements, build sites, tasks, findings,
+ * and review overlays shared across commands, widgets, and runtime hooks.
  */
+
+export const ACCEPTANCE_STATUSES = ["pass", "fail"] as const;
+export type AcceptanceStatus = (typeof ACCEPTANCE_STATUSES)[number];
 
 export interface AcceptanceCriterion {
 	id: string;
 	description: string;
-	status: "pass" | "fail";
+	status: AcceptanceStatus;
 }
 
 export interface Requirement {
@@ -22,30 +26,48 @@ export interface Kit {
 	outOfScope: string[];
 }
 
-export type TaskStatus = "pending" | "in-progress" | "done" | "failed" | "blocked";
+export const BUILD_TASK_STATUSES = ["pending", "in-progress", "complete", "failed", "blocked"] as const;
+export type BuildTaskStatus = (typeof BUILD_TASK_STATUSES)[number];
+export type TaskStatus = BuildTaskStatus | "done";
 
 export interface BuildTask {
 	id: string;
 	name: string;
 	acceptanceCriteriaIds: string[];
 	tier: number;
-	status: TaskStatus;
+	status: BuildTaskStatus;
 	retryCount: number;
 }
+
+export type BuildDependencyEdge = readonly [taskId: string, dependsOnTaskId: string];
 
 export interface BuildSite {
 	name: string;
 	tasks: BuildTask[];
 	tierAssignments: Record<string, number>;
-	dependencyEdges: Array<[string, string]>;
+	dependencyEdges: BuildDependencyEdge[];
 }
 
-export type FindingSeverity = "P0" | "P1" | "P2" | "P3";
+export const FINDING_SEVERITIES = ["P0", "P1", "P2", "P3"] as const;
+export type FindingSeverity = (typeof FINDING_SEVERITIES)[number];
 
 export interface Finding {
 	description: string;
 	severity: FindingSeverity;
 	requirementRef: string;
+}
+
+export function isTaskStatus(value: string): value is TaskStatus {
+	return value === "done" || (BUILD_TASK_STATUSES as readonly string[]).includes(value);
+}
+
+export function normalizeTaskStatus(value: string): BuildTaskStatus {
+	if (value === "done") return "complete";
+	return (BUILD_TASK_STATUSES as readonly string[]).includes(value) ? (value as BuildTaskStatus) : "pending";
+}
+
+export function isTaskComplete(status: TaskStatus): boolean {
+	return status === "done" || status === "complete";
 }
 
 // ---------------------------------------------------------------------------

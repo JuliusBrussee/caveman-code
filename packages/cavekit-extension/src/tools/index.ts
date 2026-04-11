@@ -10,10 +10,20 @@ import { buildSiteStatusTool } from "./build-site-status.js";
 import { convergenceCheckTool } from "./convergence-check.js";
 import { kitReadTool } from "./kit-read.js";
 
-export function registerTools(pi: ExtensionAPI, _config: CaveKitConfig): void {
+export const CAVEKIT_TOOL_NAMES = [
+	kitReadTool.name,
+	buildSiteStatusTool.name,
+	acceptanceCheckTool.name,
+	convergenceCheckTool.name,
+] as const;
+
+export type CaveKitToolName = (typeof CAVEKIT_TOOL_NAMES)[number];
+
+export function registerTools(pi: ExtensionAPI, _config: CaveKitConfig): CaveKitToolName[] {
 	pi.registerTool(kitReadTool);
 	pi.registerTool(buildSiteStatusTool);
 	pi.registerTool(acceptanceCheckTool);
 	pi.registerTool(convergenceCheckTool);
 	// codex_review registered separately when Codex is available (Phase 2)
+	return [...CAVEKIT_TOOL_NAMES];
 }

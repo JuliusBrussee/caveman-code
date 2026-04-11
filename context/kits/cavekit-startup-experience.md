@@ -3,7 +3,7 @@ cavekit: startup-experience
 version: 1.0.0
 status: approved
 created: 2026-04-08
-updated: 2026-04-08
+updated: 2026-04-11
 ---
 
 # Cavekit: Startup Experience
@@ -69,6 +69,22 @@ Replace the current startup header and Earendil announcement banner with a new b
 
 **Dependencies:** cavekit-brand-cleanup R9 (fallback text must be correct before removal)
 
+### R6: Contextual Action Bar
+
+**Description:** The interactive mode must display a contextual action bar (between the editor input and the footer) that renders state-appropriate keybinding/action chips — providing live feedback about streaming state, bash mode, cavekit active, and other runtime conditions without cluttering the main conversation area.
+
+**Acceptance Criteria:**
+- [ ] An `ActionBarComponent` exists at `packages/coding-agent/src/modes/interactive/components/action-bar.ts`
+- [ ] The component renders a single line of chips separated by `│` delimiters, with leading whitespace
+- [ ] Chips are truncated gracefully when terminal width is insufficient — no overflow or line wrapping
+- [ ] Streaming state (active vs idle) is reflected in the chip set — at minimum, a streaming indicator appears during LLM generation
+- [ ] Bash mode active state is reflected in the chip set
+- [ ] Cavekit active state is reflected in the chip set
+- [ ] All chip colors use values from the active theme (not hardcoded hex)
+- [ ] The component is added to the interactive mode's UI children list and rendered between the input editor and footer
+
+**Dependencies:** cavekit-visual-theme R2 (accent color for chip theming)
+
 ## Out of Scope
 
 - Animated startup intros or typewriter effects
@@ -87,3 +103,8 @@ Replace the current startup header and Earendil announcement banner with a new b
 | Date       | Version | Change         |
 |------------|---------|----------------|
 | 2026-04-08 | 1.0.0   | Initial draft  |
+
+### 2026-04-11 — Revision
+- **Affected:** R6 (new)
+- **Summary:** Added R6 — Contextual Action Bar. Manual fix introduced `ActionBarComponent` rendering state-aware chips in the interactive mode's UI tree (streaming/bash/cavekit state). No kit covered ongoing interactive-mode status display; this requirement fills that gap.
+- **Commits:** 19e1bc30

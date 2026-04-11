@@ -1,5 +1,5 @@
 {
-	"name": "pi-extension-custom-provider-gitlab-duo",
+	"name": "cave-extension-custom-provider-gitlab-duo",
 	"private": true,
 	"version": "1.16.2",
 	"type": "module",

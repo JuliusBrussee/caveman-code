@@ -1,5 +1,5 @@
 {
-	"name": "pi-extension-custom-provider-anthropic",
+	"name": "cave-extension-custom-provider-anthropic",
 	"private": true,
 	"version": "1.16.2",
 	"type": "module",

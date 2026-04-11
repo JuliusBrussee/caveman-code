@@ -10,14 +10,14 @@
 import { type ExecSyncOptionsWithStringEncoding, execSync } from "node:child_process";
 
 // Dynamic import cache — resolved once, reused.
-let _rtkFns: { getRtkStatus: () => { available: boolean }; rewriteCommand: (cmd: string) => string } | null = null;
+let _rtkFns: { getRtkStatus: () => { available: boolean }; rewriteCommandSync: (cmd: string) => string } | null = null;
 let _rtkResolved = false;
 
 async function loadRtk(): Promise<typeof _rtkFns> {
 	if (_rtkResolved) return _rtkFns;
 	try {
 		const cave = await import("cave");
-		_rtkFns = { getRtkStatus: cave.getRtkStatus, rewriteCommand: cave.rewriteCommand };
+		_rtkFns = { getRtkStatus: cave.getRtkStatus, rewriteCommandSync: cave.rewriteCommandSync };
 	} catch {
 		_rtkFns = null;
 	}
@@ -32,7 +32,7 @@ async function loadRtk(): Promise<typeof _rtkFns> {
 function rewrite(command: string): string {
 	// Use synchronous cached state — loadRtk must be called once at startup
 	if (!_rtkFns || !_rtkFns.getRtkStatus().available) return command;
-	return _rtkFns.rewriteCommand(command);
+	return _rtkFns.rewriteCommandSync(command);
 }
 
 /** Initialise RTK imports. Call once during extension init. */

@@ -61,6 +61,19 @@ Integration of [RTK (Rust Token Killer)](https://github.com/rtk-ai/rtk) into the
 
 **Dependencies:** R1, R2, R3
 
+### R5: Extension Shell Command Rewriting
+
+**Description:** All shell commands executed by the cavekit-extension (e.g. git operations in wave worktrees, build commands) must route through RTK rewriting via a dedicated `rtkExec` helper so that extension subprocess calls follow the same RTK pipeline as the main agent's bash tool.
+
+**Acceptance Criteria:**
+- [ ] A module `rtk-exec.ts` in `packages/cavekit-extension/src/` exports `rtkExec(command, options)` and `initRtkExec()`
+- [ ] `rtkExec` dynamically imports RTK utilities from `cave` and applies `rewriteCommand()` before calling `execSync`
+- [ ] When RTK is unavailable or disabled, `rtkExec` falls back to direct `execSync` with the original command (fail-open)
+- [ ] `initRtkExec()` is called during extension initialization to warm the dynamic import cache
+- [ ] All `execSync` calls in `cavekit-extension/src/commands/build.ts` and `cavekit-extension/src/wave/worktree.ts` use `rtkExec`
+
+**Dependencies:** R1 (RTK detection), R3 (settings), R4 (hook wiring)
+
 ## Out of Scope
 
 - Installing RTK automatically — users must install RTK themselves (`brew install rtk` or other methods)
@@ -85,3 +98,8 @@ Integration of [RTK (Rust Token Killer)](https://github.com/rtk-ai/rtk) into the
 - **Affected:** R3/AC-1
 - **Summary:** Changed `rtk.enabled` default from `false` to `true`. RTK is now opt-out: users with rtk on PATH get compression automatically; users without rtk are unaffected (detection fails gracefully, no hook wired).
 - **Commits:** c87c6303
+
+### 2026-04-11 — Revision
+- **Affected:** R5 (new)
+- **Summary:** Added R5 — Extension Shell Command Rewriting. Extension's direct `execSync` calls bypassed RTK entirely; manual fix introduced `rtk-exec.ts` to centralize all extension shell commands through the same RTK rewrite pipeline as the main agent. Also re-exported RTK utilities (`getRtkStatus`, `rewriteCommand`, etc.) from `coding-agent/src/index.ts` so extension can import them via the `cave` peer dep.
+- **Commits:** 1fc0c735

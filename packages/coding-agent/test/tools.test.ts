@@ -424,6 +424,51 @@ describe("Coding Agent Tools", () => {
 			expect(getTextOutput(result).trim()).toBe("no-prefix");
 		});
 
+		it("should await async spawn hooks before executing", async () => {
+			let capturedCommand: string | undefined;
+			const bashWithAsyncHook = createBashTool(testDir, {
+				operations: {
+					exec: async (command, receivedCwd, { onData }) => {
+						capturedCommand = command;
+						expect(receivedCwd).toBe(testDir);
+						onData(Buffer.from("hooked-output\n"));
+						return { exitCode: 0 };
+					},
+				},
+				spawnHook: async (context) => {
+					await Promise.resolve();
+					return { ...context, command: "echo rewritten-by-hook" };
+				},
+			});
+
+			const result = await bashWithAsyncHook.execute("test-spawn-hook-1", { command: "echo original" });
+			expect(capturedCommand).toBe("echo rewritten-by-hook");
+			expect(getTextOutput(result).trim()).toBe("hooked-output");
+		});
+
+		it("should apply command prefix before async spawn hooks run", async () => {
+			let hookCommand: string | undefined;
+			let executedCommand: string | undefined;
+			const bashWithPrefixAndHook = createBashTool(testDir, {
+				commandPrefix: "echo prefix-output",
+				operations: {
+					exec: async (command, _receivedCwd, { onData }) => {
+						executedCommand = command;
+						onData(Buffer.from("ok\n"));
+						return { exitCode: 0 };
+					},
+				},
+				spawnHook: async (context) => {
+					hookCommand = context.command;
+					return context;
+				},
+			});
+
+			await bashWithPrefixAndHook.execute("test-spawn-hook-2", { command: "echo command-output" });
+			expect(hookCommand).toBe("echo prefix-output\necho command-output");
+			expect(executedCommand).toBe("echo prefix-output\necho command-output");
+		});
+
 		it("should expose local bash operations for extension reuse", async () => {
 			const ops = createLocalBashOperations();
 			const chunks: Buffer[] = [];

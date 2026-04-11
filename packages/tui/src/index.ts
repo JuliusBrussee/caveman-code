@@ -97,6 +97,8 @@ export {
 	type OverlayHandle,
 	type OverlayMargin,
 	type OverlayOptions,
+	type SidePanelHandle,
+	type SidePanelOptions,
 	type SizeValue,
 	TUI,
 } from "./tui.js";

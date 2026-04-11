@@ -11,16 +11,16 @@
 		"dimGray": "#666666",
 		"darkGray": "#505050",
 		"borderDefault": "#2a2c48",
-		"borderAccentColor": "#1e3040",
-		"borderMutedColor": "#252738",
+		"borderAccentColor": "#252740",
+		"borderMutedColor": "#23253d",
 		"accent": "#00d7ff",
 		"brand": "#E8A840",
 		"selectedBg": "#2a2d52",
 		"userMsgBg": "#232545",
-		"toolPendingBg": "#24253d",
-		"toolSuccessBg": "#202840",
-		"toolErrorBg": "#382030",
-		"customMsgBg": "#252640"
+		"toolPendingBg": "#242a43",
+		"toolSuccessBg": "#263050",
+		"toolErrorBg": "#29274a",
+		"customMsgBg": "#25294a"
 	},
 	"colors": {
 		"accent": "accent",
@@ -52,10 +52,10 @@
 		"mdLinkUrl": "dimGray",
 		"mdCode": "accent",
 		"mdCodeBlock": "green",
-		"mdCodeBlockBorder": "gray",
+		"mdCodeBlockBorder": "borderDefault",
 		"mdQuote": "gray",
-		"mdQuoteBorder": "gray",
-		"mdHr": "gray",
+		"mdQuoteBorder": "borderMuted",
+		"mdHr": "borderMuted",
 		"mdListBullet": "accent",
 
 		"toolDiffAdded": "green",
@@ -84,7 +84,7 @@
 	},
 	"export": {
 		"pageBg": "#1c1d30",
-		"cardBg": "#22233a",
-		"infoBg": "#282a42"
+		"cardBg": "#222640",
+		"infoBg": "#262b47"
 	}
 }

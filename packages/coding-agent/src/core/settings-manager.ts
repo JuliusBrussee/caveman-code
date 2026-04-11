@@ -50,7 +50,7 @@ export interface CaveModeSettings {
 }
 
 export interface RtkSettings {
-	enabled?: boolean; // default: false
+	enabled?: boolean; // default: true
 }
 
 export type TransportSetting = Transport;

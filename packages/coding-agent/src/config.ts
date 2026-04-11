@@ -9,6 +9,8 @@ import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const DEFAULT_APP_NAME = "cave";
+const DEFAULT_PACKAGE_DIR_ENV = `${DEFAULT_APP_NAME.toUpperCase()}_PACKAGE_DIR`;
 
 /**
  * Detect if we're running as a Bun compiled binary.
@@ -79,7 +81,7 @@ export function getUpdateInstruction(packageName: string): string {
  */
 export function getPackageDir(): string {
 	// Allow override via environment variable (useful for Nix/Guix where store paths tokenize poorly)
-	const envDir = process.env.PI_PACKAGE_DIR;
+	const envDir = process.env[DEFAULT_PACKAGE_DIR_ENV];
 	if (envDir) {
 		if (envDir === "~") return homedir();
 		if (envDir.startsWith("~/")) return homedir() + envDir.slice(1);
@@ -179,28 +181,31 @@ export function getBundledInteractiveAssetPath(name: string): string {
 }
 
 // =============================================================================
-// App Config (from package.json piConfig)
+// App Config (from package.json caveConfig)
 // =============================================================================
 
 const pkg = JSON.parse(readFileSync(getPackageJsonPath(), "utf-8"));
+const appConfig = pkg.caveConfig ?? pkg.piConfig ?? {};
 
-export const APP_NAME: string = pkg.piConfig?.name || "pi";
-export const CONFIG_DIR_NAME: string = pkg.piConfig?.configDir || ".pi";
+export const APP_NAME: string = appConfig.name || "pi";
+export const CONFIG_DIR_NAME: string = appConfig.configDir || ".pi";
 export const VERSION: string = pkg.version;
 
-// e.g., PI_CODING_AGENT_DIR or TAU_CODING_AGENT_DIR
+// e.g., CAVE_CODING_AGENT_DIR
 export const ENV_AGENT_DIR = `${APP_NAME.toUpperCase()}_CODING_AGENT_DIR`;
+export const ENV_PACKAGE_DIR = `${APP_NAME.toUpperCase()}_PACKAGE_DIR`;
+export const ENV_SHARE_VIEWER_URL = `${APP_NAME.toUpperCase()}_SHARE_VIEWER_URL`;
 
 const DEFAULT_SHARE_VIEWER_URL = "";
 
 /** Get the share viewer URL for a gist ID */
 export function getShareViewerUrl(gistId: string): string {
-	const baseUrl = process.env.PI_SHARE_VIEWER_URL || DEFAULT_SHARE_VIEWER_URL;
+	const baseUrl = process.env[ENV_SHARE_VIEWER_URL] || DEFAULT_SHARE_VIEWER_URL;
 	return `${baseUrl}#${gistId}`;
 }
 
 // =============================================================================
-// User Config Paths (~/.pi/agent/*)
+// User Config Paths (for example ~/.cave/agent/*)
 // =============================================================================
 
 /** Get the agent config directory (e.g., ~/.pi/agent/) */

@@ -1,87 +1,112 @@
 /**
  * CaveKit Pi Extension
  *
- * Integrates the CaveKit DABI lifecycle (Draft → Architect → Build → Inspect)
- * as a first-class Pi coding agent extension.
+ * Integrates CaveKit DABI lifecycle (Draft → Architect → Build → Inspect)
+ * as first-class Pi coding agent extension.
  *
  * Extension entry point — export default receives ExtensionAPI.
- * Works on both Cave Pi (piConfig.name = "cave") and vanilla Pi (piConfig.name = "pi").
+ * Works on both Cave Pi (`cave`) and vanilla Pi (`pi`), degrading gracefully
+ * when thin-fork-only features are absent.
  */
 
-import * as path from "node:path";
 import type { ExtensionAPI } from "cave";
-import { registerCommands } from "./commands/index.js";
-import { loadConfig } from "./config/index.js";
-import { registerHooks } from "./hooks/index.js";
+import { registerCommands, type CaveKitCommandId } from "./commands/index.js";
+import { type CaveKitConfig, type ConfigWithSources } from "./config/index.js";
+import { registerHooks, type CaveKitHookEventName } from "./hooks/index.js";
 import { initRtkExec } from "./rtk-exec.js";
-import { registerTools } from "./tools/index.js";
-import { registerWidgets } from "./widgets/index.js";
+import { createRuntime, type CaveKitHostCapabilities, type CaveKitHostInfo } from "./runtime.js";
+import { registerTools, type CaveKitToolName } from "./tools/index.js";
+import { registerWidgets, type CaveKitShortcut } from "./widgets/index.js";
 
 export type {
 	AcceptanceCriterion,
+	BuildDependencyEdge,
 	BuildSite,
 	BuildTask,
+	BuildTaskStatus,
 	Finding,
 	FindingSeverity,
 	Kit,
 	Requirement,
 	TaskStatus,
 } from "./types.js";
+export { BUILD_TASK_STATUSES, FINDING_SEVERITIES, isTaskComplete, isTaskStatus, normalizeTaskStatus } from "./types.js";
+export type { ConfigEntry, ConfigResolutionOptions, ResolvedConfig } from "./config/index.js";
+export { CONFIG_PATHS, getConfigWithSources, loadConfig, resolveConfig, saveConfig } from "./config/index.js";
+export type {
+	CaveKitConfig,
+	CaveKitConfigKey,
+	CaveKitPhase,
+	CaveKitPhase as CaveKitModelPhase,
+	CaveKitConfigValue,
+	CavemanLevel,
+	CommandGateMode,
+	ModelPreset,
+	TierGateMode,
+} from "./config/types.js";
+export {
+	CAVEMAN_LEVELS,
+	COMMAND_GATE_MODES,
+	CONFIG_KEYS,
+	DEFAULT_CONFIG,
+	MODEL_PRESETS,
+	PRESET_MODELS,
+	TIER_GATE_MODES,
+	isConfigKey,
+	parseConfigValue,
+	sanitizeConfigValue,
+} from "./config/types.js";
+export { CAVEKIT_COMMAND_IDS } from "./commands/index.js";
+export { CAVEKIT_BASE_HOOK_EVENT_NAMES, CAVEKIT_COMMAND_GATE_HOOK_EVENT_NAMES } from "./hooks/index.js";
+export { CAVEKIT_TOOL_NAMES } from "./tools/index.js";
+export { CAVEKIT_SHORTCUTS } from "./widgets/index.js";
+export type { CaveKitHostCapabilities, CaveKitHostFlavor, CaveKitHostInfo, CaveKitRuntime } from "./runtime.js";
+export { createRuntime, detectHost, getHostCapabilities } from "./runtime.js";
 
-/**
- * Detect whether the extension is running inside Cave Pi.
- *
- * Cave Pi compiles its binary as "cave" and sets piConfig.name = "cave".
- * We inspect the process executable name as the most reliable signal
- * available to an extension at init time (no piConfig is exposed via ExtensionAPI).
- */
-function detectIsCavePi(): boolean {
-	const execName = path.basename(process.execPath, path.extname(process.execPath)).toLowerCase();
-	// "cave" binary = Cave Pi; anything else (pi, node, bun, tsx, …) = vanilla Pi or dev
-	return execName === "cave";
+export interface CaveKitBootstrapResult {
+	host: CaveKitHostInfo;
+	capabilities: CaveKitHostCapabilities;
+	config: CaveKitConfig;
+	configWithSources: ConfigWithSources;
+	registration: {
+		commands: CaveKitCommandId[];
+		hooks: CaveKitHookEventName[];
+		tools: CaveKitToolName[];
+		widgets: CaveKitShortcut[];
+	};
 }
 
-export default function cavekit(pi: ExtensionAPI) {
+export default function cavekit(pi: ExtensionAPI): CaveKitBootstrapResult | void {
 	try {
-		const isCavePi = detectIsCavePi();
+		const runtime = createRuntime(pi);
+		const commands = registerCommands(pi, runtime.config);
+		const tools = registerTools(pi, runtime.config);
+		const hooks = registerHooks(pi, runtime.config);
+		const widgets = registerWidgets(pi, runtime.config);
 
-		// Phase 1: Load config (.cavekit/config or ~/.pi/cavekit/config or defaults)
-		// loadConfig never throws — missing files are silently ignored.
-		const config = loadConfig(pi);
-
-		// Phase 2: Register all /ck:* slash commands
-		// Commands are safe on vanilla Pi: they only fire when explicitly invoked.
-		registerCommands(pi, config);
-
-		// Phase 3: Register LLM-callable tools
-		// Tools are registered globally; they are inert until the LLM calls them.
-		registerTools(pi, config);
-
-		// Phase 4: Set up lifecycle hooks
-		// All hooks guard against missing CaveKit state gracefully.
-		registerHooks(pi, config);
-
-		// Phase 5: Register TUI shortcuts
-		// Shortcuts are no-ops until invoked, safe on vanilla Pi.
-		registerWidgets(pi, config);
-
-		// Phase 6: Warm RTK imports for the rtkExec helper.
-		// All extension shell calls route through rtkExec so RTK rewriting
-		// applies consistently — same pipeline as the main agent's bash tool.
 		initRtkExec().catch(() => {
 			/* non-fatal — rtkExec falls back to direct exec */
 		});
 
-		// Announce environment for diagnostics (debug builds only)
 		if (process.env.CAVEKIT_DEBUG) {
-			console.error(`[cavekit] Loaded on ${isCavePi ? "Cave Pi" : "vanilla Pi"}`);
+			console.error(`[cavekit] Loaded on ${runtime.host.flavor}`);
 		}
+
+		return {
+			host: runtime.host,
+			capabilities: runtime.capabilities,
+			config: runtime.config,
+			configWithSources: runtime.configWithSources,
+			registration: {
+				commands,
+				hooks,
+				tools,
+				widgets,
+			},
+		};
 	} catch (err) {
-		// Surface the error as a non-fatal console message so vanilla Pi
-		// continues running even if CaveKit initialization unexpectedly fails.
 		const message = err instanceof Error ? err.message : String(err);
 		console.error(`[cavekit] Extension failed to initialize: ${message}`);
-		// Re-throw so Cave Pi operators can diagnose problems in their environment.
 		if (process.env.CAVEKIT_DEBUG) {
 			throw err;
 		}

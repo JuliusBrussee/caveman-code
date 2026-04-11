@@ -12,7 +12,7 @@
  *   - Dependency graph must be acyclic (DFS cycle detection).
  */
 
-import type { BuildSite, BuildTask, TaskStatus } from "../types.js";
+import type { BuildSite, BuildTask } from "../types.js";
 import type { ParseError } from "./kit-parser.js";
 
 export interface BuildSiteParseResult {
@@ -96,7 +96,7 @@ export function parseBuildSite(content: string, name = "Build Site"): BuildSiteP
 			name: taskName,
 			acceptanceCriteriaIds,
 			tier: currentTier,
-			status: "pending" as TaskStatus,
+			status: "pending",
 			retryCount: 0,
 		};
 

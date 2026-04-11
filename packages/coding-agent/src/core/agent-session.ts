@@ -70,7 +70,7 @@ import type { BashExecutionMessage, CustomMessage } from "./messages.js";
 import type { ModelRegistry } from "./model-registry.js";
 import { expandPromptTemplate, type PromptTemplate } from "./prompt-templates.js";
 import type { ResourceExtensionPaths, ResourceLoader } from "./resource-loader.js";
-import { createRtkSpawnHook, getRtkStatus } from "./rtk.js";
+import { createRtkSpawnHook } from "./rtk.js";
 import type { BranchSummaryEntry, CompactionEntry, SessionManager } from "./session-manager.js";
 import { CURRENT_SESSION_VERSION, getLatestCompactionEntry, type SessionHeader } from "./session-manager.js";
 import type { SettingsManager } from "./settings-manager.js";
@@ -2392,7 +2392,7 @@ export class AgentSession {
 		const autoResizeImages = this.settingsManager.getImageAutoResize();
 		const shellCommandPrefix = this.settingsManager.getShellCommandPrefix();
 		const rtkEnabled = this.settingsManager.getRtkEnabled();
-		const rtkSpawnHook = rtkEnabled && getRtkStatus().available ? createRtkSpawnHook() : undefined;
+		const rtkSpawnHook = rtkEnabled ? createRtkSpawnHook() : undefined;
 		const baseToolDefinitions = this._baseToolsOverride
 			? Object.fromEntries(
 					Object.entries(this._baseToolsOverride).map(([name, tool]) => [

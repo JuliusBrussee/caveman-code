@@ -18,6 +18,7 @@ import type {
 	MarkdownTheme,
 	OverlayHandle,
 	OverlayOptions,
+	SidePanelOptions,
 	SlashCommand,
 } from "@cave/tui";
 import {
@@ -86,7 +87,7 @@ import { ExtensionEditorComponent } from "./components/extension-editor.js";
 import { ExtensionInputComponent } from "./components/extension-input.js";
 import { ExtensionSelectorComponent } from "./components/extension-selector.js";
 import { FooterComponent } from "./components/footer.js";
-import { keyHint, keyText, rawKeyHint } from "./components/keybinding-hints.js";
+import { keyText } from "./components/keybinding-hints.js";
 import { LoginDialogComponent } from "./components/login-dialog.js";
 import { ModelSelectorComponent } from "./components/model-selector.js";
 import { OAuthSelectorComponent } from "./components/oauth-selector.js";
@@ -94,6 +95,7 @@ import { ScopedModelsSelectorComponent } from "./components/scoped-models-select
 import { SessionSelectorComponent } from "./components/session-selector.js";
 import { SettingsSelectorComponent } from "./components/settings-selector.js";
 import { SkillInvocationMessageComponent } from "./components/skill-invocation-message.js";
+import { StartupHeaderComponent } from "./components/startup-header.js";
 import { ToolExecutionComponent } from "./components/tool-execution.js";
 import { TreeSelectorComponent } from "./components/tree-selector.js";
 import { UserMessageComponent } from "./components/user-message.js";
@@ -506,49 +508,12 @@ export class InteractiveMode {
 
 		// Add header with keybindings from config (unless silenced)
 		if (this.options.verbose || !this.settingsManager.getQuietStartup()) {
-			const asciiArt = [
-				" ██████╗ █████╗ ██╗   ██╗███████╗",
-				"██╔════╝██╔══██╗██║   ██║██╔════╝",
-				"██║     ███████║╚██╗ ██╔╝█████╗  ",
-				"██║     ██╔══██║ ╚████╔╝ ██╔══╝  ",
-				"╚██████╗██║  ██║  ╚██╔╝  ███████╗",
-				" ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝",
-			].join("\n");
-			const logo = `${theme.bold(theme.fg("brand", asciiArt))}\n${theme.fg("dim", `Caveman Code v${this.version}`)}`;
-
-			// Build startup instructions using keybinding hint helpers
-			const hint = (keybinding: AppKeybinding, description: string) => keyHint(keybinding, description);
-
-			const instructions = [
-				hint("app.interrupt", "to interrupt"),
-				hint("app.clear", "to clear"),
-				rawKeyHint(`${keyText("app.clear")} twice`, "to exit"),
-				hint("app.exit", "to exit (empty)"),
-				hint("app.suspend", "to suspend"),
-				keyHint("tui.editor.deleteToLineEnd", "to delete to end"),
-				hint("app.thinking.cycle", "to cycle thinking level"),
-				rawKeyHint(`${keyText("app.model.cycleForward")}/${keyText("app.model.cycleBackward")}`, "to cycle models"),
-				hint("app.model.select", "to select model"),
-				hint("app.tools.expand", "to expand tools"),
-				hint("app.thinking.toggle", "to expand thinking"),
-				hint("app.editor.external", "for external editor"),
-				rawKeyHint("/", "for commands"),
-				rawKeyHint("!", "to run bash"),
-				rawKeyHint("!!", "to run bash (no context)"),
-				hint("app.message.followUp", "to queue follow-up"),
-				hint("app.message.dequeue", "to edit all queued messages"),
-				hint("app.clipboard.pasteImage", "to paste image"),
-				rawKeyHint("drop files", "to attach"),
-			].join("\n");
-			const onboarding = theme.fg(
-				"dim",
-				`Cave can explain its own features and look up its docs. Ask it how to use or extend Cave.`,
-			);
-			const caveModeEnabled = this.settingsManager.getCaveModeEnabled();
-			const caveModeStatus = caveModeEnabled
-				? `\n${theme.fg("accent", "cave mode: active | compression: enabled")}`
-				: "";
-			this.builtInHeader = new Text(`${logo}\n${instructions}\n\n${onboarding}${caveModeStatus}`, 1, 0);
+			const caveModeState = this.session.getCaveModeSessionState();
+			this.builtInHeader = new StartupHeaderComponent({
+				version: this.version,
+				caveModeEnabled: caveModeState.enabled,
+				caveModeIntensity: caveModeState.intensity,
+			});
 
 			// Setup UI layout
 			this.headerContainer.addChild(new Spacer(1));
@@ -1970,10 +1935,13 @@ export class InteractiveMode {
 			overlay?: boolean;
 			overlayOptions?: OverlayOptions | (() => OverlayOptions);
 			onHandle?: (handle: OverlayHandle) => void;
+			sidePanel?: boolean;
+			sidePanelOptions?: SidePanelOptions;
 		},
 	): Promise<T> {
 		const savedText = this.editor.getText();
 		const isOverlay = options?.overlay ?? false;
+		const isSidePanel = options?.sidePanel ?? false;
 
 		const restoreEditor = () => {
 			this.editorContainer.clear();
@@ -1990,9 +1958,9 @@ export class InteractiveMode {
 			const close = (result: T) => {
 				if (closed) return;
 				closed = true;
-				if (isOverlay) this.ui.hideOverlay();
+				if (isSidePanel) this.ui.hideSidePanel();
+				else if (isOverlay) this.ui.hideOverlay();
 				else restoreEditor();
-				// Note: both branches above already call requestRender
 				resolve(result);
 				try {
 					component?.dispose?.();
@@ -2005,7 +1973,9 @@ export class InteractiveMode {
 				.then((c) => {
 					if (closed) return;
 					component = c;
-					if (isOverlay) {
+					if (isSidePanel) {
+						this.ui.showSidePanel(component, options?.sidePanelOptions);
+					} else if (isOverlay) {
 						// Resolve overlay options - can be static or dynamic function
 						const resolveOptions = (): OverlayOptions | undefined => {
 							if (options?.overlayOptions) {
@@ -2031,7 +2001,7 @@ export class InteractiveMode {
 				})
 				.catch((err) => {
 					if (closed) return;
-					if (!isOverlay) restoreEditor();
+					if (!isSidePanel && !isOverlay) restoreEditor();
 					reject(err);
 				});
 		});

@@ -1,5 +1,5 @@
 {
-	"name": "pi-extension-custom-provider-qwen-cli",
+	"name": "cave-extension-custom-provider-qwen-cli",
 	"private": true,
 	"version": "1.15.2",
 	"type": "module",

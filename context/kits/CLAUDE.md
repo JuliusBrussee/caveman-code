@@ -20,5 +20,6 @@ Define WHAT needs implementing. Implementation-agnostic.
 | `cavekit-brand-cleanup.md` | Brand/identity cleanup |
 | `cavekit-documentation.md` | Docs requirements |
 | `cavekit-rtk-integration.md` | RTK integration |
+| `cavekit-extension-workflow.md` | CaveKit extension orchestration |
 | `cavekit-startup-experience.md` | Startup/onboarding |
 | `cavekit-visual-theme.md` | Visual theme |

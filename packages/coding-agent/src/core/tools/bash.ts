@@ -133,11 +133,11 @@ export interface BashSpawnContext {
 	env: NodeJS.ProcessEnv;
 }
 
-export type BashSpawnHook = (context: BashSpawnContext) => BashSpawnContext;
+export type BashSpawnHook = (context: BashSpawnContext) => BashSpawnContext | Promise<BashSpawnContext>;
 
-function resolveSpawnContext(command: string, cwd: string, spawnHook?: BashSpawnHook): BashSpawnContext {
+async function resolveSpawnContext(command: string, cwd: string, spawnHook?: BashSpawnHook): Promise<BashSpawnContext> {
 	const baseContext: BashSpawnContext = { command, cwd, env: { ...getShellEnv() } };
-	return spawnHook ? spawnHook(baseContext) : baseContext;
+	return spawnHook ? await spawnHook(baseContext) : baseContext;
 }
 
 export interface BashToolOptions {
@@ -145,7 +145,7 @@ export interface BashToolOptions {
 	operations?: BashOperations;
 	/** Command prefix prepended to every command (for example shell setup commands) */
 	commandPrefix?: string;
-	/** Hook to adjust command, cwd, or env before execution */
+	/** Hook to adjust command, cwd, or env before execution. May return a Promise. */
 	spawnHook?: BashSpawnHook;
 }
 
@@ -280,7 +280,7 @@ export function createBashToolDefinition(
 			_ctx?,
 		) {
 			const resolvedCommand = commandPrefix ? `${commandPrefix}\n${command}` : command;
-			const spawnContext = resolveSpawnContext(resolvedCommand, cwd, spawnHook);
+			const spawnContext = await resolveSpawnContext(resolvedCommand, cwd, spawnHook);
 			if (onUpdate) {
 				onUpdate({ content: [], details: undefined });
 			}

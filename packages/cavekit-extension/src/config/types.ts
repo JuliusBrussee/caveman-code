@@ -1,12 +1,21 @@
 /**
  * CaveKit configuration types.
- * Stored in .cavekit/config (project-local) or ~/.pi/cavekit/config (global).
+ * Stored in `.cavekit/config.json` (project-local) or `~/.cave/cavekit.json` (global).
  */
 
-export type ModelPreset = "expensive" | "quality" | "balanced" | "fast";
-export type TierGateMode = "severity" | "strict" | "permissive" | "off";
-export type CommandGateMode = "allowlist" | "blocklist" | "codex" | "off";
-export type CavemanLevel = 0 | 1 | 2 | 3;
+export const MODEL_PRESETS = ["expensive", "quality", "balanced", "fast"] as const;
+export type ModelPreset = (typeof MODEL_PRESETS)[number];
+
+export const TIER_GATE_MODES = ["severity", "strict", "permissive", "off"] as const;
+export type TierGateMode = (typeof TIER_GATE_MODES)[number];
+
+export const COMMAND_GATE_MODES = ["allowlist", "blocklist", "codex", "off"] as const;
+export type CommandGateMode = (typeof COMMAND_GATE_MODES)[number];
+
+export const CAVEMAN_LEVELS = [0, 1, 2, 3] as const;
+export type CavemanLevel = (typeof CAVEMAN_LEVELS)[number];
+
+export type CaveKitPhase = "draft" | "architect" | "build" | "research" | "subagent";
 
 export interface CaveKitConfig {
 	/** Model preset controlling which models are used per phase */
@@ -39,6 +48,26 @@ export interface CaveKitConfig {
 	scopedContext: boolean;
 }
 
+export const CONFIG_KEYS = [
+	"preset",
+	"tierGateMode",
+	"tierGateModel",
+	"commandGate",
+	"cavemanLevel",
+	"maxRetries",
+	"maxIterations",
+	"taskTimeout",
+	"maxParallel",
+	"worktreeIsolation",
+	"codexPath",
+	"speculativeReview",
+	"cavemanForSubagents",
+	"scopedContext",
+] as const satisfies ReadonlyArray<keyof CaveKitConfig>;
+
+export type CaveKitConfigKey = (typeof CONFIG_KEYS)[number];
+export type CaveKitConfigValue = CaveKitConfig[CaveKitConfigKey];
+
 export const DEFAULT_CONFIG: CaveKitConfig = {
 	preset: "quality",
 	tierGateMode: "severity",
@@ -57,7 +86,7 @@ export const DEFAULT_CONFIG: CaveKitConfig = {
 };
 
 /** Model assignments per DABI phase for each preset */
-export const PRESET_MODELS: Record<ModelPreset, Record<string, string>> = {
+export const PRESET_MODELS: Record<ModelPreset, Record<CaveKitPhase, string>> = {
 	expensive: {
 		draft: "claude-opus-4-6",
 		architect: "claude-opus-4-6",
@@ -87,3 +116,83 @@ export const PRESET_MODELS: Record<ModelPreset, Record<string, string>> = {
 		subagent: "claude-haiku-4-5-20251001",
 	},
 };
+
+function parseInteger(value: unknown): number | undefined {
+	if (typeof value === "number") {
+		return Number.isInteger(value) && value >= 0 ? value : undefined;
+	}
+
+	if (typeof value === "string") {
+		const trimmed = value.trim();
+		if (!/^\d+$/.test(trimmed)) return undefined;
+		const parsed = Number(trimmed);
+		return Number.isInteger(parsed) && parsed >= 0 ? parsed : undefined;
+	}
+
+	return undefined;
+}
+
+function parseBoolean(value: unknown): boolean | undefined {
+	if (typeof value === "boolean") return value;
+	if (typeof value !== "string") return undefined;
+
+	const lowered = value.trim().toLowerCase();
+	if (lowered === "true") return true;
+	if (lowered === "false") return false;
+	return undefined;
+}
+
+function parseStringEnum<T extends readonly string[]>(choices: T, value: unknown): T[number] | undefined {
+	if (typeof value !== "string") return undefined;
+	const trimmed = value.trim();
+	return choices.includes(trimmed as T[number]) ? (trimmed as T[number]) : undefined;
+}
+
+function parseString(value: unknown): string | undefined {
+	if (typeof value !== "string") return undefined;
+	const trimmed = value.trim();
+	return trimmed.length > 0 ? trimmed : undefined;
+}
+
+const CONFIG_PARSERS: {
+	[K in CaveKitConfigKey]: (value: unknown) => CaveKitConfig[K] | undefined;
+} = {
+	preset: (value) => parseStringEnum(MODEL_PRESETS, value),
+	tierGateMode: (value) => parseStringEnum(TIER_GATE_MODES, value),
+	tierGateModel: (value) => parseString(value),
+	commandGate: (value) => parseStringEnum(COMMAND_GATE_MODES, value),
+	cavemanLevel: (value) => {
+		const parsed = parseInteger(value);
+		return parsed !== undefined && CAVEMAN_LEVELS.includes(parsed as CavemanLevel)
+			? (parsed as CavemanLevel)
+			: undefined;
+	},
+	maxRetries: (value) => parseInteger(value),
+	maxIterations: (value) => parseInteger(value),
+	taskTimeout: (value) => parseInteger(value),
+	maxParallel: (value) => parseInteger(value),
+	worktreeIsolation: (value) => parseBoolean(value),
+	codexPath: (value) => parseString(value),
+	speculativeReview: (value) => parseBoolean(value),
+	cavemanForSubagents: (value) => parseBoolean(value),
+	scopedContext: (value) => parseBoolean(value),
+};
+
+export function isConfigKey(value: string): value is CaveKitConfigKey {
+	return (CONFIG_KEYS as readonly string[]).includes(value);
+}
+
+export function parseConfigValue<K extends CaveKitConfigKey>(
+	key: K,
+	value: unknown,
+): CaveKitConfig[K] | undefined {
+	return CONFIG_PARSERS[key](value);
+}
+
+export function sanitizeConfigValue<K extends CaveKitConfigKey>(
+	key: K,
+	value: unknown,
+	fallback: CaveKitConfig[K] = DEFAULT_CONFIG[key],
+): CaveKitConfig[K] {
+	return parseConfigValue(key, value) ?? fallback;
+}

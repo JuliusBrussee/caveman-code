@@ -29,7 +29,10 @@ export { ReviewPaneComponent, showReviewOverlay } from "./review-pane.js";
 export type { TierGateAction, TierGateOverlayContext } from "./tier-gate-overlay.js";
 export { showTierGateOverlay } from "./tier-gate-overlay.js";
 
-export function registerWidgets(pi: ExtensionAPI, _config: CaveKitConfig): void {
+export const CAVEKIT_SHORTCUTS = ["ctrl+shift+b", "ctrl+shift+k", "ctrl+shift+g", "ctrl+shift+d"] as const;
+export type CaveKitShortcut = (typeof CAVEKIT_SHORTCUTS)[number];
+
+export function registerWidgets(pi: ExtensionAPI, _config: CaveKitConfig): CaveKitShortcut[] {
 	// Ctrl+Shift+B — toggle build dashboard (T-035 / AC-4)
 	pi.registerShortcut("ctrl+shift+b", {
 		description: "Toggle CaveKit build dashboard",
@@ -96,4 +99,6 @@ export function registerWidgets(pi: ExtensionAPI, _config: CaveKitConfig): void 
 			}
 		},
 	});
+
+	return [...CAVEKIT_SHORTCUTS];
 }

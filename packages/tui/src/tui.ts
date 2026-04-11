@@ -84,6 +84,24 @@ export type OverlayAnchor =
 	| "right-center";
 
 /**
+ * Options for side panel positioning and sizing.
+ */
+export interface SidePanelOptions {
+	/** Width in columns, or percentage of terminal width (e.g., "40%"). Default: "40%" */
+	width?: SizeValue;
+	/** Which side to place the panel. Default: "right" */
+	side?: "left" | "right";
+}
+
+/**
+ * Handle returned by showSidePanel for controlling the panel
+ */
+export interface SidePanelHandle {
+	/** Remove the side panel and restore focus */
+	hide(): void;
+}
+
+/**
  * Margin configuration for overlays
  */
 export interface OverlayMargin {
@@ -234,6 +252,13 @@ export class TUI extends Container {
 	private fullRedrawCount = 0;
 	private stopped = false;
 
+	// Side panel for column-based layout alongside main content
+	private sidePanelEntry: {
+		component: Component;
+		options: SidePanelOptions;
+		preFocus: Component | null;
+	} | null = null;
+
 	// Overlay stack for modal components rendered on top of base content
 	private focusOrderCounter = 0;
 	private overlayStack: {
@@ -382,6 +407,35 @@ export class TUI extends Container {
 		this.requestRender();
 	}
 
+	/** Show a side panel alongside the main content in a column layout. */
+	showSidePanel(component: Component, options?: SidePanelOptions): SidePanelHandle {
+		this.sidePanelEntry = {
+			component,
+			options: options ?? {},
+			preFocus: this.focusedComponent,
+		};
+		this.setFocus(component);
+		this.terminal.hideCursor();
+		this.requestRender();
+		return {
+			hide: () => this.hideSidePanel(),
+		};
+	}
+
+	/** Hide the side panel and restore previous focus. */
+	hideSidePanel(): void {
+		if (!this.sidePanelEntry) return;
+		const preFocus = this.sidePanelEntry.preFocus;
+		this.sidePanelEntry = null;
+		this.setFocus(preFocus);
+		this.requestRender();
+	}
+
+	/** Check if a side panel is currently shown. */
+	hasSidePanel(): boolean {
+		return this.sidePanelEntry !== null;
+	}
+
 	/** Check if there are any visible overlays */
 	hasOverlay(): boolean {
 		return this.overlayStack.some((o) => this.isOverlayVisible(o));
@@ -409,6 +463,7 @@ export class TUI extends Container {
 
 	override invalidate(): void {
 		super.invalidate();
+		this.sidePanelEntry?.component.invalidate?.();
 		for (const overlay of this.overlayStack) overlay.component.invalidate?.();
 	}
 
@@ -728,6 +783,38 @@ export class TUI extends Container {
 		}
 	}
 
+	/** Render main content and side panel in a two-column layout. */
+	private renderWithSidePanel(termWidth: number, termHeight: number): string[] {
+		const panel = this.sidePanelEntry!;
+		const panelWidth = parseSizeValue(panel.options.width, termWidth) ?? Math.floor(termWidth * 0.4);
+		const mainWidth = Math.max(1, termWidth - panelWidth - 1); // 1 for separator
+		const isRight = (panel.options.side ?? "right") === "right";
+
+		const mainLines = this.render(isRight ? mainWidth : panelWidth);
+		const panelLines = panel.component.render(isRight ? panelWidth : mainWidth);
+		const maxRows = Math.max(mainLines.length, panelLines.length, termHeight);
+
+		const leftLines = isRight ? mainLines : panelLines;
+		const rightLines = isRight ? panelLines : mainLines;
+		const leftW = isRight ? mainWidth : panelWidth;
+		const rightW = isRight ? panelWidth : mainWidth;
+
+		const result: string[] = [];
+		const RESET = "\x1b[0m";
+
+		for (let i = 0; i < maxRows; i++) {
+			const lRaw = leftLines[i] ?? "";
+			const rRaw = rightLines[i] ?? "";
+			const lTrunc = visibleWidth(lRaw) > leftW ? sliceByColumn(lRaw, 0, leftW, true) : lRaw;
+			const rTrunc = visibleWidth(rRaw) > rightW ? sliceByColumn(rRaw, 0, rightW, true) : rRaw;
+			const lPad = " ".repeat(Math.max(0, leftW - visibleWidth(lTrunc)));
+			const rPad = " ".repeat(Math.max(0, rightW - visibleWidth(rTrunc)));
+			result.push(`${lTrunc}${RESET}${lPad}│${rTrunc}${RESET}${rPad}`);
+		}
+
+		return result;
+	}
+
 	/** Composite all overlays into content lines (sorted by focusOrder, higher = on top). */
 	private compositeOverlays(lines: string[], termWidth: number, termHeight: number): string[] {
 		if (this.overlayStack.length === 0) return lines;
@@ -899,7 +986,12 @@ export class TUI extends Container {
 		};
 
 		// Render all components to get new lines
-		let newLines = this.render(width);
+		let newLines: string[];
+		if (this.sidePanelEntry) {
+			newLines = this.renderWithSidePanel(width, height);
+		} else {
+			newLines = this.render(width);
+		}
 
 		// Composite overlays into the rendered lines (before differential compare)
 		if (this.overlayStack.length > 0) {

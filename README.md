@@ -2,16 +2,16 @@
   <img src="packages/coding-agent/src/modes/interactive/assets/clankolas.png" width="120" />
 </p>
 
-<h1 align="center">Cave CLI</h1>
+<h1 align="center">Caveman Code</h1>
 
 <p align="center">
-  <strong>The open-source terminal coding agent that works with every LLM.</strong><br/>
+  <strong>Caveman Code is the open-source terminal coding agent that works with every LLM.</strong><br/>
   One tool. Every provider. Your workflow.
 </p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/cave"><img src="https://img.shields.io/npm/v/cave?color=blue&label=npm" alt="npm version" /></a>
-  <a href="https://github.com/JuliusBrussee/cave-cli/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License" /></a>
+  <a href="https://github.com/JuliusBrussee/caveman-cli/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License" /></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen" alt="Node.js 20+" /></a>
 </p>
 
@@ -20,6 +20,8 @@
 Most terminal coding agents lock you into a single provider. Cave doesn't. Use Claude, GPT, Gemini, Mistral, Bedrock, or any OpenAI-compatible endpoint — and switch between them mid-conversation. Bring your API key, use your existing subscription (Claude Pro, ChatGPT Plus, Copilot, Gemini), or plug in a custom provider. Your context, sessions, and tools travel with you.
 
 Cave is built for developers who want a coding agent they can actually own: extend it, theme it, script it, and share packages with others — all without touching a fork.
+
+Forked from [pi-mono](https://github.com/badlogic/pi-mono) by badlogic. Maintained in [JuliusBrussee/caveman-cli](https://github.com/JuliusBrussee/caveman-cli).
 
 ```bash
 npm install -g cave
@@ -305,8 +307,8 @@ Built-in tools: `read`, `bash`, `edit`, `write`, `grep`, `find`, `ls`
 ## Contributing
 
 ```bash
-git clone https://github.com/JuliusBrussee/cave-cli.git
-cd cave-cli
+git clone https://github.com/JuliusBrussee/caveman-cli.git
+cd caveman-cli
 npm install
 npm run build
 npm run check   # lint, format, type check

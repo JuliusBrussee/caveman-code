@@ -1,5 +1,5 @@
 {
-	"name": "pi-extension-with-deps",
+	"name": "cave-extension-with-deps",
 	"private": true,
 	"version": "1.29.2",
 	"type": "module",

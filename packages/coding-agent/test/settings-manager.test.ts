@@ -289,6 +289,41 @@ describe("SettingsManager", () => {
 		});
 	});
 
+	describe("rtk settings", () => {
+		it("should default rtk.enabled to true", () => {
+			const manager = SettingsManager.create(projectDir, agentDir);
+			expect(manager.getRtkEnabled()).toBe(true);
+		});
+
+		it("should persist rtk.enabled across sessions", async () => {
+			const settingsPath = join(agentDir, "settings.json");
+			writeFileSync(settingsPath, JSON.stringify({ theme: "dark" }));
+
+			const manager = SettingsManager.create(projectDir, agentDir);
+			expect(manager.getRtkEnabled()).toBe(true);
+
+			manager.setRtkEnabled(false);
+			await manager.flush();
+
+			expect(JSON.parse(readFileSync(settingsPath, "utf-8"))).toMatchObject({
+				rtk: { enabled: false },
+			});
+
+			const disabledManager = SettingsManager.create(projectDir, agentDir);
+			expect(disabledManager.getRtkEnabled()).toBe(false);
+
+			disabledManager.setRtkEnabled(true);
+			await disabledManager.flush();
+
+			expect(JSON.parse(readFileSync(settingsPath, "utf-8"))).toMatchObject({
+				rtk: { enabled: true },
+			});
+
+			const enabledManager = SettingsManager.create(projectDir, agentDir);
+			expect(enabledManager.getRtkEnabled()).toBe(true);
+		});
+	});
+
 	describe("getSessionDir", () => {
 		it("should return undefined when not set", () => {
 			writeFileSync(join(agentDir, "settings.json"), JSON.stringify({ theme: "dark" }));

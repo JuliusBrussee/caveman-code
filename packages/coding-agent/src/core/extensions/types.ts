@@ -30,6 +30,7 @@ import type {
 	KeyId,
 	OverlayHandle,
 	OverlayOptions,
+	SidePanelOptions,
 	TUI,
 } from "@cave/tui";
 import type { Static, TSchema } from "@sinclair/typebox";
@@ -165,6 +166,10 @@ export interface ExtensionUIContext {
 			overlayOptions?: OverlayOptions | (() => OverlayOptions);
 			/** Called with the overlay handle after the overlay is shown. Use to control visibility. */
 			onHandle?: (handle: OverlayHandle) => void;
+			/** Show as a side panel alongside the main content instead of an overlay. */
+			sidePanel?: boolean;
+			/** Side panel positioning/sizing options. */
+			sidePanelOptions?: SidePanelOptions;
 		},
 	): Promise<T>;
 

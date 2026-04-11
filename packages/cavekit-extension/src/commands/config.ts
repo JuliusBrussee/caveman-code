@@ -5,56 +5,51 @@
  */
 
 import type { ExtensionAPI } from "cave";
-import type { CaveKitConfig } from "../config/index.js";
-import { getConfigWithSources, saveConfig } from "../config/index.js";
-import type { CavemanLevel, ModelPreset, TierGateMode } from "../config/types.js";
+import { getConfigWithSources, loadConfig, saveConfig, type CaveKitConfig } from "../config/index.js";
+import {
+	CAVEMAN_LEVELS,
+	COMMAND_GATE_MODES,
+	CONFIG_KEYS,
+	MODEL_PRESETS,
+	TIER_GATE_MODES,
+	isConfigKey,
+	parseConfigValue,
+	type CaveKitConfigKey,
+} from "../config/types.js";
 
-const CONFIGURABLE_KEYS: Array<keyof CaveKitConfig> = [
-	"preset",
-	"tierGateMode",
-	"tierGateModel",
-	"commandGate",
-	"cavemanLevel",
-	"maxRetries",
-	"maxIterations",
-	"taskTimeout",
-	"maxParallel",
-	"worktreeIsolation",
-	"codexPath",
-	"speculativeReview",
-	"cavemanForSubagents",
-	"scopedContext",
-];
+const CONFIGURABLE_KEYS = [...CONFIG_KEYS];
 
 export function registerConfigCommand(pi: ExtensionAPI, config: CaveKitConfig): void {
 	pi.registerCommand("ck:config", {
 		description: "View or change CaveKit configuration",
 		getArgumentCompletions: (prefix) => {
 			if (!prefix.includes(" ")) {
-				return CONFIGURABLE_KEYS.filter((k) => k.startsWith(prefix)).map((k) => ({ value: k, label: k }));
+				return CONFIGURABLE_KEYS.filter((key) => key.startsWith(prefix)).map((key) => ({
+					value: key,
+					label: key,
+				}));
 			}
 			const key = prefix.split(" ")[0];
 			return getValueCompletions(key);
 		},
 		handler: async (args, ctx) => {
-			const parts = args.trim().split(/\s+/);
+			const parts = args.trim().split(/\s+/).filter(Boolean);
 			const key = parts[0];
 			const value = parts.slice(1).join(" ");
+			const options = { cwd: ctx.cwd };
 
 			if (!key) {
-				// Show current config with source provenance (AC-4)
-				const withSources = getConfigWithSources();
-				const SOURCE_TAG: Record<string, string> = {
+				const withSources = getConfigWithSources(options);
+				const sourceTag: Record<string, string> = {
 					default: "[default]",
 					global: "[global] ",
 					project: "[project]",
 				};
 				const lines = [
 					"╔══ CaveKit Config ═════════════════════════════════╗",
-					...Object.entries(withSources).map(([k, entry]) => {
-						const { value, source } = entry as { value: unknown; source: string };
-						const tag = SOURCE_TAG[source] ?? source;
-						return `║  ${tag} ${k.padEnd(22)} ${String(value).padEnd(12)} ║`;
+					...Object.entries(withSources).map(([configKey, entry]) => {
+						const tag = sourceTag[entry.source] ?? entry.source;
+						return `║  ${tag} ${configKey.padEnd(22)} ${String(entry.value).padEnd(12)} ║`;
 					}),
 					"╚═══════════════════════════════════════════════════╝",
 					"",
@@ -65,40 +60,48 @@ export function registerConfigCommand(pi: ExtensionAPI, config: CaveKitConfig): 
 				return;
 			}
 
-			if (!CONFIGURABLE_KEYS.includes(key as keyof CaveKitConfig)) {
+			if (!isConfigKey(key)) {
 				ctx.ui.notify(`Unknown config key: ${key}. Valid keys: ${CONFIGURABLE_KEYS.join(", ")}`, "warning");
 				return;
 			}
 
 			if (!value) {
-				ctx.ui.notify(`Current ${key}: ${config[key as keyof CaveKitConfig]}`, "info");
+				const resolved = loadConfig(options);
+				ctx.ui.notify(`Current ${key}: ${String(resolved[key])}`, "info");
 				return;
 			}
 
-			// Apply and persist
-			const parsed = parseValue(key, value);
-			if (parsed === null) {
+			const parsed = parseConfigValue(key, value);
+			if (parsed === undefined) {
 				ctx.ui.notify(`Invalid value "${value}" for key "${key}"`, "error");
 				return;
 			}
 
-			(config as unknown as Record<string, unknown>)[key] = parsed;
-			saveConfig({ [key]: parsed } as Partial<CaveKitConfig>, "local");
+			applyConfigValue(config, key, parsed);
+			saveConfig({ [key]: parsed }, "local", options);
 			ctx.ui.notify(`Set ${key} = ${String(parsed)}`, "info");
 		},
 	});
 }
 
+function applyConfigValue<K extends CaveKitConfigKey>(
+	config: CaveKitConfig,
+	key: K,
+	value: CaveKitConfig[K],
+): void {
+	config[key] = value;
+}
+
 function getValueCompletions(key: string): Array<{ value: string; label: string }> | null {
 	switch (key) {
 		case "preset":
-			return (["expensive", "quality", "balanced", "fast"] as ModelPreset[]).map((v) => ({ value: v, label: v }));
+			return MODEL_PRESETS.map((value) => ({ value, label: value }));
 		case "tierGateMode":
-			return (["severity", "strict", "permissive", "off"] as TierGateMode[]).map((v) => ({ value: v, label: v }));
+			return TIER_GATE_MODES.map((value) => ({ value, label: value }));
 		case "commandGate":
-			return ["allowlist", "blocklist", "codex", "off"].map((v) => ({ value: v, label: v }));
+			return COMMAND_GATE_MODES.map((value) => ({ value, label: value }));
 		case "cavemanLevel":
-			return (["0", "1", "2", "3"] as string[]).map((v) => ({ value: v, label: v }));
+			return CAVEMAN_LEVELS.map((value) => ({ value: String(value), label: String(value) }));
 		case "worktreeIsolation":
 		case "speculativeReview":
 		case "cavemanForSubagents":
@@ -109,37 +112,5 @@ function getValueCompletions(key: string): Array<{ value: string; label: string 
 			];
 		default:
 			return null;
-	}
-}
-
-function parseValue(key: string, value: string): unknown {
-	switch (key) {
-		case "preset":
-			return ["expensive", "quality", "balanced", "fast"].includes(value) ? value : null;
-		case "tierGateMode":
-			return ["severity", "strict", "permissive", "off"].includes(value) ? value : null;
-		case "commandGate":
-			return ["allowlist", "blocklist", "codex", "off"].includes(value) ? value : null;
-		case "cavemanLevel": {
-			const n = Number(value);
-			return [0, 1, 2, 3].includes(n) ? (n as CavemanLevel) : null;
-		}
-		case "maxRetries":
-		case "maxIterations":
-		case "maxParallel":
-		case "taskTimeout": {
-			const n = Number(value);
-			return Number.isInteger(n) && n >= 0 ? n : null;
-		}
-		case "worktreeIsolation":
-		case "speculativeReview":
-		case "cavemanForSubagents":
-		case "scopedContext":
-			if (value === "true") return true;
-			if (value === "false") return false;
-			return null;
-		default:
-			// String fields (e.g. tierGateModel, codexPath)
-			return value || null;
 	}
 }

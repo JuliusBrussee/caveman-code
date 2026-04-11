@@ -1,8 +1,8 @@
 # Contributing to Caveman Code
 
-Thanks for wanting to contribute! This guide exists to save both of us time.
+Contributing here means contributing to the Caveman Code fork maintained in [JuliusBrussee/caveman-cli](https://github.com/JuliusBrussee/caveman-cli).
 
-Caveman Code is a fork of [pi-mono](https://github.com/badlogic/pi-mono) by Mario Zechner (badlogic). Upstream contributions should be directed to the original project.
+Caveman Code is a fork of [pi-mono](https://github.com/badlogic/pi-mono) by Mario Zechner (badlogic). Upstream contributions should still be directed to the original project where appropriate.
 
 ## The One Rule
 
@@ -14,7 +14,24 @@ If you use an agent, run it from the `caveman-cli` root directory so it picks up
 
 ## Syncing with Upstream (pi-mono)
 
-The `upstream` remote tracks https://github.com/badlogic/pi-mono.git. Push to upstream is disabled to prevent accidental pushes.
+Fork sync contract is tracked in `.github/upstream-sync.json`.
+
+Required local git configuration:
+
+- Remote name: `upstream`
+- Fetch URL: `https://github.com/badlogic/pi-mono.git`
+- Push URL: `DISABLE`
+- Fetch refspec: `+refs/heads/*:refs/remotes/upstream/*`
+- Default upstream branch: `upstream/main`
+
+Audit current clone before syncing:
+
+```bash
+git remote get-url upstream
+git remote get-url --push upstream
+git config --get-all remote.upstream.fetch
+git fetch upstream
+```
 
 To pull in upstream changes:
 

@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { selectConfig } from "./cli/config-selector.js";
-import { APP_NAME, getAgentDir } from "./config.js";
+import { APP_NAME, CONFIG_DIR_NAME, getAgentDir } from "./config.js";
 import { DefaultPackageManager } from "./core/package-manager.js";
 import { SettingsManager } from "./core/settings-manager.js";
 
@@ -46,7 +46,7 @@ function printPackageCommandHelp(command: PackageCommand): void {
 Install a package and add it to settings.
 
 Options:
-  -l, --local    Install project-locally (.pi/settings.json)
+  -l, --local    Install project-locally (${CONFIG_DIR_NAME}/settings.json)
 
 Examples:
   ${APP_NAME} install npm:@foo/bar
@@ -66,7 +66,7 @@ Remove a package and its source from settings.
 Alias: ${APP_NAME} uninstall <source> [-l]
 
 Options:
-  -l, --local    Remove from project settings (.pi/settings.json)
+  -l, --local    Remove from project settings (${CONFIG_DIR_NAME}/settings.json)
 
 Examples:
   ${APP_NAME} remove npm:@foo/bar

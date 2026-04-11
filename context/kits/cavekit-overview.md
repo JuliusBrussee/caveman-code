@@ -60,7 +60,8 @@ These rules apply across all kits:
 
 | Kit | File | Description | Requirements | Acceptance Criteria |
 |-----|------|-------------|:------------:|:-------------------:|
-| RTK Integration | [cavekit-rtk-integration.md](cavekit-rtk-integration.md) | RTK binary integration for bash command output compression | 4 | 19 |
+| RTK Integration | [cavekit-rtk-integration.md](cavekit-rtk-integration.md) | RTK binary integration for bash command output compression | 5 | 24 |
+| Extension Workflow | [cavekit-extension-workflow.md](cavekit-extension-workflow.md) | CaveKit extension orchestration: tier gate overlay, build site discovery, wave commits, SDK executor, prompt constraints | 7 | 27 |
 
 ### RTK Integration Dependency Graph
 
@@ -77,5 +78,6 @@ R1 and R3 are independent. R2 depends on R1. R4 depends on R1, R2, and R3.
 
 | Date       | Version | Change         |
 |------------|---------|----------------|
+| 2026-04-11 | 1.2.0   | Added Extension Workflow kit; RTK Integration updated to 5 reqs |
 | 2026-04-09 | 1.1.0   | Added RTK Integration kit |
 | 2026-04-08 | 1.0.0   | Initial draft  |

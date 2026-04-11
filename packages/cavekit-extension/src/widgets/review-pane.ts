@@ -428,12 +428,10 @@ export async function showReviewOverlay(
 			return new ReviewPaneComponent(items, theme, tui.terminal.rows, getMarkdownTheme, done, options);
 		},
 		{
-			overlay: true,
-			overlayOptions: {
-				width: "90%",
-				maxHeight: "85%",
-				anchor: "center",
-				margin: 2,
+			sidePanel: true,
+			sidePanelOptions: {
+				width: "45%",
+				side: "right",
 			},
 		},
 	);

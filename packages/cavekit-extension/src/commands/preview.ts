@@ -98,7 +98,8 @@ function resolveShorthand(cwd: string, shorthand: string): string | null {
 
 function findLatestMd(dir: string, prefix?: string): string | null {
 	if (!fs.existsSync(dir)) return null;
-	const files = fs.readdirSync(dir)
+	const files = fs
+		.readdirSync(dir)
 		.filter((f) => f.endsWith(".md") && (!prefix || f.startsWith(prefix)))
 		.map((f) => ({ name: f, mtime: fs.statSync(path.join(dir, f)).mtimeMs }))
 		.sort((a, b) => b.mtime - a.mtime);
@@ -137,18 +138,27 @@ function collectArtifacts(cwd: string): Array<{ value: string; label: string; pa
 	// Gap analyses
 	const reportsDir = path.join(cwd, "context", "reports");
 	if (fs.existsSync(reportsDir)) {
-		const gaps = fs.readdirSync(reportsDir)
+		const gaps = fs
+			.readdirSync(reportsDir)
 			.filter((f) => f.startsWith("gap-analysis-") && f.endsWith(".md"))
-			.sort().reverse();
+			.sort()
+			.reverse();
 		if (gaps.length > 0) {
-			artifacts.push({ value: "gap", label: `gap — context/reports/${gaps[0]}`, path: path.join(reportsDir, gaps[0]!) });
+			artifacts.push({
+				value: "gap",
+				label: `gap — context/reports/${gaps[0]}`,
+				path: path.join(reportsDir, gaps[0]!),
+			});
 		}
 	}
 
 	// Impl records
 	const implDir = path.join(cwd, "context", "impl");
 	if (fs.existsSync(implDir)) {
-		for (const f of fs.readdirSync(implDir).filter((f) => /^T-\d+\.md$/.test(f)).sort()) {
+		for (const f of fs
+			.readdirSync(implDir)
+			.filter((f) => /^T-\d+\.md$/.test(f))
+			.sort()) {
 			const id = f.replace(/\.md$/, "");
 			artifacts.push({ value: id, label: `${id} — context/impl/${f}`, path: path.join(implDir, f) });
 		}
@@ -159,7 +169,11 @@ function collectArtifacts(cwd: string): Array<{ value: string; label: string; pa
 	if (fs.existsSync(refsDir)) {
 		for (const f of fs.readdirSync(refsDir).filter((f) => f.endsWith(".md"))) {
 			const name = f.replace(/\.md$/, "");
-			artifacts.push({ value: `ref-${name}`, label: `ref-${name} — context/refs/${f}`, path: path.join(refsDir, f) });
+			artifacts.push({
+				value: `ref-${name}`,
+				label: `ref-${name} — context/refs/${f}`,
+				path: path.join(refsDir, f),
+			});
 		}
 	}
 

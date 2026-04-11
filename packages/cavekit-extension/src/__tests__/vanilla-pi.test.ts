@@ -217,6 +217,16 @@ describe("cavekit commands — vanilla Pi (AC-2)", () => {
 			expect(typeof cmd.handler, `${name} handler should be a function`).toBe("function");
 		}
 	});
+
+	it("all registered commands handle empty args without throwing on vanilla Pi", async () => {
+		const { commands, ctx } = await getCommandMap();
+		for (const [name, cmd] of commands) {
+			await expect(
+				Promise.resolve(cmd.handler("", ctx)),
+				`${name} should handle empty args without throwing on vanilla Pi`,
+			).resolves.toBeUndefined();
+		}
+	});
 });
 
 // ============================================================================

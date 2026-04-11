@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "upstream": {
+    "remote": "upstream",
+    "fetchUrl": "https://github.com/badlogic/pi-mono.git",
+    "pushUrl": "DISABLE",
+    "defaultBranch": "main",
+    "fetchRefspec": "+refs/heads/*:refs/remotes/upstream/*"
+  },
+  "sync": {
+    "fetch": "git fetch upstream",
+    "rebase": "git rebase upstream/main",
+    "merge": "git merge upstream/main"
+  },
+  "identity": {
+    "forkName": "Caveman Code",
+    "upstreamName": "pi-mono",
+    "userFacingIdentitySource": "README.md",
+    "maintainerOnlyMetadata": true
+  }
+}
