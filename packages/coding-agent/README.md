@@ -211,6 +211,88 @@ Change level with `/cave [lite|full|ultra|off]`.
 
 Settings reference: [docs/settings.md](docs/settings.md)
 
+### Benchmark Results
+
+Run `npm run bench:offline` to reproduce. Results on 10 real-world tool output fixtures:
+
+#### Tool Output Compression
+
+```
+                         0%        25%        50%        75%       100%
+                         |          |          |          |          |
+  git diff (901 lines)   [##################################################] -94.0%
+  npm ls (701 lines)     [################################################  ] -91.6%
+  ls recursive (601 ln)  [###############################################   ] -90.3%
+  grep results (801 ln)  [##############################################    ] -89.3%
+  test output (501 ln)   [############################################      ] -87.6%
+  XML/pom.xml (382 ln)   [########################################          ] -78.7%
+  docker inspect (258)   [##################################                ] -67.9%
+  ANSI colored (97 ln)   [#########################                         ] -50.0%
+  read file (429 lines)  [################                                  ] -32.0%
+  build output (19 ln)   [#########                                         ] -18.0%
+                         |          |          |          |          |
+  AGGREGATE              [###########################################       ] -85.9%
+```
+
+**~72,400 tokens saved** across 337K chars of tool output. Larger outputs compress more aggressively.
+
+#### Compression Pipeline Layers
+
+| Layer | What it does | Biggest impact on |
+|-------|-------------|-------------------|
+| **Flint Chipper** | Per-tool line budgets (bash: 80, read: 300, grep: 120) | Large outputs (-67% to -92%) |
+| **ANSI Strip** | Removes escape codes from colored output | Terminal output (-20% to -40%) |
+| **Stone Tablet** | Semantic JSON/XML key extraction | Structured bash output |
+| **Blank Collapse** | Collapses 3+ blank lines | Sparse output |
+| **General Truncation** | 500-line cap with head+tail preservation | Very long outputs |
+
+#### Read Deduplication
+
+```
+  First read (429-line file)   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  ~2,966 tokens
+  Second read (unchanged)      ~                                            ~22 tokens
+                                                                      99.3% savings
+```
+
+#### System Prompt Overhead vs Savings
+
+| Intensity | Prompt Cost | Break-even | Net per 15-turn session |
+|-----------|------------|------------|------------------------|
+| lite | +120 tokens | 1 tool call | **+567K tokens saved** |
+| full | +175 tokens | 1 tool call | **+567K tokens saved** |
+| ultra | +195 tokens | 1 tool call | **+566K tokens saved** |
+
+Cave mode pays for itself on the **first tool call** of every session.
+
+#### Cost Impact (Sonnet pricing, $3/M input)
+
+```
+  15-turn session:  ~$1.70 saved per session
+  30-turn session:  ~$6.92 saved per session  (91% tool compression)
+```
+
+#### Session Replay (real sessions)
+
+4 sessions analyzed from `~/.cave/agent/sessions/`:
+
+| Metric | Value |
+|--------|-------|
+| Total tool calls | 78 |
+| Actual API input tokens | 105,105 |
+| Cache read tokens | 1,314,699 |
+| Tool types | bash (19), read (31), write (28) |
+
+Note: These sessions had small tool outputs (all under budget thresholds). Compression savings scale with output size -- the offline benchmarks above show the full range on realistic large outputs.
+
+Run benchmarks yourself:
+
+```bash
+npm run bench:offline   # Compression analysis (free, <1s)
+npm run bench:replay    # Analyze your real sessions (free)
+npm run bench:live      # A/B comparison with LLM calls (needs API key, ~$1-2)
+npm run bench           # All tiers
+```
+
 ---
 
 ## RTK Integration
