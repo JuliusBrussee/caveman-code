@@ -37,3 +37,36 @@ export class SandboxViolation extends Error {
 		this.name = "SandboxViolation";
 	}
 }
+
+// T-115, T-116: sandbox.allow configuration + interactive escape.
+export interface SandboxAllowConfig {
+	writes?: string[];
+	reads?: string[];
+	network?: boolean;
+}
+
+export interface EscapeRequest {
+	kind: "write" | "read" | "network";
+	path?: string;
+	reason: string;
+}
+
+export type EscapeConfirm = (req: EscapeRequest) => boolean;
+
+/** Merge base allow with a runtime escape after interactive confirm. */
+export function applyEscape(
+	base: SandboxAllowConfig,
+	req: EscapeRequest,
+	confirm: EscapeConfirm,
+): SandboxAllowConfig {
+	if (!confirm(req)) return base;
+	const merged: SandboxAllowConfig = { ...base };
+	if (req.kind === "write" && req.path) {
+		merged.writes = [...(merged.writes ?? []), req.path];
+	} else if (req.kind === "read" && req.path) {
+		merged.reads = [...(merged.reads ?? []), req.path];
+	} else if (req.kind === "network") {
+		merged.network = true;
+	}
+	return merged;
+}
