@@ -1,0 +1,21 @@
+{
+  "name": "cavekit",
+  "description": "T-015: CaveKit PRESET_MODELS folded into a single routing profile. CaveKit phases map to roles via a single router lookup; no double-routing.",
+  "roles": {
+    "plan": { "model": "claude-opus-4-6", "retention": "long" },
+    "edit": { "model": "claude-sonnet-4-6", "retention": "short" },
+    "explore": { "model": "claude-sonnet-4-6", "retention": "short" },
+    "verify": { "model": "claude-haiku-4-5", "retention": "short" }
+  },
+  "cavekitPhaseRole": {
+    "draft": "plan",
+    "architect": "plan",
+    "build": "edit",
+    "inspect": "verify"
+  },
+  "cheapTier": {
+    "edit": "claude-haiku-4-5",
+    "explore": "claude-haiku-4-5",
+    "verify": "claude-haiku-4-5"
+  }
+}

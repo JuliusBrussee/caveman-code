@@ -17,6 +17,12 @@ export interface Args {
 	systemPrompt?: string;
 	appendSystemPrompt?: string;
 	thinking?: ThinkingLevel;
+	/** T-014: router profile name to load for multi-role model routing */
+	routerProfile?: string;
+	/** T-014: override model used for role=plan */
+	planModel?: string;
+	/** T-014: override model used for role=edit */
+	editModel?: string;
 	continue?: boolean;
 	resume?: boolean;
 	help?: boolean;
@@ -115,6 +121,12 @@ export function parseArgs(args: string[]): Args {
 				}
 			}
 			result.tools = validTools;
+		} else if (arg === "--router-profile" && i + 1 < args.length) {
+			result.routerProfile = args[++i];
+		} else if (arg === "--plan-model" && i + 1 < args.length) {
+			result.planModel = args[++i];
+		} else if (arg === "--edit-model" && i + 1 < args.length) {
+			result.editModel = args[++i];
 		} else if (arg === "--thinking" && i + 1 < args.length) {
 			const level = args[++i];
 			if (isValidThinkingLevel(level)) {
