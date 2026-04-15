@@ -105,3 +105,151 @@ export const JSONL_V3_COMPAT = {
 	sessionJsonlDir: ".cave/sessions",
 	disjoint: true,
 } as const;
+
+// ─── T-104, T-105: atomic rewind ────────────────────────────────────────────
+
+export interface RewindAdapter {
+	checkout(commitSha: string): void;
+	truncateJsonl(entryId: string): void;
+	reconstructSummary(entryId: string): string;
+}
+
+export interface RewindResult {
+	status: "ok" | "not_found" | "rollback";
+	entryId: string;
+	summary?: string;
+	error?: string;
+}
+
+/** Rewind a session to the given entry id atomically:
+ *  - Pick the checkpoint's commit
+ *  - Truncate JSONL entries after the target
+ *  - Reconstruct a summary for the remaining branch
+ *  - On any failure, the checkout is rolled back (caller's adapter does it) */
+export function rewindSession(
+	checkpoints: ShadowCheckpoints,
+	targetEntryId: string,
+	adapter: RewindAdapter,
+): RewindResult {
+	const entry = checkpoints.entries().find((e) => e.entryId === targetEntryId);
+	if (!entry) {
+		return { status: "not_found", entryId: targetEntryId, error: "entry not found" };
+	}
+	const preCheckoutTargetEntries = [...checkpoints.entries()];
+	try {
+		adapter.checkout(entry.commitSha);
+		adapter.truncateJsonl(targetEntryId);
+		const summary = adapter.reconstructSummary(targetEntryId);
+		return { status: "ok", entryId: targetEntryId, summary };
+	} catch (err) {
+		// Rollback: re-checkout the most recent commit to restore workdir
+		const latest = preCheckoutTargetEntries[preCheckoutTargetEntries.length - 1];
+		if (latest) {
+			try {
+				adapter.checkout(latest.commitSha);
+			} catch {
+				/* best-effort rollback */
+			}
+		}
+		return {
+			status: "rollback",
+			entryId: targetEntryId,
+			error: err instanceof Error ? err.message : String(err),
+		};
+	}
+}
+
+// ─── T-106: Esc-Esc rewind picker ───────────────────────────────────────────
+
+export interface PickerEntry {
+	entryId: string;
+	timestamp: number;
+	commitSha: string;
+	summary: string;
+}
+
+export function buildPickerEntries(
+	checkpoints: ShadowCheckpoints,
+	summarize: (entryId: string) => string,
+): PickerEntry[] {
+	return checkpoints.entries().map((e) => ({
+		entryId: e.entryId,
+		timestamp: e.timestamp,
+		commitSha: e.commitSha,
+		summary: summarize(e.entryId),
+	}));
+}
+
+// ─── T-107, T-108: cave resume fuzzy picker ─────────────────────────────────
+
+export interface SessionRow {
+	sessionId: string;
+	/** ISO 8601 string for display */
+	lastActivity: string;
+	messageCount: number;
+	/** Short summary (first user message trimmed) */
+	title: string;
+	/** Total dollars spent */
+	dollars: number;
+}
+
+export function sortByRecency(rows: SessionRow[]): SessionRow[] {
+	return [...rows].sort((a, b) => b.lastActivity.localeCompare(a.lastActivity));
+}
+
+export function fuzzyFilter(rows: SessionRow[], query: string): SessionRow[] {
+	if (!query) return rows;
+	const q = query.toLowerCase();
+	return rows.filter(
+		(r) =>
+			r.sessionId.toLowerCase().includes(q) ||
+			r.title.toLowerCase().includes(q),
+	);
+}
+
+// ─── T-109, T-110: plan mode ────────────────────────────────────────────────
+
+const PLAN_MODE_BLOCKED_TOOLS = new Set(["write", "edit", "apply_sr_diff", "edit_symbol", "bash"]);
+const PLAN_MODE_ALLOWED_TOOLS = new Set(["read", "grep", "glob", "ls", "find"]);
+
+export class PlanMode {
+	private active = false;
+	enter(): void {
+		this.active = true;
+	}
+	exit(): void {
+		this.active = false;
+	}
+	isActive(): boolean {
+		return this.active;
+	}
+	isBlocked(tool: string): boolean {
+		return this.active && PLAN_MODE_BLOCKED_TOOLS.has(tool);
+	}
+	isAllowed(tool: string): boolean {
+		return !this.active || PLAN_MODE_ALLOWED_TOOLS.has(tool);
+	}
+}
+
+// ─── T-111: checkpoint GC retention ─────────────────────────────────────────
+
+export interface CheckpointGcPolicy {
+	retentionDays: number;
+	activeSessionId?: string;
+}
+
+export interface CheckpointDirMetadata {
+	sessionId: string;
+	lastModifiedMs: number;
+}
+
+export function selectGcCandidates(
+	dirs: CheckpointDirMetadata[],
+	policy: CheckpointGcPolicy,
+	now: number = Date.now(),
+): CheckpointDirMetadata[] {
+	const cutoff = now - policy.retentionDays * 24 * 60 * 60 * 1000;
+	return dirs.filter(
+		(d) => d.lastModifiedMs < cutoff && d.sessionId !== policy.activeSessionId,
+	);
+}
