@@ -51,11 +51,66 @@ describe("ToolResultCache", () => {
 	});
 
 	it("bypassed tools are never cached", () => {
-		const c = new ToolResultCache(["bash"]);
+		const c = new ToolResultCache({ bypass: ["bash"] });
 		const key = { sessionId: "s", tool: "bash", args: { cmd: "ls" }, fingerprint: fp };
 		c.put(key, "output");
 		expect(c.get(key)).toBeUndefined();
 		expect(c.size()).toBe(0);
+	});
+
+	it("invalidateFile drops entries whose args reference the touched path", () => {
+		const c = new ToolResultCache();
+		const a = { sessionId: "s", tool: "read", args: { path: "f.ts" }, fingerprint: fp };
+		const b = { sessionId: "s", tool: "read", args: { path: "g.ts" }, fingerprint: fp };
+		c.put(a, "A");
+		c.put(b, "B");
+		const removed = c.invalidateFile("f.ts");
+		expect(removed).toBe(1);
+		expect(c.get(a)).toBeUndefined();
+		expect(c.get(b)?.bytes).toBe("B");
+	});
+
+	it("LRU eviction respects token budget (T-076)", () => {
+		const c = new ToolResultCache({ tokenBudget: 3 }); // ~3 tokens = 12 bytes
+		c.setTurn(1);
+		for (let i = 0; i < 5; i++) {
+			c.put(
+				{ sessionId: "s", tool: "read", args: { path: `${i}.ts` }, fingerprint: fp },
+				"aaaa", // 4 bytes = 1 token
+			);
+		}
+		c.setTurn(2); // move to next turn so all entries are evictable
+		c.put({ sessionId: "s", tool: "read", args: { path: "new.ts" }, fingerprint: fp }, "b");
+		expect(c.size()).toBeLessThanOrEqual(5);
+	});
+
+	it("entries accessed in current turn are not evicted (T-077)", () => {
+		const c = new ToolResultCache({ tokenBudget: 1 });
+		c.setTurn(1);
+		const k1 = { sessionId: "s", tool: "read", args: { path: "a" }, fingerprint: fp };
+		c.put(k1, "xxxxxxxxxxxx"); // 3 tokens, exceeds budget immediately but protected by same-turn
+		expect(c.get(k1)?.bytes).toBe("xxxxxxxxxxxx");
+	});
+
+	it("traceSink emits tool_cache_hit/miss with savedTokens", () => {
+		const events: unknown[] = [];
+		const c = new ToolResultCache({ traceSink: (e) => events.push(e) });
+		const key = { sessionId: "s", tool: "read", args: { path: "a" }, fingerprint: fp };
+		c.get(key); // miss
+		c.put(key, "hello world");
+		c.get(key); // hit
+		const types = events.map((e) => (e as { type: string }).type);
+		expect(types).toContain("tool_cache_miss");
+		expect(types).toContain("tool_cache_hit");
+	});
+
+	it("counter aggregates hits across entries (T-094)", () => {
+		const c = new ToolResultCache();
+		const k = { sessionId: "s", tool: "read", args: {}, fingerprint: fp };
+		c.put(k, "x");
+		c.get(k);
+		c.get(k);
+		expect(c.counter()).toBe(2);
 	});
 
 	it("keyHash is deterministic", () => {

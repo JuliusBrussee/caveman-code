@@ -69,38 +69,140 @@ export function normalizeToolOutput(output: string, workdir: string): string {
 	return out;
 }
 
-export class ToolResultCache {
-	private store = new Map<string, CachedResult>();
-	private readonly bypass = new Set<string>(); // tool names that bypass caching
+export interface CachedEntry {
+	key: CacheKey;
+	hash: string;
+	bytes: string;
+	byteLen: number;
+	createdAt: number;
+	lastAccessed: number;
+	turnAccessed: number;
+	hits: number;
+}
 
-	constructor(bypass: string[] = []) {
-		for (const name of bypass) this.bypass.add(name);
+export interface CacheTraceEvent {
+	type: "tool_cache_hit" | "tool_cache_miss";
+	tool: string;
+	sessionId: string;
+	savedTokens?: number;
+}
+
+export type CacheTraceSink = (event: CacheTraceEvent) => void;
+
+export class ToolResultCache {
+	private store = new Map<string, CachedEntry>();
+	private readonly bypass = new Set<string>();
+	private currentTurn = 0;
+	private tokenBudget: number | undefined;
+	private currentTokens = 0;
+	private traceSink?: CacheTraceSink;
+
+	constructor(options: { bypass?: string[]; tokenBudget?: number; traceSink?: CacheTraceSink } = {}) {
+		for (const name of options.bypass ?? []) this.bypass.add(name);
+		this.tokenBudget = options.tokenBudget;
+		this.traceSink = options.traceSink;
+	}
+
+	setTurn(turn: number): void {
+		this.currentTurn = turn;
 	}
 
 	isBypass(tool: string): boolean {
 		return this.bypass.has(tool);
 	}
 
-	get(key: CacheKey, now: () => number = Date.now): CachedResult | undefined {
-		if (this.bypass.has(key.tool)) return undefined;
+	get(key: CacheKey, now: () => number = Date.now): CachedEntry | undefined {
+		if (this.bypass.has(key.tool)) {
+			this.traceSink?.({ type: "tool_cache_miss", tool: key.tool, sessionId: key.sessionId });
+			return undefined;
+		}
 		const k = keyHash(key);
 		const hit = this.store.get(k);
-		if (hit) hit.hits++;
-		return hit;
+		if (hit) {
+			hit.hits++;
+			hit.lastAccessed = now();
+			hit.turnAccessed = this.currentTurn;
+			this.traceSink?.({
+				type: "tool_cache_hit",
+				tool: key.tool,
+				sessionId: key.sessionId,
+				savedTokens: Math.ceil(hit.byteLen / 4),
+			});
+			return hit;
+		}
+		this.traceSink?.({ type: "tool_cache_miss", tool: key.tool, sessionId: key.sessionId });
+		return undefined;
 	}
 
 	put(key: CacheKey, bytes: string, now: () => number = Date.now): void {
 		if (this.bypass.has(key.tool)) return;
 		const k = keyHash(key);
-		this.store.set(k, { bytes, createdAt: now(), hits: 0 });
+		const byteLen = Buffer.byteLength(bytes, "utf8");
+		const prev = this.store.get(k);
+		if (prev) this.currentTokens -= Math.ceil(prev.byteLen / 4);
+		const entry: CachedEntry = {
+			key,
+			hash: k,
+			bytes,
+			byteLen,
+			createdAt: now(),
+			lastAccessed: now(),
+			turnAccessed: this.currentTurn,
+			hits: 0,
+		};
+		this.store.set(k, entry);
+		this.currentTokens += Math.ceil(byteLen / 4);
+		this.maybeEvict();
 	}
 
-	/** Invalidate entries whose fingerprint intersects `touched`. */
-	invalidate(tool: string, predicate: (key: CacheKey) => boolean): void {
-		// Not used in the basic tests; placeholder for T-072 wiring.
+	/** T-072: invalidate all entries whose key matches predicate. */
+	invalidate(predicate: (key: CacheKey) => boolean): number {
+		let removed = 0;
+		for (const [hash, entry] of this.store) {
+			if (predicate(entry.key)) {
+				this.currentTokens -= Math.ceil(entry.byteLen / 4);
+				this.store.delete(hash);
+				removed++;
+			}
+		}
+		return removed;
+	}
+
+	/** T-072: file-level invalidation — drop every entry whose fingerprint mentions the touched path. */
+	invalidateFile(touchedFile: string): number {
+		return this.invalidate((key) => {
+			const args = key.args as Record<string, unknown> | undefined;
+			const path = (args?.path ?? args?.file) as string | undefined;
+			return path === touchedFile;
+		});
 	}
 
 	size(): number {
 		return this.store.size;
+	}
+
+	tokenEstimate(): number {
+		return this.currentTokens;
+	}
+
+	counter(): number {
+		let total = 0;
+		for (const e of this.store.values()) total += e.hits;
+		return total;
+	}
+
+	/** T-076: token-bounded LRU eviction. Entries accessed in the current
+	 *  turn are never evicted (T-077). */
+	private maybeEvict(): void {
+		if (this.tokenBudget === undefined) return;
+		if (this.currentTokens <= this.tokenBudget) return;
+		const candidates = [...this.store.values()]
+			.filter((e) => e.turnAccessed !== this.currentTurn)
+			.sort((a, b) => a.lastAccessed - b.lastAccessed);
+		for (const victim of candidates) {
+			if (this.currentTokens <= this.tokenBudget) break;
+			this.currentTokens -= Math.ceil(victim.byteLen / 4);
+			this.store.delete(victim.hash);
+		}
 	}
 }
