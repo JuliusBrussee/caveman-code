@@ -1,0 +1,32 @@
+name: bench-nightly
+on:
+  schedule:
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+    inputs:
+      instance_count:
+        description: "Number of instances to run"
+        required: false
+        default: "50"
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      CAVE_BENCH_INSTANCE_CAP_DOLLARS: "5"
+      CAVE_BENCH_INSTANCE_COUNT: ${{ inputs.instance_count || '50' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm ci
+      - run: npm run bench:nightly
+      - name: Commit results
+        run: |
+          git config user.name "cave-bot"
+          git config user.email "bot@cave.local"
+          DATE=$(date -u +%Y-%m-%d)
+          git add "research/results/nightly/${DATE}.json" README.md
+          git commit -m "bench(nightly): ${DATE}" || echo "no changes"
+          git push

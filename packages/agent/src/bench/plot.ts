@@ -1,0 +1,42 @@
+// T-136: tokens-vs-resolved chart generator.
+
+export interface SystemDatapoint {
+	name: string;
+	inputTokensTotal: number;
+	outputTokensTotal: number;
+	resolvedCount: number;
+	totalInstances: number;
+}
+
+export interface PlotSpec {
+	title: string;
+	xAxis: string;
+	yAxis: string;
+	series: Array<{
+		name: string;
+		points: Array<{ x: number; y: number }>;
+	}>;
+}
+
+export function buildTokensVsResolvedSpec(systems: SystemDatapoint[]): PlotSpec {
+	return {
+		title: "Tokens vs. Resolved",
+		xAxis: "Total tokens (input + output)",
+		yAxis: "Resolved rate",
+		series: [
+			{
+				name: "systems",
+				points: systems.map((s) => ({
+					x: s.inputTokensTotal + s.outputTokensTotal,
+					y: s.totalInstances === 0 ? 0 : s.resolvedCount / s.totalInstances,
+				})),
+			},
+		],
+	};
+}
+
+export function requireTwoComparisonSystems(systems: SystemDatapoint[]): void {
+	if (systems.length < 2) {
+		throw new Error("plot: requires ≥2 comparison systems");
+	}
+}
