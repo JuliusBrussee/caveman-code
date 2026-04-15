@@ -35,6 +35,33 @@ export function defaultPolicy(): CachePolicy {
 	return { retention: "short", supportsBreakpoints: false };
 }
 
+// T-044, T-046: unified token-usage shape exposed by every adapter.
+export interface CacheUsageReport {
+	cachedInputTokens: number;
+	cacheWriteTokens: number;
+	uncachedInputTokens: number;
+}
+
+export function totalInputTokens(u: CacheUsageReport): number {
+	return u.cachedInputTokens + u.uncachedInputTokens;
+}
+
+// T-047, T-048, T-049: per-call retention resolution.
+export interface RetentionResolveContext {
+	roleDefault: CacheRetention;
+	/** CLI flag --cache=long|short|none overrides role default. */
+	cliFlag?: CacheRetention;
+	/** CaveKit phase override takes precedence over role default but
+	 *  is still overridden by an explicit CLI flag. */
+	cavekitPhaseOverride?: CacheRetention;
+}
+
+export function resolveRetention(ctx: RetentionResolveContext): CacheRetention {
+	if (ctx.cliFlag) return ctx.cliFlag;
+	if (ctx.cavekitPhaseOverride) return ctx.cavekitPhaseOverride;
+	return ctx.roleDefault;
+}
+
 /** Enforce R1: at most one breakpoint per layer, layers in canonical order. */
 export function validateLayers(layers: LayerBlock[]): void {
 	const seen = new Set<CacheLayer>();
