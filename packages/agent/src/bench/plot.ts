@@ -4,8 +4,10 @@ export interface SystemDatapoint {
 	name: string;
 	inputTokensTotal: number;
 	outputTokensTotal: number;
+	cacheReadTokensTotal?: number;
 	resolvedCount: number;
 	totalInstances: number;
+	dollarsTotal?: number;
 }
 
 export interface PlotSpec {
@@ -39,4 +41,23 @@ export function requireTwoComparisonSystems(systems: SystemDatapoint[]): void {
 	if (systems.length < 2) {
 		throw new Error("plot: requires ≥2 comparison systems");
 	}
+}
+
+export function buildCostVsResolvedSpec(systems: SystemDatapoint[]): PlotSpec {
+	return {
+		title: "Cost vs. Resolved",
+		xAxis: "Total cost ($)",
+		yAxis: "Resolved rate",
+		series: [
+			{
+				name: "systems",
+				points: systems
+					.filter((s) => s.dollarsTotal !== undefined)
+					.map((s) => ({
+						x: s.dollarsTotal!,
+						y: s.totalInstances === 0 ? 0 : s.resolvedCount / s.totalInstances,
+					})),
+			},
+		],
+	};
 }
