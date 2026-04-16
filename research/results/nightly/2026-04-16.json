@@ -1,0 +1,30 @@
+{
+  "date": "2026-04-16",
+  "model": "cave:openai-codex:gpt-5.4:high",
+  "config": {
+    "provider": "openai-codex",
+    "model": "gpt-5.4",
+    "thinking": "high",
+    "capDollars": 5,
+    "compression": "ultra+tool+ml"
+  },
+  "aggregate": {
+    "total": 1,
+    "resolved": 1,
+    "resolvedRate": 1,
+    "dollarsTotal": 0.0861875,
+    "capFailures": 0
+  },
+  "results": [
+    {
+      "instance_id": "astropy__astropy-12907",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.0861875,
+      "duration_ms": 83549,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-12907.json"
+      ]
+    }
+  ]
+}

@@ -32,6 +32,9 @@
 		"release:major": "node scripts/release.mjs major",
 		"bench": "cd packages/coding-agent && npm run bench",
 		"bench:offline": "cd packages/coding-agent && npm run bench:offline",
+		"bench:swebench": "npx tsx research/evals/run-swebench.ts",
+		"bench:nightly": "npx tsx research/evals/run-swebench.ts --limit 50",
+		"bench:eval": "bash research/evals/evaluate-patches.sh",
 		"prepare": "husky"
 	},
 	"devDependencies": {

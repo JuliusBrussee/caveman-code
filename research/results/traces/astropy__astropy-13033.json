@@ -1,0 +1,11 @@
+{
+  "instance_id": "astropy__astropy-13033",
+  "duration_ms": 128406,
+  "cost": 0.14830800000000002,
+  "tool_calls": 18,
+  "tokens": {
+    "input": 15304,
+    "output": 5120
+  },
+  "patch_lines": 36
+}
