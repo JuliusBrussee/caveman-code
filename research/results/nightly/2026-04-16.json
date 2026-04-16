@@ -9,10 +9,10 @@
     "compression": "ultra+tool+ml"
   },
   "aggregate": {
-    "total": 1,
-    "resolved": 1,
+    "total": 50,
+    "resolved": 50,
     "resolvedRate": 1,
-    "dollarsTotal": 0.0861875,
+    "dollarsTotal": 9.385960999999998,
     "capFailures": 0
   },
   "results": [
@@ -20,10 +20,500 @@
       "instance_id": "astropy__astropy-12907",
       "resolved": true,
       "attempts": 1,
-      "dollars_spent": 0.0861875,
-      "duration_ms": 83549,
+      "dollars_spent": 0.091578,
+      "duration_ms": 48543,
       "traces": [
         "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-12907.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-13033",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.14830800000000002,
+      "duration_ms": 128406,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-13033.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-13236",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.443482,
+      "duration_ms": 261026,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-13236.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-13398",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.37596199999999996,
+      "duration_ms": 252390,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-13398.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-13453",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.17552,
+      "duration_ms": 66931,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-13453.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-13579",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.19030399999999997,
+      "duration_ms": 110985,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-13579.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-13977",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.145478,
+      "duration_ms": 104659,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-13977.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-14096",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.16665800000000003,
+      "duration_ms": 108285,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-14096.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-14182",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.24253549999999996,
+      "duration_ms": 126150,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-14182.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-14309",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.10086450000000001,
+      "duration_ms": 125549,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-14309.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-14365",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.10552550000000001,
+      "duration_ms": 64406,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-14365.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-14369",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.370028,
+      "duration_ms": 236479,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-14369.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-14508",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.265522,
+      "duration_ms": 175629,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-14508.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-14539",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.37326650000000006,
+      "duration_ms": 174660,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-14539.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-14598",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.31350500000000003,
+      "duration_ms": 272253,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-14598.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-14995",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.1655295,
+      "duration_ms": 80727,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-14995.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-7166",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.0639065,
+      "duration_ms": 44237,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-7166.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-7336",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.067422,
+      "duration_ms": 43265,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-7336.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-7606",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.06780549999999999,
+      "duration_ms": 64193,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-7606.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-7671",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.17510400000000004,
+      "duration_ms": 109992,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-7671.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-8707",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.303227,
+      "duration_ms": 159106,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-8707.json"
+      ]
+    },
+    {
+      "instance_id": "astropy__astropy-8872",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.190784,
+      "duration_ms": 112110,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/astropy__astropy-8872.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-10097",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.23131100000000002,
+      "duration_ms": 144265,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-10097.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-10554",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.38515999999999995,
+      "duration_ms": 166279,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-10554.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-10880",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.048932,
+      "duration_ms": 34516,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-10880.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-10914",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.2038635,
+      "duration_ms": 138710,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-10914.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-10973",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.31788200000000005,
+      "duration_ms": 242879,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-10973.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-10999",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.0853025,
+      "duration_ms": 50622,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-10999.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11066",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.033211000000000004,
+      "duration_ms": 18330,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11066.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11087",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.5079015,
+      "duration_ms": 384504,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11087.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11095",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.24478099999999997,
+      "duration_ms": 165852,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11095.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11099",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.031254500000000005,
+      "duration_ms": 20280,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11099.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11119",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.0615305,
+      "duration_ms": 37559,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11119.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11133",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.1265035,
+      "duration_ms": 78290,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11133.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11138",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.5480465,
+      "duration_ms": 274762,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11138.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11141",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.0667495,
+      "duration_ms": 44451,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11141.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11149",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.3091555,
+      "duration_ms": 143195,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11149.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11163",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.0351095,
+      "duration_ms": 26755,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11163.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11179",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.04101200000000001,
+      "duration_ms": 34185,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11179.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11206",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.15132400000000001,
+      "duration_ms": 95881,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11206.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11211",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.226884,
+      "duration_ms": 88589,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11211.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11239",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.082725,
+      "duration_ms": 69174,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11239.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11265",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.15772150000000001,
+      "duration_ms": 80022,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11265.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11276",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.061075000000000004,
+      "duration_ms": 41222,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11276.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11292",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.35034400000000004,
+      "duration_ms": 170159,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11292.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11299",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.078764,
+      "duration_ms": 39478,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11299.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11333",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.08639949999999999,
+      "duration_ms": 64098,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11333.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11400",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.14657399999999998,
+      "duration_ms": 66570,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11400.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11433",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.168036,
+      "duration_ms": 112206,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11433.json"
+      ]
+    },
+    {
+      "instance_id": "django__django-11451",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.05609249999999999,
+      "duration_ms": 22280,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/django__django-11451.json"
       ]
     }
   ]

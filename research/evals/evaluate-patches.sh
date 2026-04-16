@@ -58,8 +58,16 @@ if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "aarch64" ]; then
 	NAMESPACE_FLAG="--namespace ''"
 fi
 
+# On ARM, cap workers at 1 to avoid OOM (exit 137) during Docker image builds
+if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "aarch64" ]; then
+	if [ "$MAX_WORKERS" -gt 1 ]; then
+		echo "ARM detected: capping workers to 1 to avoid OOM during x86 emulation."
+		MAX_WORKERS=1
+	fi
+fi
+
 # Run evaluation
-echo "Starting evaluation harness..."
+echo "Starting evaluation harness (workers: $MAX_WORKERS)..."
 eval python3 -m swebench.harness.run_evaluation \
 	--dataset_name princeton-nlp/SWE-bench_Verified \
 	--predictions_path "$PREDICTIONS" \
