@@ -5,7 +5,7 @@ import { join } from "node:path";
 
 export interface BaselineData {
 	system: string;
-	benchmark: "swebench" | "microbench";
+	benchmark: "swebench" | "microbench" | "terminal-bench";
 	date: string;
 	source: string;
 	resolvedCount: number;
@@ -13,7 +13,18 @@ export interface BaselineData {
 	inputTokensTotal: number;
 	outputTokensTotal: number;
 	cacheReadTokensTotal?: number;
+	cacheWriteTokensTotal?: number;
 	dollarsTotal: number;
+	/** Mean conversation turns / agent steps (terminal-bench only). */
+	meanTurns?: number;
+	/** Mean wall-clock per task in ms (terminal-bench only). */
+	meanWallTimeMs?: number;
+	/** Iso-quality intersection size used to compute the headline number. */
+	isoQualityResolvedCount?: number;
+	/** Sum of total tokens for this agent restricted to the iso-quality intersection. */
+	isoQualityTokensTotal?: number;
+	/** Average token-verification delta across rows (subscription mode: ≤5%; api-key: ≤2%). */
+	tokensVerificationDeltaPct?: number;
 }
 
 export interface ComparisonRow {
@@ -28,6 +39,11 @@ export interface ComparisonRow {
 	cacheReadRatio?: number;
 	/** output / (input + output). */
 	outputTokenRatio: number;
+	/** Iso-quality tokens-per-resolved (terminal-bench headline number). */
+	isoQualityTokensPerResolved?: number;
+	meanTurns?: number;
+	meanWallTimeMs?: number;
+	tokensVerificationDeltaPct?: number;
 }
 
 export interface ComparisonReport {
@@ -119,6 +135,11 @@ function toRow(b: BaselineData): ComparisonRow {
 	const totalTokens = promptTokens + b.outputTokensTotal;
 	const resolved = b.resolvedCount || 1; // avoid /0
 
+	let isoQualityTokensPerResolved: number | undefined;
+	if (b.isoQualityTokensTotal !== undefined && b.isoQualityResolvedCount && b.isoQualityResolvedCount > 0) {
+		isoQualityTokensPerResolved = b.isoQualityTokensTotal / b.isoQualityResolvedCount;
+	}
+
 	return {
 		system: b.system,
 		benchmark: b.benchmark,
@@ -126,9 +147,12 @@ function toRow(b: BaselineData): ComparisonRow {
 		tokensPerResolved: totalTokens / resolved,
 		costPerResolved: b.dollarsTotal / resolved,
 		tokenEfficiencyRatio: totalTokens > 0 ? (b.resolvedCount / totalTokens) * 1_000_000 : 0,
-		cacheReadRatio:
-			b.cacheReadTokensTotal !== undefined ? b.cacheReadTokensTotal / (promptTokens || 1) : undefined,
+		cacheReadRatio: b.cacheReadTokensTotal !== undefined ? b.cacheReadTokensTotal / (promptTokens || 1) : undefined,
 		outputTokenRatio: totalTokens > 0 ? b.outputTokensTotal / totalTokens : 0,
+		isoQualityTokensPerResolved,
+		meanTurns: b.meanTurns,
+		meanWallTimeMs: b.meanWallTimeMs,
+		tokensVerificationDeltaPct: b.tokensVerificationDeltaPct,
 	};
 }
 
@@ -176,25 +200,86 @@ function kTokens(n: number): string {
 	return `${(n / 1000).toFixed(0)}k`;
 }
 
-export function formatComparisonTable(report: ComparisonReport): string {
+export interface FormatComparisonOptions {
+	/** Subscription mode hides the dollar column ("all on plan; tokens are the unit"). */
+	authMode?: "subscription" | "api-key";
+	/** Quality-band footer flag. Surfaced when iso-quality slice was gated. */
+	qualityGated?: boolean;
+	/** Number of tasks in the iso-quality intersection (footer). */
+	isoQualityCount?: number;
+}
+
+export function formatComparisonTable(report: ComparisonReport, options: FormatComparisonOptions = {}): string {
 	const lines: string[] = [];
+	const isTb = report.benchmarks.includes("terminal-bench");
+	const showDollars = !(isTb && options.authMode === "subscription");
 
 	lines.push("=== Cross-System Comparison ===");
 	lines.push("");
 
-	// Header
-	lines.push(
-		`| ${pad("System", 14)} | ${pad("Bench", 10)} | ${rpad("Resolved", 10)} | ${rpad("Tok/Resolved", 13)} | ${rpad("$/Resolved", 11)} | ${rpad("Eff (res/Mtok)", 15)} | ${rpad("Cache%", 7)} |`,
-	);
-	lines.push(
-		`|${"-".repeat(16)}|${"-".repeat(12)}|${"-".repeat(12)}|${"-".repeat(15)}|${"-".repeat(13)}|${"-".repeat(17)}|${"-".repeat(9)}|`,
-	);
+	// Header — for terminal-bench, lead with the iso-quality headline column;
+	// otherwise the SWE-bench/microbench tables stay byte-identical.
+	const benchWidth = isTb ? 14 : 10;
+	let header = `| ${pad("System", 14)} | ${pad("Bench", benchWidth)} |`;
+	let rule = `|${"-".repeat(16)}|${"-".repeat(benchWidth + 2)}|`;
+	if (isTb) {
+		header += ` ${rpad("Iso Tok/Res", 12)} |`;
+		rule += `${"-".repeat(14)}|`;
+	}
+	header += ` ${rpad("Resolved", 10)} | ${rpad("Tok/Resolved", 13)} | ${rpad("$/Resolved", 11)} | ${rpad("Eff (res/Mtok)", 15)} | ${rpad("Cache%", 7)} |`;
+	rule += `${"-".repeat(12)}|${"-".repeat(15)}|${"-".repeat(13)}|${"-".repeat(17)}|${"-".repeat(9)}|`;
+	if (isTb) {
+		header += ` ${rpad("Turns", 6)} | ${rpad("Wall", 7)} |`;
+		rule += `${"-".repeat(8)}|${"-".repeat(9)}|`;
+	}
+	lines.push(header);
+	lines.push(rule);
 
 	for (const row of report.rows) {
 		const cacheStr = row.cacheReadRatio !== undefined ? pct(row.cacheReadRatio) : "n/a";
-		lines.push(
-			`| ${pad(row.system, 14)} | ${pad(row.benchmark, 10)} | ${rpad(pct(row.resolvedRate), 10)} | ${rpad(kTokens(row.tokensPerResolved), 13)} | ${rpad(dollars(row.costPerResolved), 11)} | ${rpad(row.tokenEfficiencyRatio.toFixed(2), 15)} | ${rpad(cacheStr, 7)} |`,
+		// Per-row badge when token verification delta exceeds 2% (terminal-bench only).
+		const deltaBadge =
+			isTb && row.tokensVerificationDeltaPct !== undefined && row.tokensVerificationDeltaPct > 0.02 ? " *" : "";
+		const systemLabel = pad(`${row.system}${deltaBadge}`, 14);
+		let line = `| ${systemLabel} | ${pad(row.benchmark, benchWidth)} |`;
+		if (isTb) {
+			const iso = row.isoQualityTokensPerResolved !== undefined ? kTokens(row.isoQualityTokensPerResolved) : "n/a";
+			line += ` ${rpad(iso, 12)} |`;
+		}
+		// In subscription-mode terminal-bench the dollar column is meaningless
+		// (everyone is on a plan); blank it but keep alignment so the SWE-bench
+		// / microbench tables remain byte-identical.
+		const costStr = showDollars ? dollars(row.costPerResolved) : "—";
+		line += ` ${rpad(pct(row.resolvedRate), 10)} | ${rpad(kTokens(row.tokensPerResolved), 13)} | ${rpad(costStr, 11)} | ${rpad(row.tokenEfficiencyRatio.toFixed(2), 15)} | ${rpad(cacheStr, 7)} |`;
+		if (isTb) {
+			const turns = row.meanTurns !== undefined ? row.meanTurns.toFixed(1) : "n/a";
+			const wall = row.meanWallTimeMs !== undefined ? `${(row.meanWallTimeMs / 1000).toFixed(1)}s` : "n/a";
+			line += ` ${rpad(turns, 6)} | ${rpad(wall, 7)} |`;
+		}
+		lines.push(line);
+	}
+
+	// Footer for terminal-bench: iso-quality count + quality-gating warning +
+	// verification-delta badge legend.
+	if (isTb) {
+		lines.push("");
+		if (options.isoQualityCount !== undefined) {
+			lines.push(`Iso-quality intersection: ${options.isoQualityCount} task(s) resolved by every agent.`);
+		}
+		if (options.qualityGated) {
+			lines.push(
+				"WARNING: pass rates differ by more than the quality band — headline number is quality-gated, not like-for-like.",
+			);
+		}
+		const anyDeltaFlagged = report.rows.some(
+			(r) => r.tokensVerificationDeltaPct !== undefined && r.tokensVerificationDeltaPct > 0.02,
 		);
+		if (anyDeltaFlagged) {
+			lines.push("`*` after system name = token-verification delta > 2%; investigate parser before publishing.");
+		}
+		if (!showDollars) {
+			lines.push("All agents authenticated via subscription plan; tokens are the cost-attributable unit.");
+		}
 	}
 
 	// Relative section

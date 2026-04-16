@@ -40,6 +40,48 @@ Key metrics:
 - **75% prompt cache hit rate** (caveman compression)
 - **14 min** wall clock
 
+### Terminal-Bench (head-to-head, live)
+
+Runs cave (with gpt-5.4), Codex CLI, and Claude Code on the **same** Terminal-Bench
+task set, on the **same** machine, in the **same** week — producing live token
+numbers instead of relying on published leaderboard estimates.
+
+Requires Docker (TB tasks run in containers) and Python 3.10+.
+
+```bash
+# (a) Install Terminal-Bench in a local venv + pull its base image
+python3 -m venv research/evals/terminal-bench/.venv
+research/evals/terminal-bench/.venv/bin/pip install -r \
+  research/evals/terminal-bench/requirements.txt
+docker pull ghcr.io/laude-institute/terminal-bench/tb-base:latest
+
+# (b) 3-task smoke (~10 min, ~$2 ceiling)
+npm run bench:tb -- --agents cave,codex,claude \
+  --tasks research/evals/terminal-bench/task-lists/tb-core-smoke.txt \
+  --limit 3 --output research/results/tb-smoke \
+  --cap-wall-sec 300 --max-total-dollars 5
+
+# (c) Headline 20-task run (~3 hr, ~$25)
+npm run bench:tb -- --agents cave,codex,claude \
+  --tasks research/evals/terminal-bench/task-lists/tb-core-20.txt \
+  --limit 20 --cap-wall-sec 600 --max-total-dollars 50
+
+# (d) Render head-to-head table
+npm run bench:compare -- --benchmark terminal-bench
+```
+
+Results land in `research/baselines/{cave,codex,claude-code}-terminal-bench.json`
+plus `research/results/terminal-bench-<date>.json` (full per-task records, iso-quality
+slice, and run metadata). The combined comparison table leads with
+**Tokens/resolved (iso-quality)** — the headline metric — and prints Pass /
+$/Resolved / Cache / Turns / Wall as supporting columns. Rows whose token-verification
+delta exceeds 2% are flagged with a `*` so the operator can fix the parser before
+publishing.
+
+Auth defaults to **subscription mode** (cave + codex on ChatGPT plan, claude-code on
+Pro/Max plan); pass `--auth-mode api-key` to swap in metered keys for the audit run
+(adds dollar columns + tightens token tolerance to 2%).
+
 ### SWE-bench Verified (thorough, expensive)
 
 500 real GitHub issues from the SWE-bench Verified dataset.

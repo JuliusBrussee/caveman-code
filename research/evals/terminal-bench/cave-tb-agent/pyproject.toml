@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cave-tb-agent"
+version = "0.1.0"
+description = "Terminal-Bench adapter for the cave coding agent CLI."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Cave CLI" }]
+license = { text = "MIT" }
+dependencies = [
+    "terminal-bench>=0.2",
+]
+
+[project.entry-points."terminal_bench.agents"]
+cave = "cave_tb_agent.agent:CaveTbAgent"
+
+[tool.setuptools]
+packages = ["cave_tb_agent"]
+package-dir = { "cave_tb_agent" = "." }

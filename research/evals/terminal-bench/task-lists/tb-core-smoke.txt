@@ -1,0 +1,5 @@
+# Terminal-Bench smoke set — 3 tasks for the verification run.
+# Picked from the tb-core split: short, deterministic, no flaky external deps.
+hello-world
+fix-python-typo
+list-files

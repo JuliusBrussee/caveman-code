@@ -1,0 +1,3 @@
+# Pin Terminal-Bench so adapter loading stays stable across re-runs. Bump in
+# lockstep with the cave-tb-agent Dockerfile's TB_BASE_IMAGE tag.
+terminal-bench==0.2.18

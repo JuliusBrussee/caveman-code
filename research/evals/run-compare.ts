@@ -79,7 +79,12 @@ function parseArgs(): CompareConfig {
 function findLatestResults(dir: string, benchmark?: string): string | null {
 	if (!existsSync(dir)) return null;
 
-	const prefix = benchmark === "microbench" ? "microbench-" : "swebench-";
+	const prefix =
+		benchmark === "microbench"
+			? "microbench-"
+			: benchmark === "terminal-bench"
+				? "terminal-bench-"
+				: "swebench-";
 	const files = readdirSync(dir)
 		.filter((f) => f.startsWith(prefix) && f.endsWith(".json"))
 		.sort()
@@ -100,7 +105,7 @@ function main() {
 	if (!caveResultsPath) {
 		caveResultsPath = findLatestResults(resolve("research/results"), config.benchmark);
 		if (!caveResultsPath) {
-			console.error("No cave results found. Run bench:micro or bench:swebench first, or specify --cave-results.");
+			console.error("No cave results found. Run bench:micro, bench:swebench, or bench:tb first, or specify --cave-results.");
 			process.exit(1);
 		}
 		console.log(`Auto-detected results: ${caveResultsPath}`);
@@ -110,19 +115,31 @@ function main() {
 	const caveBenchmark = caveResults.benchmark ?? "swebench";
 	const effectiveBenchmark = config.benchmark ?? caveBenchmark;
 
-	// Convert cave results to baseline format
-	const caveBaseline = resultsToBaseline(caveResults, "cave");
+	let allSystems: BaselineData[];
+	let isoQualityCount: number | undefined;
+	let qualityGated = false;
+	let authMode: "subscription" | "api-key" | undefined;
 
-	// Load external baselines
-	const externalBaselines = loadBaselinesFromDir(config.baselinesDir, effectiveBenchmark);
-
-	if (externalBaselines.length === 0) {
-		console.log(`No external baselines found for "${effectiveBenchmark}" in ${config.baselinesDir}`);
-		console.log("Showing cave results only.\n");
+	if (effectiveBenchmark === "terminal-bench") {
+		// Per-agent baselines were already written by run-terminal-bench.ts;
+		// the run report just supplies metadata for the table footer.
+		allSystems = loadBaselinesFromDir(config.baselinesDir, "terminal-bench");
+		isoQualityCount = caveResults.isoQuality?.resolvedTaskIds?.length;
+		qualityGated = Boolean(caveResults.isoQuality?.qualityGated);
+		authMode = caveResults.authMode;
+		if (allSystems.length === 0) {
+			console.error(`No terminal-bench baselines found in ${config.baselinesDir}. Run bench:tb first.`);
+			process.exit(1);
+		}
+	} else {
+		const caveBaseline = resultsToBaseline(caveResults, "cave");
+		const externalBaselines = loadBaselinesFromDir(config.baselinesDir, effectiveBenchmark);
+		if (externalBaselines.length === 0) {
+			console.log(`No external baselines found for "${effectiveBenchmark}" in ${config.baselinesDir}`);
+			console.log("Showing cave results only.\n");
+		}
+		allSystems = [caveBaseline, ...externalBaselines];
 	}
-
-	// Combine all systems
-	const allSystems: BaselineData[] = [caveBaseline, ...externalBaselines];
 
 	// Generate comparison
 	const report = compareSystemsJSON(allSystems);
@@ -136,7 +153,7 @@ function main() {
 			console.log(json);
 		}
 	} else {
-		const table = formatComparisonTable(report);
+		const table = formatComparisonTable(report, { authMode, qualityGated, isoQualityCount });
 		console.log(table);
 
 		if (config.outputPath) {

@@ -36,6 +36,7 @@
 		"bench:nightly": "npx tsx research/evals/run-swebench.ts --limit 50",
 		"bench:eval": "bash research/evals/evaluate-patches.sh",
 		"bench:micro": "npx tsx research/evals/run-microbench.ts",
+		"bench:tb": "npx tsx research/evals/run-terminal-bench.ts",
 		"bench:compare": "npx tsx research/evals/run-compare.ts",
 		"prepare": "husky"
 	},

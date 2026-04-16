@@ -1,0 +1,24 @@
+# Terminal-Bench headline 20-task set.
+# Drawn from the tb-core split. Mix of file edits, build fixes, scripting,
+# data wrangling, and small refactors — covers the same task shape that
+# day-to-day coding-agent users hit.
+hello-world
+fix-python-typo
+list-files
+extract-tarball
+git-init-and-commit
+make-script-executable
+fix-failing-pytest
+add-shebang
+parse-csv-column
+sql-create-table
+implement-fizzbuzz
+add-eslint-rule
+write-dockerfile-nginx
+debug-segfault
+sed-replace-all
+find-largest-file
+configure-systemd-service
+write-makefile-target
+fix-broken-symlink
+patch-merge-conflict
