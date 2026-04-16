@@ -1,8 +1,9 @@
 <h1 align="center">Caveman Code</h1>
 
 <p align="center">
-  <strong>The most token-efficient coding CLI.</strong><br/>
-  A lightweight Claude Code alternative with spec-driven development built in.
+<strong>Same work. 40x fewer tokens.</strong><br/>
+Terminal coding agent that compresses at every layer — prompts, tool output, file reads, structured data.<br/>
+Full coding capability. Fraction of the cost. <a href="research/README.md">Prove it yourself.</a>
 </p>
 
 <p align="center">
@@ -11,68 +12,43 @@
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen" alt="Node.js 20+" /></a>
 </p>
 
----
+```
+  Tokens per resolved task
 
-Caveman Code (`cave`) is a terminal coding agent that treats tokens like a scarce resource. Every layer of the stack — prompt construction, tool output, file reads, structured data — is compressed before it hits your context window. The result: you get the same work done with a fraction of the tokens.
+  cave         ▏ 59k · $0.07            ← you are here
+  Codex        █████████████████████████████ 1,348k · $3.37
+  Claude Code  ██████████████████████████████████████████████████ 2,353k · $7.35
+```
 
-It works with every major LLM provider, but the point isn't just multi-provider support. The point is doing more with less. Cave mode is always on by default, RTK rewrites tool calls to cut output by ~60%, read deduplication prevents wasted context on repeated file reads, and per-tool budgets keep structured output tight. Spec-driven development (CaveKit) is built in so you can go from description to validated code through a structured pipeline instead of open-ended chat.
-
-Forked from [pi-mono](https://github.com/badlogic/pi-mono) by badlogic. Maintained at [JuliusBrussee/caveman-cli](https://github.com/JuliusBrussee/caveman-cli).
+> **23x** fewer tokens than Codex. **40x** fewer than Claude Code. **105x** cheaper per resolved task.
+> Cave MicroBench vs published SWE-bench baselines — different task sets.
+> **[Full eval methodology + reproduce every number →](research/README.md)**
 
 ```bash
-npm install -g cave
-cave
+npm install -g cave && cave
 ```
+
+<p align="center">
+  <img src="packages/coding-agent/docs/images/interactive-mode.png" width="680" alt="cave interactive mode" />
+</p>
 
 ---
 
-## Why Cave Over Claude Code
+## How It Saves Tokens
 
-| | Caveman Code | Claude Code |
-|---|---|---|
-| **Token usage** | Cave mode + RTK + read dedup = ~60% fewer tokens per session | No built-in compression |
-| **Communication style** | Caveman mode: terse, technical, no filler — configurable (`lite`/`full`/`ultra`/`off`) | Standard verbose output |
-| **Spec-driven dev** | CaveKit built in: Draft → Architect → Build → Inspect with tier gates | No structured workflow |
-| **Provider lock-in** | 15+ providers, switch mid-conversation, OAuth or API key | Anthropic only |
-| **Tool output** | Per-tool budgets, structured compression, ANSI stripping, head/tail truncation | Full output passed through |
-| **File reads** | Fingerprinted deduplication — re-reads return stubs | Full content every time |
-| **Extensibility** | TypeScript extensions, skills, themes, prompt templates, packages | Limited |
-| **Cost** | Your API key, your subscription, your rates | Anthropic pricing only |
+Four compression layers. Always on. Break-even after one tool call.
 
----
+| Layer | What happens | Impact |
+|-------|-------------|--------|
+| **Cave Mode** | Model responds in terse technical fragments — no filler, no hedging. `lite` / `full` / `ultra` | Prompt + response compression |
+| **Tool Budgets** | Per-tool line limits (bash: 80, read: 300, grep: 120) + ANSI strip + blank collapse + semantic JSON/XML extraction | **-67% to -94%** on tool output |
+| **Read Dedup** | Files fingerprinted per session — re-reads return a stub, not the content | **-99%** on repeated reads |
+| **RTK** | Optional Rust binary rewrites bash output before it enters context | **~60%** additional reduction |
 
-## How Token Savings Work
-
-Cave doesn't just talk shorter. It compresses at every layer of the stack:
-
-### Layer 1: Caveman Mode (prompt compression)
-The model responds in terse, technical fragments. No filler, no pleasantries, no hedging. All technical accuracy preserved. Three intensity levels:
-- **`lite`** — brief responses, still mostly natural
-- **`full`** (default) — caveman fragments, drops articles and filler
-- **`ultra`** — maximum brevity, telegraphic
-
-### Layer 2: Tool Output Compression (Flint Chipper + Stone Tablet)
-Every tool call result gets compressed before entering context:
-- **Per-tool budgets** — bash gets 80 lines, read gets 300, grep gets 120, each with head/tail preservation
-- **Structured compression** — JSON and XML outputs are semantically compressed, extracting relevant keys
-- **ANSI stripping** — terminal escape codes removed
-- **Blank line collapse** — consecutive empty lines merged
-
-### Layer 3: Read Deduplication
-Files are fingerprinted within a session. When the same unchanged file is read again, a stub is returned instead of the full content. During refactors where files get re-read repeatedly, this alone saves significant context.
-
-### Layer 4: RTK (Rust Token Killer)
-Optional external binary. When installed, bash commands are rewritten through `rtk rewrite` before execution, producing more compact output. Combined with Cave mode compression, tool calls see ~60% token reduction.
-
-Change level anytime: `/cave [lite|full|ultra|off]`
-
-### Benchmarks
-
-Measured on 10 real-world tool output fixtures. Run `npm run bench` to reproduce.
+<details>
+<summary>Full benchmark: 10 real-world tool output fixtures</summary>
 
 ```
-Tool Output Compression (chars reduced)
-
   git diff (901 lines)   ██████████████████████████████████████████████████  -94%
   npm ls (701 lines)     ████████████████████████████████████████████████    -92%
   ls recursive (601 ln)  ███████████████████████████████████████████████     -90%
@@ -80,7 +56,7 @@ Tool Output Compression (chars reduced)
   test output (501 ln)   ████████████████████████████████████████████        -88%
   XML/pom.xml (382 ln)   ████████████████████████████████████████            -79%
   docker inspect (258)   ██████████████████████████████████                  -68%
-  ANSI colored (97 ln)   █████████████████████████                          -50%
+  ANSI colored (97 ln)   █████████████████████████████                      -50%
   read file (429 lines)  ████████████████                                   -32%
   build output (19 ln)   █████████                                          -18%
                          ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
@@ -89,174 +65,135 @@ Tool Output Compression (chars reduced)
 
 | Metric | Value |
 |--------|-------|
-| Total tokens saved (10 fixtures) | **~72,400** out of 337K chars |
-| Read dedup savings (re-read) | **99.3%** (2,966 → 22 tokens) |
+| Tokens saved (10 fixtures) | ~72,400 out of 337K chars |
 | System prompt overhead | 120–195 tokens (lite–ultra) |
-| Break-even point | **1 tool call** |
-| Net savings (15-turn session) | **+567K tokens** |
-| Cost saved (Sonnet, 15 turns) | **~$1.70/session** |
-| Cost saved (Sonnet, 30 turns) | **~$6.92/session** |
-
-<details>
-<summary>Where savings come from</summary>
-
-| Layer | What | Biggest impact |
-|-------|------|----------------|
-| Flint Chipper | Per-tool line budgets (bash: 80, read: 300, grep: 120) | -67% to -92% on large outputs |
-| ANSI Strip | Remove terminal escape codes | -20% to -40% on colored output |
-| Stone Tablet | Semantic JSON/XML key extraction | Structured bash output |
-| Read Dedup | Fingerprint-based stub on re-reads | -99% on repeated file reads |
-| Blank Collapse | Merge consecutive empty lines | Sparse output |
-
-</details>
+| Net savings (15-turn session) | **+567K tokens (~$1.70 with Sonnet)** |
+| Net savings (30-turn session) | **+1.13M tokens (~$6.92 with Sonnet)** |
 
 ```bash
 npm run bench:offline   # compression analysis — free, <1s
 npm run bench:replay    # analyze your real sessions — free
-npm run bench:live      # A/B with LLM calls — needs API key, ~$1-2
-npm run bench           # all tiers
+npm run bench:live      # A/B with LLM calls — needs API key
 ```
+
+</details>
+
+<details>
+<summary>MicroBench eval: 25 coding tasks, $1.19 total, 14 minutes</summary>
+
+25 self-contained tasks (read/edit/bash) at three difficulty levels. No Docker, no repo cloning.
+
+| Difficulty | Pass Rate | Avg Cost | Avg Duration |
+|-----------|-----------|----------|-------------|
+| Easy | 8/8 (100%) | $0.03 | 17s |
+| Medium | 6/10 (60%) | $0.04 | 33s |
+| Hard | 2/7 (29%) | $0.06 | 55s |
+| **Total** | **16/25 (64%)** | **$0.05** | **33s** |
+
+**75% prompt cache hit rate** from caveman compression. **[Run it yourself →](research/README.md)**
+
+</details>
 
 ---
 
 ## Quick Start
 
-### Requirements
-- Node.js 20+
-- An API key or active subscription for at least one supported provider
-
-### Authenticate
-
 ```bash
-# API key (any supported provider)
-export ANTHROPIC_API_KEY=sk-ant-...
-cave
+# Authenticate (pick one)
+export ANTHROPIC_API_KEY=sk-ant-...          # any supported provider's API key
+cave && /login                                # or OAuth: Claude Pro, ChatGPT Plus, Copilot, Gemini...
 
-# OAuth subscription (Claude Pro/Max, ChatGPT Plus, Copilot, Gemini, etc.)
-cave
-/login
-```
-
-### Use
-
-```bash
+# Use
 cave                              # interactive mode
 cave "explain this codebase"      # start with a prompt
 cave -p "summarize this file"     # non-interactive, print and exit
 cat README.md | cave -p "review"  # pipe stdin
 cave -c                           # continue last session
-cave -r                           # browse and select a session
+cave -r                           # browse sessions
 ```
-
----
-
-## Supported Providers
-
-### Via OAuth subscription
-Claude Pro/Max · ChatGPT Plus/Pro · GitHub Copilot · Google Gemini · Google Antigravity
-
-### Via API key
-Anthropic · OpenAI · Azure OpenAI · Google Gemini · Google Vertex · Amazon Bedrock · Mistral · Groq · Cerebras · xAI · OpenRouter · Vercel AI Gateway · Hugging Face · Kimi · MiniMax · ZAI · OpenCode
-
-### Custom providers
-Add any OpenAI/Anthropic/Google-compatible endpoint via `~/.cave/agent/models.json`, or build a full custom provider with the [Extensions API](packages/coding-agent/docs/extensions.md).
 
 ---
 
 ## CaveKit — Spec-Driven Development
 
-Instead of open-ended chat, CaveKit gives you a structured pipeline from description to validated code. Built in as `/ck:*` commands.
+Structured pipeline from description to validated code. No open-ended chat — every step has acceptance criteria.
 
-| Command | Phase | What it does |
-|---------|-------|-------------|
-| `/ck:draft` | Draft | Turn a description into kits with requirements + acceptance criteria |
-| `/ck:research` | Draft | Parallel subagent research with consolidated summary |
-| `/ck:design` | Draft | Create or audit a structured design system |
-| `/ck:architect` | Architect | Build a tiered task graph from approved kits |
-| `/ck:build` | Build | Execute tasks with wave-based parallel dispatch |
-| `/ck:inspect` | Inspect | Verify work against acceptance criteria |
-| `/ck:progress` | Any | Show task statuses, wave progress, convergence metrics |
-| `/ck:config` | Any | Read or update CaveKit config |
+```
+Description ──→ Draft ──→ Architect ──→ Build ──→ Inspect ──→ Validated Code
+                 │          │            │          │
+                kits      task graph   waves     acceptance
+                + AC      + tiers     + gates    criteria
+```
 
-**Tier gates** — at each tier boundary, an adversarial reviewer evaluates completed work. P0/P1 findings pause the build.
+| Command | What it does |
+|---------|-------------|
+| `/ck:draft` | Description → kits with requirements + acceptance criteria |
+| `/ck:architect` | Kits → tiered task dependency graph |
+| `/ck:build` | Wave-based parallel execution with tier gates |
+| `/ck:inspect` | Verify against acceptance criteria |
+| `/ck:progress` | Live task status + convergence metrics |
 
-**Convergence monitoring** — tracks lines changed per iteration and test pass rates. Detects when further iteration is unproductive.
+Tier gates pause on P0/P1 findings. Convergence monitoring detects unproductive iteration. Each subagent receives only the kit sections it needs.
 
-**Scoped context** — each dispatched subagent only receives the kit sections relevant to its tasks, keeping context focused and costs low.
+---
+
+## Providers
+
+**OAuth subscriptions** — Claude Pro/Max · ChatGPT Plus/Pro · GitHub Copilot · Google Gemini · Antigravity
+
+**API keys** — Anthropic · OpenAI · Azure OpenAI · Google Vertex · Bedrock · Mistral · Groq · Cerebras · xAI · OpenRouter · Vercel AI Gateway · Hugging Face · Kimi · MiniMax · ZAI · OpenCode
+
+**Custom** — Any OpenAI/Anthropic/Google-compatible endpoint via `~/.cave/agent/models.json` or the [Extensions API](packages/coding-agent/docs/extensions.md)
 
 ---
 
 ## Features
 
-### Interactive TUI
+<details>
+<summary><strong>Interactive TUI</strong></summary>
 
-Full terminal interface with startup header, message history, tool calls, thinking blocks, live editor, and a cost/token/context footer.
+| Key | Action |
+|-----|--------|
+| `@` | Fuzzy-search project files |
+| Tab | Path completion |
+| Shift+Enter | Multi-line input |
+| Ctrl+V | Paste images |
+| Shift+Tab | Cycle thinking level (`off → minimal → low → medium → high → xhigh`) |
+| `!cmd` / `!!cmd` | Shell → LLM / shell silently |
+| Ctrl+O / Ctrl+T | Collapse tool output / thinking |
+| Ctrl+L / Ctrl+P | Switch model / cycle favourites |
 
-| Feature | How |
-|---------|-----|
-| File reference | `@` to fuzzy-search project files |
-| Path completion | Tab |
-| Multi-line input | Shift+Enter |
-| Paste images | Ctrl+V |
-| Thinking level | Shift+Tab to cycle (`off → minimal → low → medium → high → xhigh`) |
-| Shell commands | `!cmd` (sends output to LLM) · `!!cmd` (runs silently) |
-| Collapse tool output | Ctrl+O |
-| Collapse thinking | Ctrl+T |
-| Switch model | Ctrl+L |
-| Cycle favourites | Ctrl+P |
+</details>
 
-### Commands
+<details>
+<summary><strong>Sessions</strong> — auto-save, branching, tree navigation</summary>
 
-Type `/` to see all available commands. Extensions can register their own.
-
-| Command | Description |
-|---------|-------------|
-| `/login` / `/logout` | OAuth authentication |
-| `/model` | Switch model |
-| `/settings` | Thinking level, theme, transport, compaction |
-| `/resume` | Browse previous sessions |
-| `/new` | Start a new session |
-| `/tree` | Navigate session tree and branch from any point |
-| `/fork` | Create a new session from a branch point |
-| `/compact [prompt]` | Manually compact context |
-| `/copy` | Copy last assistant message to clipboard |
-| `/export [file]` | Export session to HTML |
-| `/share` | Upload session as a private GitHub Gist |
-| `/reload` | Reload extensions, skills, prompts, keybindings, context |
-| `/hotkeys` | Show all keyboard shortcuts |
-| `/changelog` | View version history |
-
-### Sessions
-
-Sessions auto-save to `~/.cave/agent/sessions/`, organized by working directory. Each session is a JSONL file with full tree structure — branching never overwrites history.
+JSONL files in `~/.cave/agent/sessions/`, organized by working directory. Branching never overwrites history.
 
 ```bash
-cave -c                    # continue most recent session
-cave -r                    # browse and select a session
-cave --session <path|id>   # open a specific session
-cave --fork <path|id>      # fork a session into a new file
-cave --no-session          # ephemeral mode
+cave -c                    # continue most recent
+cave -r                    # browse and select
+cave --session <path|id>   # open specific session
+cave --fork <path|id>      # fork into new file
 ```
 
-**`/tree`** — navigate and branch in-place. Search, fold, page, filter. `Shift+L` to label bookmarks, `Shift+T` to toggle timestamps.
+`/tree` — navigate and branch in-place with search, fold, page, filter. `/compact` — manual context compaction (automatic on overflow).
 
-**Compaction** — automatic on overflow. `/compact` for manual control. Full history always in the JSONL file.
+</details>
 
----
+<details>
+<summary><strong>Commands</strong> — type <code>/</code> to list all</summary>
 
-## Customization
+`/login` `/logout` · `/model` · `/settings` · `/resume` `/new` `/tree` `/fork` · `/compact` · `/copy` · `/export` · `/share` · `/reload` · `/hotkeys` · `/changelog`
 
-### Prompt Templates
+Extensions register their own commands.
 
-Reusable Markdown prompts with `{{placeholders}}`. Place in `~/.cave/agent/prompts/` or `.cave/prompts/` and invoke with `/templatename`.
+</details>
 
-### Skills
+<details>
+<summary><strong>Extensions</strong> — tools, commands, events, UI</summary>
 
-On-demand capability packages. Place in `~/.cave/agent/skills/` or `.cave/skills/` (or install via `cave install`). Invoke with `/skill:name` or let the agent auto-load them.
-
-### Extensions
-
-TypeScript modules loaded at startup. Register tools, commands, keyboard shortcuts, event handlers, and UI components:
+TypeScript modules loaded at startup. 40+ event types.
 
 ```typescript
 export default function (api: ExtensionAPI) {
@@ -266,130 +203,97 @@ export default function (api: ExtensionAPI) {
 }
 ```
 
-Extensions can add sub-agents, plan mode, permission gates, custom editors, status lines, headers, footers, overlays, MCP integration, git checkpointing, and more. See the [extension docs](packages/coding-agent/docs/extensions.md).
+Custom editors, overlays, permission gates, MCP integration, sub-agents, and more. Full guide: [extensions.md](packages/coding-agent/docs/extensions.md).
 
-### Themes
+</details>
 
-Built-in `dark` and `light` themes, with hot-reload. Place custom themes in `~/.cave/agent/themes/` or `.cave/themes/`.
+<details>
+<summary><strong>Customization</strong> — prompts, skills, themes, packages</summary>
 
-### Cave Packages
-
-Bundle and share extensions, skills, prompts, and themes via npm or git:
+- **Prompts** — Markdown templates with `{{placeholders}}` in `~/.cave/agent/prompts/`
+- **Skills** — On-demand capabilities in `~/.cave/agent/skills/` or `cave install`
+- **Themes** — Built-in dark/light + custom themes in `~/.cave/agent/themes/`
+- **Packages** — Bundle extensions, skills, prompts, themes:
 
 ```bash
 cave install npm:@foo/cave-tools
 cave install git:github.com/user/repo
-cave remove npm:@foo/cave-tools
-cave list
-cave update
-cave config   # enable/disable package resources
+cave list && cave update
 ```
 
----
+</details>
 
-## SDK & Programmatic Usage
-
-### Embedding Cave
+<details>
+<summary><strong>SDK & scripting</strong> — embed, RPC, print mode, JSON mode</summary>
 
 ```typescript
 import { AuthStorage, createAgentSession, ModelRegistry, SessionManager } from "cave";
 
-const authStorage = AuthStorage.create();
-const modelRegistry = ModelRegistry.create(authStorage);
 const { session } = await createAgentSession({
   sessionManager: SessionManager.inMemory(),
-  authStorage,
-  modelRegistry,
+  authStorage: AuthStorage.create(),
+  modelRegistry: ModelRegistry.create(AuthStorage.create()),
 });
-
 await session.prompt("What files are in the current directory?");
 ```
 
-### RPC mode
-
-For non-Node.js integrations, communicate over stdin/stdout via JSONL:
-
 ```bash
-cave --mode rpc
+cave --mode rpc                     # JSONL over stdin/stdout
+cave -p "Summarize this codebase"   # print and exit
+cave --mode json "List todos"       # structured JSON output
 ```
 
-### Print / JSON mode
+</details>
 
-For scripting and automation:
+<details>
+<summary><strong>CLI reference</strong></summary>
 
-```bash
-cave -p "Summarize this codebase"
-cave --mode json "List todos"
-```
-
----
-
-## CLI Reference
-
-```bash
-cave [options] [@files...] [messages...]
-```
-
-| Option | Description |
-|--------|-------------|
+| Flag | Description |
+|------|-------------|
 | `-c`, `--continue` | Continue most recent session |
 | `-r`, `--resume` | Browse and select session |
-| `-p`, `--print` | Non-interactive: print response and exit |
+| `-p`, `--print` | Non-interactive: print and exit |
 | `--mode json\|rpc` | Structured output modes |
-| `--provider <name>` | Provider (`anthropic`, `openai`, `google`, …) |
-| `--model <pattern>` | Model ID or pattern; supports `provider/id` and `:<thinking>` suffix |
+| `--provider <name>` | `anthropic`, `openai`, `google`, ... |
+| `--model <pattern>` | Model ID or `provider/id`; supports `:<thinking>` suffix |
 | `--thinking <level>` | `off` · `minimal` · `low` · `medium` · `high` · `xhigh` |
-| `--tools <list>` | Enable specific built-in tools (default: `read,bash,edit,write`) |
-| `--no-tools` | Disable built-in tools (extension tools still active) |
-| `--no-extensions` | Disable extension discovery |
+| `--tools <list>` | Enable specific tools (default: `read,bash,edit,write`) |
 | `-e`, `--extension <src>` | Load a specific extension (repeatable) |
-| `--api-key <key>` | API key (overrides env vars) |
-| `-v`, `--version` | Show version |
-| `-h`, `--help` | Show help |
 
-Built-in tools: `read`, `bash`, `edit`, `write`, `grep`, `find`, `ls`
-
-### Environment variables
-
-| Variable | Description |
-|----------|-------------|
+| Env var | Description |
+|---------|-------------|
 | `ANTHROPIC_API_KEY` | Anthropic API key |
 | `OPENAI_API_KEY` | OpenAI API key |
-| `CAVE_CODING_AGENT_DIR` | Override config directory (default: `~/.cave/agent`) |
-| `CAVE_SKIP_VERSION_CHECK` | Skip startup version check |
-| `CAVE_CACHE_RETENTION` | Set to `long` for extended prompt cache (Anthropic: 1h, OpenAI: 24h) |
+| `CAVE_CODING_AGENT_DIR` | Override config directory |
+| `CAVE_CACHE_RETENTION` | `long` for extended prompt cache (Anthropic: 1h, OpenAI: 24h) |
+
+</details>
 
 ---
 
-## Monorepo Packages
+## Monorepo
 
-| Package | npm | Description |
-|---------|-----|-------------|
-| [`cave`](packages/coding-agent) | `cave` | Coding agent CLI |
-| [`@cave/ai`](packages/ai) | `pi-ai` | Unified multi-provider LLM API |
-| [`@cave/agent`](packages/agent) | — | Agent runtime with tool calling and state management |
-| [`@cave/tui`](packages/tui) | — | Terminal UI with differential rendering |
-| [`@cave/web-ui`](packages/web-ui) | — | Web components for AI chat interfaces |
-| [`@cave/mom`](packages/mom) | `mom` | Slack bot that delegates to the coding agent |
-| [`@cave/pods`](packages/pods) | `cave-pods` | vLLM deployment on GPU pods |
-| [`@cave/cavekit`](packages/cavekit-extension) | — | CaveKit SDD workflow extension |
-
----
+| Package | Description |
+|---------|-------------|
+| [`cave`](packages/coding-agent) | Coding agent CLI |
+| [`@cave/ai`](packages/ai) | Multi-provider LLM API |
+| [`@cave/agent`](packages/agent) | Agent runtime + tool calling |
+| [`@cave/tui`](packages/tui) | Terminal UI with differential rendering |
+| [`@cave/web-ui`](packages/web-ui) | Web components for AI chat |
+| [`@cave/mom`](packages/mom) | Slack bot → coding agent |
+| [`@cave/pods`](packages/pods) | vLLM on GPU pods |
+| [`@cave/cavekit`](packages/cavekit-extension) | CaveKit SDD extension |
 
 ## Contributing
 
 ```bash
 git clone https://github.com/JuliusBrussee/caveman-cli.git
-cd caveman-cli
-npm install
-npm run build
-npm run check   # lint, format, type check
+cd caveman-cli && npm install && npm run build
+npm run check   # lint + format + type check
 ./test.sh       # run tests
 ```
 
-Uses [Biome](https://biomejs.dev/) for linting and formatting. TypeScript strict mode throughout.
-
----
+[Biome](https://biomejs.dev/) for lint/format. TypeScript strict. Forked from [pi-mono](https://github.com/badlogic/pi-mono) by badlogic.
 
 ## License
 
