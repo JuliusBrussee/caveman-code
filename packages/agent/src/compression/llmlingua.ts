@@ -27,23 +27,48 @@ export type OnnxSessionFactory = (modelPath: string) => Promise<OnnxInferenceSes
 
 // ── Deterministic compressor (fallback) ─────────────────────────────
 
-/** Deterministic compressor: drops every Nth word to hit the ratio. */
+/**
+ * Deterministic compressor: line-based for multi-line content,
+ * word-based for single lines. Preserves whitespace structure.
+ */
 export function deterministicCompress(input: string, targetRatio: number): string {
 	if (input.length === 0 || targetRatio >= 1) return input;
 	const clamped = Math.max(0.05, Math.min(targetRatio, 0.95));
+
+	const lines = input.split("\n");
+	if (lines.length > 1) {
+		// Multi-line: keep the most important lines (by content length),
+		// drop blank/short lines first, preserve original order
+		const keepCount = Math.max(1, Math.floor(lines.length * clamped));
+		const scored = lines.map((line, i) => ({
+			line,
+			i,
+			score: line.trim().length === 0 ? 0 : line.trim().length,
+		}));
+		scored.sort((a, b) => b.score - a.score);
+		const kept = new Set(scored.slice(0, keepCount).map((s) => s.i));
+		return lines.filter((_, i) => kept.has(i)).join("\n");
+	}
+
+	// Single line: drop every Nth word, preserving inter-word whitespace
 	const keepEvery = Math.round(1 / clamped);
-	const words = input.split(/(\s+)/);
+	const segments = input.split(/(\s+)/);
 	const out: string[] = [];
 	let wordIdx = 0;
-	for (const token of words) {
-		if (/^\s+$/.test(token)) {
-			out.push(token);
+	for (const segment of segments) {
+		if (/^\s+$/.test(segment)) {
+			// Keep whitespace only if the preceding word was kept
+			if (out.length > 0 && !/^\s+$/.test(out[out.length - 1])) {
+				out.push(segment);
+			}
 			continue;
 		}
-		if (wordIdx % keepEvery === 0) out.push(token);
+		if (wordIdx % keepEvery === 0) {
+			out.push(segment);
+		}
 		wordIdx++;
 	}
-	return out.join("").replace(/\s+/g, " ").trim();
+	return out.join("");
 }
 
 // ── Middleware ───────────────────────────────────────────────────────
@@ -72,7 +97,7 @@ export class LLMLinguaMiddleware implements CompressionMiddleware {
 			throw new Error("llmlingua: ONNX runtime not initialized — call compressAsync() or initOnnx() first");
 		}
 		const compressed = deterministicCompress(block, opts.targetRatio);
-		return result(block, compressed, inputTokens, this.useOnnx ? `${this.name}:onnx` : this.name);
+		return result(compressed, inputTokens, this.useOnnx ? `${this.name}:onnx` : this.name);
 	}
 
 	/** Initialize ONNX runtime + tokenizer. Downloads model on first use. */
@@ -88,9 +113,7 @@ export class LLMLinguaMiddleware implements CompressionMiddleware {
 
 	private async doInit(): Promise<void> {
 		if (this.sessionFactory) {
-			// Test/injection path: skip download, use factory directly
 			if (!this.tokenizer) {
-				// Attempt to load vocab if available, but don't fail
 				try {
 					this.tokenizer = new BertTokenizer(vocabPath(LLMLINGUA2_MANIFEST));
 				} catch {
@@ -101,7 +124,6 @@ export class LLMLinguaMiddleware implements CompressionMiddleware {
 			return;
 		}
 
-		// Production path: download model + vocab, load tokenizer + ONNX session
 		if (!(await isModelCached(LLMLINGUA2_MANIFEST))) {
 			await downloadModel(LLMLINGUA2_MANIFEST);
 		}
@@ -111,15 +133,13 @@ export class LLMLinguaMiddleware implements CompressionMiddleware {
 		}
 
 		const mPath = modelPath(LLMLINGUA2_MANIFEST);
-		{
-			try {
-				const ort = await import("onnxruntime-node");
-				this.onnxSession = await ort.InferenceSession.create(mPath, {
-					executionProviders: ["cpu"],
-				}) as unknown as OnnxInferenceSession;
-			} catch (e) {
-				throw new Error(`llmlingua: ONNX runtime init failed: ${e}`);
-			}
+		try {
+			const ort = await import("onnxruntime-node");
+			this.onnxSession = await ort.InferenceSession.create(mPath, {
+				executionProviders: ["cpu"],
+			}) as unknown as OnnxInferenceSession;
+		} catch (e) {
+			throw new Error(`llmlingua: ONNX runtime init failed: ${e}`);
 		}
 	}
 
@@ -133,85 +153,73 @@ export class LLMLinguaMiddleware implements CompressionMiddleware {
 			try {
 				await this.initOnnx();
 				const compressed = await this.onnxCompress(block, opts.targetRatio);
-				return result(block, compressed, inputTokens, `${this.name}:onnx`);
+				return result(compressed, inputTokens, `${this.name}:onnx`);
 			} catch {
-				// Fallback to deterministic on any ONNX error
 				const compressed = deterministicCompress(block, opts.targetRatio);
-				return result(block, compressed, inputTokens, `${this.name}:fallback`);
+				return result(compressed, inputTokens, `${this.name}:fallback`);
 			}
 		}
 		const compressed = deterministicCompress(block, opts.targetRatio);
-		return result(block, compressed, inputTokens, this.name);
+		return result(compressed, inputTokens, this.name);
 	}
 
 	// ── BERT inference ────────────────────────────────────────────────
 
 	/**
-	 * LLMLingua-2 compression via BERT token classification:
-	 * 1. Tokenize with WordPiece
-	 * 2. Run ONNX model → per-token keep/drop logits
-	 * 3. Softmax → keep probabilities
-	 * 4. Rank by probability, keep top N
-	 * 5. Reconstruct text from kept tokens in original order
+	 * LLMLingua-2 compression via BERT token classification.
+	 * Span-based: reconstructs from original text to preserve whitespace.
 	 */
 	private async onnxCompress(block: string, targetRatio: number): Promise<string> {
 		if (!this.tokenizer || !this.onnxSession) {
 			throw new Error("llmlingua: not initialized");
 		}
 
-		// For short inputs, process directly
 		const chunks = this.tokenizer.chunkText(block, 500);
 		if (chunks.length === 1) {
-			return this.compressChunk(chunks[0], targetRatio);
+			return this.compressChunk(block, chunks[0].text, targetRatio);
 		}
 
-		// For long inputs, compress each chunk independently
-		const compressed: string[] = [];
-		for (const chunk of chunks) {
-			compressed.push(await this.compressChunk(chunk, targetRatio));
+		// Compress each chunk, reconstruct with original inter-chunk gaps
+		const parts: string[] = [];
+		for (let i = 0; i < chunks.length; i++) {
+			if (i > 0) {
+				// Preserve the whitespace gap between chunks
+				const gap = block.slice(chunks[i - 1].end, chunks[i].start);
+				parts.push(gap);
+			}
+			parts.push(await this.compressChunk(chunks[i].text, chunks[i].text, targetRatio));
 		}
-		return compressed.join(" ");
+		return parts.join("");
 	}
 
-	private async compressChunk(chunk: string, targetRatio: number): Promise<string> {
-		const tokens = this.tokenizer!.tokenize(chunk);
+	private async compressChunk(originalChunk: string, _chunkText: string, targetRatio: number): Promise<string> {
+		const tokens = this.tokenizer!.tokenize(originalChunk);
+		const contentTokens = tokens.filter((t) => t.wordIndex >= 0);
+		if (contentTokens.length === 0) return originalChunk;
 
-		// Get content tokens (exclude [CLS] and [SEP])
-		const contentTokens = tokens.filter(t => t.wordIndex >= 0);
-		if (contentTokens.length === 0) return chunk;
-
-		// Run inference
 		const keepProbs = await this.runBertInference(tokens);
 
-		// Map probabilities to content tokens (skip [CLS] at index 0)
 		const scored = contentTokens.map((token, i) => ({
 			token,
 			prob: keepProbs[i + 1] ?? 0, // +1 to skip [CLS]
 			originalIndex: i,
 		}));
 
-		// Determine how many tokens to keep
 		const keepCount = Math.max(1, Math.floor(contentTokens.length * targetRatio));
-
-		// Sort by keep probability descending, take top-K
 		const sorted = [...scored].sort((a, b) => b.prob - a.prob);
 		const keptSet = new Set<number>();
 		for (let i = 0; i < keepCount && i < sorted.length; i++) {
 			keptSet.add(sorted[i].originalIndex);
 		}
 
-		// Emit kept tokens in original order
 		const keptTokens = contentTokens.filter((_, i) => keptSet.has(i));
-		return this.tokenizer!.decode(keptTokens);
+		// Span-based reconstruction: preserves original whitespace
+		return this.tokenizer!.reconstructFromOriginal(originalChunk, keptTokens);
 	}
 
 	/**
 	 * Run BERT token classification model.
-	 *
-	 * Input: BertToken[] with [CLS] + content + [SEP]
-	 * Output: per-token "keep" probability (softmax of logit class 1)
-	 *
-	 * Model output tensor: logits [1, seqLen, 2] where class 0=drop, 1=keep.
+	 * Returns per-token "keep" probability via softmax of logit class 1.
 	 */
 	private async runBertInference(tokens: BertToken[]): Promise<number[]> {
 		const seqLen = tokens.length;
@@ -231,18 +239,15 @@ export class LLMLinguaMiddleware implements CompressionMiddleware {
 			token_type_ids: { data: tokenTypeIds, dims: [1, seqLen] },
 		});
 
-		// Extract logits [1, seqLen, 2]
 		const logits = outputs.logits?.data as Float32Array;
 		if (!logits) {
 			throw new Error("llmlingua: model output missing 'logits' tensor");
 		}
 
-		// Compute softmax per token → keep probability (class 1)
 		const keepProbs: number[] = [];
 		for (let i = 0; i < seqLen; i++) {
 			const dropLogit = logits[i * 2];
 			const keepLogit = logits[i * 2 + 1];
-			// Numerically stable softmax
 			const max = Math.max(dropLogit, keepLogit);
 			const expDrop = Math.exp(dropLogit - max);
 			const expKeep = Math.exp(keepLogit - max);
@@ -265,7 +270,7 @@ function passthrough(block: string, inputTokens: number): CompressionResult {
 	};
 }
 
-function result(original: string, compressed: string, inputTokens: number, via: string): CompressionResult {
+function result(compressed: string, inputTokens: number, via: string): CompressionResult {
 	return {
 		bytes: compressed,
 		estimatedInputTokens: inputTokens,

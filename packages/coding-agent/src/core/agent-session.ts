@@ -439,30 +439,9 @@ export class AgentSession {
 			// Cave mode tool result compression (runs before extension hooks, never on errors)
 			let processedContent = result.content;
 			if (!isError && caveEnabled) {
-				try {
-					// Per-tool budget truncation (Flint Chipper) runs first
-					processedContent = applyToolBudgetToContentBlocks(
-						processedContent as Array<{ type: string; text?: string; [key: string]: unknown }>,
-						toolCall.name,
-					) as typeof result.content;
-					// Structured output compression (Stone Tablet) runs second
-					const commandHint = toolCall.name === "bash" ? (args as { command?: string }).command : undefined;
-					processedContent = applyStructuredCompressionToContentBlocks(
-						processedContent as Array<{ type: string; text?: string; [key: string]: unknown }>,
-						toolCall.name,
-						commandHint,
-					) as typeof result.content;
-					// General cave compression runs last
-					processedContent = compressCaveToolContentBlocks(
-						processedContent as Array<{ type: string; text?: string; [key: string]: unknown }>,
-					) as typeof result.content;
-				} catch {
-					// Fallback: use original unmodified output if compression encounters an error
-					processedContent = result.content;
-				}
-
-				// ML compression (LLMLingua-2 ONNX) — optional 4th stage, must be explicitly enabled
 				if (this.settingsManager.getCaveModeMLCompression()) {
+					// ML compression (LLMLingua-2 ONNX) — runs INSTEAD of rule-based stages
+					// to avoid compounding and to let BERT see original text structure
 					try {
 						if (!this._llmlingua) {
 							this._llmlingua = new LLMLinguaMiddleware(true);
@@ -481,8 +460,27 @@ export class AgentSession {
 						);
 						processedContent = mlResults as typeof result.content;
 					} catch {
-						// ML compression failed — keep rule-based compressed content
+						// ML failed — fall through to rule-based pipeline
+						processedContent = result.content;
 					}
+				}
+				// Rule-based compression (always runs: as primary when ML disabled, as safety net when ML enabled)
+				try {
+					processedContent = applyToolBudgetToContentBlocks(
+						processedContent as Array<{ type: string; text?: string; [key: string]: unknown }>,
+						toolCall.name,
+					) as typeof result.content;
+					const commandHint = toolCall.name === "bash" ? (args as { command?: string }).command : undefined;
+					processedContent = applyStructuredCompressionToContentBlocks(
+						processedContent as Array<{ type: string; text?: string; [key: string]: unknown }>,
+						toolCall.name,
+						commandHint,
+					) as typeof result.content;
+					processedContent = compressCaveToolContentBlocks(
+						processedContent as Array<{ type: string; text?: string; [key: string]: unknown }>,
+					) as typeof result.content;
+				} catch {
+					processedContent = result.content;
 				}
 			}
 
