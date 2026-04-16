@@ -1302,9 +1302,10 @@ describe("Generate E2E Tests", () => {
 		});
 	});
 
-	// Check if ollama is installed and local LLM tests are enabled
+	// Local LLM tests are opt-in: set PI_LOCAL_LLM=1 to enable.
+	// These pull large models and spawn ollama serve, which can consume 10+ GB RAM.
 	let ollamaInstalled = false;
-	if (!process.env.PI_NO_LOCAL_LLM) {
+	if (process.env.PI_LOCAL_LLM) {
 		try {
 			execSync("which ollama", { stdio: "ignore" });
 			ollamaInstalled = true;
