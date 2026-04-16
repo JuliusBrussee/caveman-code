@@ -29,7 +29,7 @@ npm install -g cave && cave
 ```
 
 <p align="center">
-  <img src="packages/coding-agent/docs/images/interactive-mode.png" width="680" alt="cave interactive mode" />
+  <img src="packages/coding-agent/docs/images/cave-tui.png" width="680" alt="cave interactive mode" />
 </p>
 
 ---
