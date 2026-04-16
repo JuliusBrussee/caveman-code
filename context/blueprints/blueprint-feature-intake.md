@@ -4,6 +4,7 @@
 **Status:** draft
 
 ## Requirements
+
 ### R1: Feature Description Is Captured As A Kit Seed
 The system must accept a feature description and preserve it as the source input for downstream kit creation. The captured input must remain readable and traceable in the resulting kit.
 
@@ -31,5 +32,6 @@ The kit must state what the feature does not cover so downstream work does not i
 ## Out of Scope
 - Implementation design
 - Task breakdown
+- Code changes
 - UI mockups
 - Performance tuning details
