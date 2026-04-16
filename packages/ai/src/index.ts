@@ -30,6 +30,17 @@ export type {
 	OAuthProviderInfo,
 	OAuthProviderInterface,
 } from "./utils/oauth/types.js";
+export type {
+	CachePolicy,
+	CacheUsageReport,
+	CacheRetention,
+	CacheLayer,
+	LayerBlock,
+	LayeredPayload,
+	RetentionResolveContext,
+} from "./cache/index.js";
+export { defaultPolicy, resolveRetention, totalInputTokens, validateLayers, CACHE_LAYER_ORDER } from "./cache/index.js";
+export { usageToCacheReport } from "./cache/index.js";
 export * from "./utils/overflow.js";
 export * from "./utils/typebox-helpers.js";
 export * from "./utils/validation.js";

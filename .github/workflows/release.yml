@@ -1,0 +1,98 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build-binaries:
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            target: bun-darwin-arm64
+            triple: darwin-arm64
+          - os: macos-13
+            target: bun-darwin-x64
+            triple: darwin-x64
+          - os: ubuntu-latest
+            target: bun-linux-x64
+            triple: linux-x64
+          - os: ubuntu-24.04-arm
+            target: bun-linux-arm64
+            triple: linux-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - run: |
+          bun build packages/coding-agent/src/cli.ts \
+            --compile \
+            --target=${{ matrix.target }} \
+            --outfile=cave-${{ matrix.triple }}
+      - run: ./cave-${{ matrix.triple }} --version
+        if: matrix.triple == 'linux-x64' || matrix.triple == 'darwin-arm64'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cave-${{ matrix.triple }}
+          path: cave-${{ matrix.triple }}
+
+  publish-npm:
+    runs-on: ubuntu-latest
+    needs: build-binaries
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - run: npm run build
+      - run: npm publish --workspaces --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: build-binaries
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - run: |
+          gh release create ${{ github.ref_name }} \
+            --title "${{ github.ref_name }}" \
+            --generate-notes \
+            cave-darwin-arm64 \
+            cave-darwin-x64 \
+            cave-linux-arm64 \
+            cave-linux-x64
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-docker:
+    runs-on: ubuntu-latest
+    needs: build-binaries
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: cave-linux-x64
+      - run: chmod +x cave-linux-x64
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }},ghcr.io/${{ github.repository }}:latest

@@ -9,6 +9,8 @@ import {
 	type Transport,
 } from "@cave/ai";
 import { runAgentLoop, runAgentLoopContinue } from "./agent-loop.js";
+import type { Role } from "./roles.js";
+import type { ModelRouter } from "./router.js";
 import type {
 	AfterToolCallContext,
 	AfterToolCallResult,
@@ -107,6 +109,10 @@ export interface AgentOptions {
 	transport?: Transport;
 	maxRetryDelayMs?: number;
 	toolExecution?: ToolExecutionMode;
+	/** Optional model router for resolving models per outbound LLM call. */
+	router?: ModelRouter;
+	/** Current role for routing decisions. Required when router is set. */
+	role?: Role;
 }
 
 class PendingMessageQueue {
@@ -184,6 +190,10 @@ export class Agent {
 	public maxRetryDelayMs?: number;
 	/** Tool execution strategy for assistant messages that contain multiple tool calls. */
 	public toolExecution: ToolExecutionMode;
+	/** Optional model router for resolving models per outbound LLM call. */
+	public router?: ModelRouter;
+	/** Current role for routing decisions. Required when router is set. */
+	public role?: Role;
 
 	constructor(options: AgentOptions = {}) {
 		this._state = createMutableAgentState(options.initialState);
@@ -201,6 +211,8 @@ export class Agent {
 		this.transport = options.transport ?? "sse";
 		this.maxRetryDelayMs = options.maxRetryDelayMs;
 		this.toolExecution = options.toolExecution ?? "parallel";
+		this.router = options.router;
+		this.role = options.role;
 	}
 
 	/**
@@ -408,6 +420,8 @@ export class Agent {
 		let skipInitialSteeringPoll = options.skipInitialSteeringPoll === true;
 		return {
 			model: this._state.model,
+			router: this.router,
+			role: this.role,
 			reasoning: this._state.thinkingLevel === "off" ? undefined : this._state.thinkingLevel,
 			sessionId: this.sessionId,
 			onPayload: this.onPayload,

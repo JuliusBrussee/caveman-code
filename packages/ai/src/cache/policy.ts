@@ -1,5 +1,6 @@
 // T-001: CachePolicy shape + layered breakpoint ordering contract.
 // T-003: Single breakpoint per layer, layer isolation invariant.
+import type { Usage } from "../types.js";
 
 export type CacheLayer = "tools" | "system" | "project" | "messages";
 
@@ -90,4 +91,13 @@ export function validateLayers(layers: LayerBlock[]): void {
 			throw new Error(`cache: layer ${layer} has ${count} breakpoints, max 1`);
 		}
 	}
+}
+
+// T-041/T-042: convert provider Usage to CacheUsageReport.
+export function usageToCacheReport(usage: Usage): CacheUsageReport {
+	return {
+		cachedInputTokens: usage.cacheRead,
+		cacheWriteTokens: usage.cacheWrite,
+		uncachedInputTokens: Math.max(0, usage.input),
+	};
 }

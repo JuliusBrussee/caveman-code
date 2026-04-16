@@ -77,6 +77,18 @@ If you're adding a new provider to `packages/ai`, see `AGENTS.md` for required t
 
 Cave's core is minimal. If your feature doesn't belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.
 
+## Good First Issues
+
+Look for issues labeled [`good first issue`](https://github.com/JuliusBrussee/caveman-cli/labels/good%20first%20issue). These are scoped, well-described tasks suitable for new contributors.
+
+Some areas where contributions are especially welcome:
+
+- **Extensions** — build a new extension and submit it as a package
+- **Provider support** — add or improve an LLM provider in `packages/ai`
+- **Themes** — create and share custom terminal themes
+- **Documentation** — improve docs, fix typos, add examples
+- **Benchmarks** — add new compression fixtures or improve measurement
+
 ## Questions?
 
 Open an issue or ask on [Discord](https://discord.com/invite/nKXTsAcmbT).

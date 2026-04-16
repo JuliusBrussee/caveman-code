@@ -143,3 +143,32 @@ function mapKind(raw: string): ParsedSymbol["kind"] {
 			return "function";
 	}
 }
+
+/* ------------------------------------------------------------------ */
+/*  T-032: async parser — tree-sitter first, regex fallback            */
+/* ------------------------------------------------------------------ */
+
+import * as treeSitter from "./tree-sitter.js";
+export { treeSitter };
+
+/** Async parser: tries tree-sitter first, falls back to regex. */
+export async function parseFileAsync(
+	file: string,
+	source: string,
+): Promise<ParsedFile> {
+	const language = languageFor(file);
+	if (!isSupported(language)) {
+		return {
+			file,
+			language,
+			symbols: [],
+			fallback: { lineCount: source.split("\n").length },
+		};
+	}
+	if (treeSitter.isAvailable()) {
+		const symbols = await treeSitter.extractSymbols(file, source, language);
+		if (symbols) return { file, language, symbols };
+	}
+	// Fallback to regex heuristic
+	return { file, language, symbols: extractSymbols(file, source, language) };
+}
