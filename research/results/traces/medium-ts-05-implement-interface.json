@@ -1,0 +1,16 @@
+{
+  "instance_id": "medium-ts-05-implement-interface",
+  "difficulty": "medium",
+  "language": "typescript",
+  "duration_ms": 43355,
+  "cost": 0.043279,
+  "tool_calls": 7,
+  "tokens": {
+    "input": 6306,
+    "output": 1350,
+    "cacheRead": 29056,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": true
+}

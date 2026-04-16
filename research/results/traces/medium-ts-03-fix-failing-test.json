@@ -1,0 +1,16 @@
+{
+  "instance_id": "medium-ts-03-fix-failing-test",
+  "difficulty": "medium",
+  "language": "typescript",
+  "duration_ms": 23137,
+  "cost": 0.0355515,
+  "tool_calls": 7,
+  "tokens": {
+    "input": 6889,
+    "output": 727,
+    "cacheRead": 29696,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": true
+}

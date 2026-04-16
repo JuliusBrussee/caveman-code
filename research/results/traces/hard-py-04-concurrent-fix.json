@@ -1,0 +1,16 @@
+{
+  "instance_id": "hard-py-04-concurrent-fix",
+  "difficulty": "hard",
+  "language": "python",
+  "duration_ms": 32454,
+  "cost": 0.04616800000000001,
+  "tool_calls": 7,
+  "tokens": {
+    "input": 8112,
+    "output": 1184,
+    "cacheRead": 32512,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": false
+}

@@ -1,0 +1,16 @@
+{
+  "instance_id": "easy-ts-03-add-error-handling",
+  "difficulty": "easy",
+  "language": "typescript",
+  "duration_ms": 15676,
+  "cost": 0.026974000000000005,
+  "tool_calls": 5,
+  "tokens": {
+    "input": 5572,
+    "output": 620,
+    "cacheRead": 14976,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": true
+}

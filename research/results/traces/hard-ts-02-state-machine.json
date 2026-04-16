@@ -1,0 +1,16 @@
+{
+  "instance_id": "hard-ts-02-state-machine",
+  "difficulty": "hard",
+  "language": "typescript",
+  "duration_ms": 75749,
+  "cost": 0.07557449999999999,
+  "tool_calls": 9,
+  "tokens": {
+    "input": 7101,
+    "output": 3042,
+    "cacheRead": 48768,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": true
+}

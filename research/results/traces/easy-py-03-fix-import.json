@@ -1,0 +1,16 @@
+{
+  "instance_id": "easy-py-03-fix-import",
+  "difficulty": "easy",
+  "language": "python",
+  "duration_ms": 18207,
+  "cost": 0.0352685,
+  "tool_calls": 5,
+  "tokens": {
+    "input": 10639,
+    "output": 337,
+    "cacheRead": 14464,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": true
+}

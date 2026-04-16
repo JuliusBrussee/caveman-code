@@ -1,0 +1,16 @@
+{
+  "instance_id": "hard-py-01-async-refactor",
+  "difficulty": "hard",
+  "language": "python",
+  "duration_ms": 55232,
+  "cost": 0.082942,
+  "tool_calls": 20,
+  "tokens": {
+    "input": 14130,
+    "output": 2223,
+    "cacheRead": 57088,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": false
+}

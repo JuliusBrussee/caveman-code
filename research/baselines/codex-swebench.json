@@ -1,0 +1,12 @@
+{
+  "system": "codex",
+  "benchmark": "swebench",
+  "date": "2025-05-16",
+  "source": "https://openai.com/index/introducing-codex/ — SWE-bench Verified leaderboard",
+  "notes": "Token counts estimated from published cost ($2.50 avg/instance) and codex-mini pricing ($0.0015/1k input, $0.006/1k output). Assumed 4:1 input:output ratio.",
+  "resolvedCount": 371,
+  "totalInstances": 500,
+  "inputTokensTotal": 400000000,
+  "outputTokensTotal": 100000000,
+  "dollarsTotal": 1250.00
+}

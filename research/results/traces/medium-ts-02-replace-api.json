@@ -1,0 +1,16 @@
+{
+  "instance_id": "medium-ts-02-replace-api",
+  "difficulty": "medium",
+  "language": "typescript",
+  "duration_ms": 51323,
+  "cost": 0.062462000000000004,
+  "tool_calls": 13,
+  "tokens": {
+    "input": 7158,
+    "output": 2233,
+    "cacheRead": 44288,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": true
+}

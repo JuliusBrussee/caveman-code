@@ -1,0 +1,16 @@
+{
+  "instance_id": "medium-ts-01-extract-function",
+  "difficulty": "medium",
+  "language": "typescript",
+  "duration_ms": 41361,
+  "cost": 0.048876499999999996,
+  "tool_calls": 8,
+  "tokens": {
+    "input": 6701,
+    "output": 1540,
+    "cacheRead": 36096,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": false
+}

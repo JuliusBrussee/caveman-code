@@ -1,0 +1,16 @@
+{
+  "instance_id": "medium-py-01-refactor-class",
+  "difficulty": "medium",
+  "language": "python",
+  "duration_ms": 34248,
+  "cost": 0.039471,
+  "tool_calls": 5,
+  "tokens": {
+    "input": 5722,
+    "output": 1298,
+    "cacheRead": 22784,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": true
+}

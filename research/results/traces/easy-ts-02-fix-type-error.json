@@ -1,0 +1,16 @@
+{
+  "instance_id": "easy-ts-02-fix-type-error",
+  "difficulty": "easy",
+  "language": "typescript",
+  "duration_ms": 12078,
+  "cost": 0.0217575,
+  "tool_calls": 4,
+  "tokens": {
+    "input": 5455,
+    "output": 296,
+    "cacheRead": 14720,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": true
+}

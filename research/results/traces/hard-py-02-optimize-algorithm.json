@@ -1,0 +1,16 @@
+{
+  "instance_id": "hard-py-02-optimize-algorithm",
+  "difficulty": "hard",
+  "language": "python",
+  "duration_ms": 31986,
+  "cost": 0.04348500000000001,
+  "tool_calls": 7,
+  "tokens": {
+    "input": 7158,
+    "output": 1194,
+    "cacheRead": 30720,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": false
+}

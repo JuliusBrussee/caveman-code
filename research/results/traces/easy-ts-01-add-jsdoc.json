@@ -1,0 +1,16 @@
+{
+  "instance_id": "easy-ts-01-add-jsdoc",
+  "difficulty": "easy",
+  "language": "typescript",
+  "duration_ms": 18835,
+  "cost": 0.029588,
+  "tool_calls": 4,
+  "tokens": {
+    "input": 5836,
+    "output": 746,
+    "cacheRead": 15232,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": true
+}

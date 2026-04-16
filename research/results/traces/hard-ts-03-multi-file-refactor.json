@@ -1,0 +1,16 @@
+{
+  "instance_id": "hard-ts-03-multi-file-refactor",
+  "difficulty": "hard",
+  "language": "typescript",
+  "duration_ms": 109040,
+  "cost": 0.12063650000000001,
+  "tool_calls": 12,
+  "tokens": {
+    "input": 17671,
+    "output": 4229,
+    "cacheRead": 52096,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": true
+}

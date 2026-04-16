@@ -1,0 +1,16 @@
+{
+  "instance_id": "easy-py-04-type-hints",
+  "difficulty": "easy",
+  "language": "python",
+  "duration_ms": 14529,
+  "cost": 0.026692,
+  "tool_calls": 5,
+  "tokens": {
+    "input": 5386,
+    "output": 549,
+    "cacheRead": 19968,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": true
+}

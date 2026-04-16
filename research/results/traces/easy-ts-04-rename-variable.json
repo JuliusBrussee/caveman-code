@@ -1,0 +1,16 @@
+{
+  "instance_id": "easy-ts-04-rename-variable",
+  "difficulty": "easy",
+  "language": "typescript",
+  "duration_ms": 16015,
+  "cost": 0.0365945,
+  "tool_calls": 5,
+  "tokens": {
+    "input": 10247,
+    "output": 559,
+    "cacheRead": 10368,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": true
+}

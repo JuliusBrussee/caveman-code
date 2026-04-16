@@ -1,0 +1,16 @@
+{
+  "instance_id": "medium-py-04-fix-json-parser",
+  "difficulty": "medium",
+  "language": "python",
+  "duration_ms": 29004,
+  "cost": 0.04627800000000001,
+  "tool_calls": 6,
+  "tokens": {
+    "input": 12166,
+    "output": 793,
+    "cacheRead": 15872,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": false
+}

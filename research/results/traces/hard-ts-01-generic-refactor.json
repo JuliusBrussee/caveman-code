@@ -1,0 +1,16 @@
+{
+  "instance_id": "hard-ts-01-generic-refactor",
+  "difficulty": "hard",
+  "language": "typescript",
+  "duration_ms": 48261,
+  "cost": 0.059846500000000004,
+  "tool_calls": 8,
+  "tokens": {
+    "input": 11247,
+    "output": 1503,
+    "cacheRead": 36736,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": false
+}

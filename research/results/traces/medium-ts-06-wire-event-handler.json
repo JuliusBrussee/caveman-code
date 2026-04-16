@@ -1,0 +1,16 @@
+{
+  "instance_id": "medium-ts-06-wire-event-handler",
+  "difficulty": "medium",
+  "language": "typescript",
+  "duration_ms": 37900,
+  "cost": 0.046228,
+  "tool_calls": 7,
+  "tokens": {
+    "input": 6422,
+    "output": 1523,
+    "cacheRead": 29312,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": true
+}

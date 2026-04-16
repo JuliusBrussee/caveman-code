@@ -1,0 +1,16 @@
+{
+  "instance_id": "easy-py-01-add-docstrings",
+  "difficulty": "easy",
+  "language": "python",
+  "duration_ms": 21642,
+  "cost": 0.0440055,
+  "tool_calls": 6,
+  "tokens": {
+    "input": 11275,
+    "output": 790,
+    "cacheRead": 15872,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": true
+}

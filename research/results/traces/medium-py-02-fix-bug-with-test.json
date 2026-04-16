@@ -1,0 +1,16 @@
+{
+  "instance_id": "medium-py-02-fix-bug-with-test",
+  "difficulty": "medium",
+  "language": "python",
+  "duration_ms": 21873,
+  "cost": 0.049110499999999994,
+  "tool_calls": 7,
+  "tokens": {
+    "input": 13741,
+    "output": 570,
+    "cacheRead": 24832,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": false
+}

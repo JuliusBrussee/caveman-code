@@ -1,0 +1,16 @@
+{
+  "instance_id": "medium-py-03-add-cli-arg",
+  "difficulty": "medium",
+  "language": "python",
+  "duration_ms": 18301,
+  "cost": 0.02778,
+  "tool_calls": 5,
+  "tokens": {
+    "input": 5862,
+    "output": 619,
+    "cacheRead": 15360,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": false
+}

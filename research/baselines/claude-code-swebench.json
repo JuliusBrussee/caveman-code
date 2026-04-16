@@ -1,0 +1,12 @@
+{
+  "system": "claude-code",
+  "benchmark": "swebench",
+  "date": "2025-10-29",
+  "source": "https://www.anthropic.com/research/swe-bench-sonnet — Claude 3.5 Sonnet with Claude Code",
+  "notes": "Token counts estimated from published cost (~$3.75 avg/instance) and Sonnet pricing ($3/1M input, $15/1M output). Assumed 5:1 input:output ratio.",
+  "resolvedCount": 255,
+  "totalInstances": 500,
+  "inputTokensTotal": 500000000,
+  "outputTokensTotal": 100000000,
+  "dollarsTotal": 1875.00
+}

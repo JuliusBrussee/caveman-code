@@ -1,0 +1,16 @@
+{
+  "instance_id": "medium-ts-04-create-module",
+  "difficulty": "medium",
+  "language": "typescript",
+  "duration_ms": 22064,
+  "cost": 0.041249,
+  "tool_calls": 4,
+  "tokens": {
+    "input": 10642,
+    "output": 812,
+    "cacheRead": 9856,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": true
+}

@@ -1,0 +1,16 @@
+{
+  "instance_id": "easy-py-02-fix-assertion",
+  "difficulty": "easy",
+  "language": "python",
+  "duration_ms": 19135,
+  "cost": 0.041679,
+  "tool_calls": 7,
+  "tokens": {
+    "input": 11328,
+    "output": 545,
+    "cacheRead": 20736,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": true
+}

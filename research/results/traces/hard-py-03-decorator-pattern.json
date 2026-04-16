@@ -1,0 +1,16 @@
+{
+  "instance_id": "hard-py-03-decorator-pattern",
+  "difficulty": "hard",
+  "language": "python",
+  "duration_ms": 31754,
+  "cost": 0.0605235,
+  "tool_calls": 8,
+  "tokens": {
+    "input": 14185,
+    "output": 1035,
+    "cacheRead": 38144,
+    "cacheWrite": 0
+  },
+  "error": null,
+  "resolved": false
+}

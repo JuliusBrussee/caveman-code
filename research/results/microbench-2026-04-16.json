@@ -1,0 +1,471 @@
+{
+  "date": "2026-04-16",
+  "benchmark": "microbench",
+  "model": "cave:openai-codex:gpt-5.4:high",
+  "config": {
+    "provider": "openai-codex",
+    "model": "gpt-5.4",
+    "thinking": "high",
+    "capDollars": 0.5,
+    "compression": "ultra+tool+ml"
+  },
+  "aggregate": {
+    "total": 25,
+    "resolved": 16,
+    "resolvedRate": 0.64,
+    "dollarsTotal": 1.1920205000000001,
+    "capFailures": 0
+  },
+  "results": [
+    {
+      "instance_id": "easy-py-01-add-docstrings",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.0440055,
+      "duration_ms": 21642,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/easy-py-01-add-docstrings.json"
+      ],
+      "difficulty": "easy",
+      "language": "python",
+      "tokens": {
+        "input": 11275,
+        "output": 790,
+        "cacheRead": 15872,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "easy-py-02-fix-assertion",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.041679,
+      "duration_ms": 19135,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/easy-py-02-fix-assertion.json"
+      ],
+      "difficulty": "easy",
+      "language": "python",
+      "tokens": {
+        "input": 11328,
+        "output": 545,
+        "cacheRead": 20736,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "easy-py-03-fix-import",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.0352685,
+      "duration_ms": 18207,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/easy-py-03-fix-import.json"
+      ],
+      "difficulty": "easy",
+      "language": "python",
+      "tokens": {
+        "input": 10639,
+        "output": 337,
+        "cacheRead": 14464,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "easy-py-04-type-hints",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.026692,
+      "duration_ms": 14529,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/easy-py-04-type-hints.json"
+      ],
+      "difficulty": "easy",
+      "language": "python",
+      "tokens": {
+        "input": 5386,
+        "output": 549,
+        "cacheRead": 19968,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "easy-ts-01-add-jsdoc",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.029588,
+      "duration_ms": 18835,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/easy-ts-01-add-jsdoc.json"
+      ],
+      "difficulty": "easy",
+      "language": "typescript",
+      "tokens": {
+        "input": 5836,
+        "output": 746,
+        "cacheRead": 15232,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "easy-ts-02-fix-type-error",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.0217575,
+      "duration_ms": 12078,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/easy-ts-02-fix-type-error.json"
+      ],
+      "difficulty": "easy",
+      "language": "typescript",
+      "tokens": {
+        "input": 5455,
+        "output": 296,
+        "cacheRead": 14720,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "easy-ts-03-add-error-handling",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.026974000000000005,
+      "duration_ms": 15676,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/easy-ts-03-add-error-handling.json"
+      ],
+      "difficulty": "easy",
+      "language": "typescript",
+      "tokens": {
+        "input": 5572,
+        "output": 620,
+        "cacheRead": 14976,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "easy-ts-04-rename-variable",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.0365945,
+      "duration_ms": 16015,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/easy-ts-04-rename-variable.json"
+      ],
+      "difficulty": "easy",
+      "language": "typescript",
+      "tokens": {
+        "input": 10247,
+        "output": 559,
+        "cacheRead": 10368,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "hard-py-01-async-refactor",
+      "resolved": false,
+      "attempts": 1,
+      "dollars_spent": 0.082942,
+      "duration_ms": 55232,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/hard-py-01-async-refactor.json"
+      ],
+      "difficulty": "hard",
+      "language": "python",
+      "tokens": {
+        "input": 14130,
+        "output": 2223,
+        "cacheRead": 57088,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "hard-py-02-optimize-algorithm",
+      "resolved": false,
+      "attempts": 1,
+      "dollars_spent": 0.04348500000000001,
+      "duration_ms": 31986,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/hard-py-02-optimize-algorithm.json"
+      ],
+      "difficulty": "hard",
+      "language": "python",
+      "tokens": {
+        "input": 7158,
+        "output": 1194,
+        "cacheRead": 30720,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "hard-py-03-decorator-pattern",
+      "resolved": false,
+      "attempts": 1,
+      "dollars_spent": 0.0605235,
+      "duration_ms": 31754,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/hard-py-03-decorator-pattern.json"
+      ],
+      "difficulty": "hard",
+      "language": "python",
+      "tokens": {
+        "input": 14185,
+        "output": 1035,
+        "cacheRead": 38144,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "hard-py-04-concurrent-fix",
+      "resolved": false,
+      "attempts": 1,
+      "dollars_spent": 0.04616800000000001,
+      "duration_ms": 32454,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/hard-py-04-concurrent-fix.json"
+      ],
+      "difficulty": "hard",
+      "language": "python",
+      "tokens": {
+        "input": 8112,
+        "output": 1184,
+        "cacheRead": 32512,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "hard-ts-01-generic-refactor",
+      "resolved": false,
+      "attempts": 1,
+      "dollars_spent": 0.059846500000000004,
+      "duration_ms": 48261,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/hard-ts-01-generic-refactor.json"
+      ],
+      "difficulty": "hard",
+      "language": "typescript",
+      "tokens": {
+        "input": 11247,
+        "output": 1503,
+        "cacheRead": 36736,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "hard-ts-02-state-machine",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.07557449999999999,
+      "duration_ms": 75749,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/hard-ts-02-state-machine.json"
+      ],
+      "difficulty": "hard",
+      "language": "typescript",
+      "tokens": {
+        "input": 7101,
+        "output": 3042,
+        "cacheRead": 48768,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "hard-ts-03-multi-file-refactor",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.12063650000000001,
+      "duration_ms": 109040,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/hard-ts-03-multi-file-refactor.json"
+      ],
+      "difficulty": "hard",
+      "language": "typescript",
+      "tokens": {
+        "input": 17671,
+        "output": 4229,
+        "cacheRead": 52096,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "medium-py-01-refactor-class",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.039471,
+      "duration_ms": 34248,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/medium-py-01-refactor-class.json"
+      ],
+      "difficulty": "medium",
+      "language": "python",
+      "tokens": {
+        "input": 5722,
+        "output": 1298,
+        "cacheRead": 22784,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "medium-py-02-fix-bug-with-test",
+      "resolved": false,
+      "attempts": 1,
+      "dollars_spent": 0.049110499999999994,
+      "duration_ms": 21873,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/medium-py-02-fix-bug-with-test.json"
+      ],
+      "difficulty": "medium",
+      "language": "python",
+      "tokens": {
+        "input": 13741,
+        "output": 570,
+        "cacheRead": 24832,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "medium-py-03-add-cli-arg",
+      "resolved": false,
+      "attempts": 1,
+      "dollars_spent": 0.02778,
+      "duration_ms": 18301,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/medium-py-03-add-cli-arg.json"
+      ],
+      "difficulty": "medium",
+      "language": "python",
+      "tokens": {
+        "input": 5862,
+        "output": 619,
+        "cacheRead": 15360,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "medium-py-04-fix-json-parser",
+      "resolved": false,
+      "attempts": 1,
+      "dollars_spent": 0.04627800000000001,
+      "duration_ms": 29004,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/medium-py-04-fix-json-parser.json"
+      ],
+      "difficulty": "medium",
+      "language": "python",
+      "tokens": {
+        "input": 12166,
+        "output": 793,
+        "cacheRead": 15872,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "medium-ts-01-extract-function",
+      "resolved": false,
+      "attempts": 1,
+      "dollars_spent": 0.048876499999999996,
+      "duration_ms": 41361,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/medium-ts-01-extract-function.json"
+      ],
+      "difficulty": "medium",
+      "language": "typescript",
+      "tokens": {
+        "input": 6701,
+        "output": 1540,
+        "cacheRead": 36096,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "medium-ts-02-replace-api",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.062462000000000004,
+      "duration_ms": 51323,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/medium-ts-02-replace-api.json"
+      ],
+      "difficulty": "medium",
+      "language": "typescript",
+      "tokens": {
+        "input": 7158,
+        "output": 2233,
+        "cacheRead": 44288,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "medium-ts-03-fix-failing-test",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.0355515,
+      "duration_ms": 23137,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/medium-ts-03-fix-failing-test.json"
+      ],
+      "difficulty": "medium",
+      "language": "typescript",
+      "tokens": {
+        "input": 6889,
+        "output": 727,
+        "cacheRead": 29696,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "medium-ts-04-create-module",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.041249,
+      "duration_ms": 22064,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/medium-ts-04-create-module.json"
+      ],
+      "difficulty": "medium",
+      "language": "typescript",
+      "tokens": {
+        "input": 10642,
+        "output": 812,
+        "cacheRead": 9856,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "medium-ts-05-implement-interface",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.043279,
+      "duration_ms": 43355,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/medium-ts-05-implement-interface.json"
+      ],
+      "difficulty": "medium",
+      "language": "typescript",
+      "tokens": {
+        "input": 6306,
+        "output": 1350,
+        "cacheRead": 29056,
+        "cacheWrite": 0
+      }
+    },
+    {
+      "instance_id": "medium-ts-06-wire-event-handler",
+      "resolved": true,
+      "attempts": 1,
+      "dollars_spent": 0.046228,
+      "duration_ms": 37900,
+      "traces": [
+        "/Users/julb/Desktop/GitHub/caveman-cli/research/results/traces/medium-ts-06-wire-event-handler.json"
+      ],
+      "difficulty": "medium",
+      "language": "typescript",
+      "tokens": {
+        "input": 6422,
+        "output": 1523,
+        "cacheRead": 29312,
+        "cacheWrite": 0
+      }
+    }
+  ]
+}
