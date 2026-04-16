@@ -66,3 +66,5 @@ export function aggregateBench(results: BenchInstanceResult[]): {
 		capFailures: results.filter((r) => r.cost_cap_failure).length,
 	};
 }
+
+export { loadSweBenchVerified, loadSweBenchFromFile } from "./swe-bench-dataset.js";

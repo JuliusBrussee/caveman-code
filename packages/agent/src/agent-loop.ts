@@ -258,13 +258,22 @@ async function streamAssistantResponse(
 		tools: context.tools,
 	};
 
+	// Resolve model via router if configured
+	let resolvedModel = config.model;
+	if (config.router && config.role) {
+		const decision = config.router.route({
+			role: config.role,
+		});
+		resolvedModel = { ...config.model, id: decision.model };
+	}
+
 	const streamFunction = streamFn || streamSimple;
 
 	// Resolve API key (important for expiring tokens)
 	const resolvedApiKey =
 		(config.getApiKey ? await config.getApiKey(config.model.provider) : undefined) || config.apiKey;
 
-	const response = await streamFunction(config.model, llmContext, {
+	const response = await streamFunction(resolvedModel, llmContext, {
 		...config,
 		apiKey: resolvedApiKey,
 		signal,

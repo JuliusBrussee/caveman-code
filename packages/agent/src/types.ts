@@ -11,6 +11,8 @@ import type {
 	ToolResultMessage,
 } from "@cave/ai";
 import type { Static, TSchema } from "@sinclair/typebox";
+import type { Role } from "./roles.js";
+import type { ModelRouter } from "./router.js";
 
 /**
  * Stream function used by the agent loop.
@@ -95,6 +97,11 @@ export interface AfterToolCallContext {
 
 export interface AgentLoopConfig extends SimpleStreamOptions {
 	model: Model<any>;
+
+	/** Optional model router. When set, resolves the model for each outbound LLM call. */
+	router?: ModelRouter;
+	/** Current role for routing decisions. Required when router is set. */
+	role?: Role;
 
 	/**
 	 * Converts AgentMessage[] to LLM-compatible Message[] before each LLM call.
