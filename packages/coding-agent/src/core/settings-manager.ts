@@ -47,6 +47,7 @@ export interface CaveModeSettings {
 	enabled?: boolean; // default: true
 	intensity?: "lite" | "full" | "ultra"; // default: "full"
 	toolCompression?: boolean; // default: true
+	mlCompression?: boolean; // default: false — enables LLMLingua-2 ONNX compression
 }
 
 export interface RtkSettings {
@@ -1019,11 +1020,25 @@ export class SettingsManager {
 		this.save();
 	}
 
-	getCaveModeSettings(): { enabled: boolean; intensity: "lite" | "full" | "ultra"; toolCompression: boolean } {
+	getCaveModeMLCompression(): boolean {
+		return this.settings.caveMode?.mlCompression ?? false;
+	}
+
+	setCaveModeMLCompression(enabled: boolean): void {
+		if (!this.globalSettings.caveMode) {
+			this.globalSettings.caveMode = {};
+		}
+		this.globalSettings.caveMode.mlCompression = enabled;
+		this.markModified("caveMode", "mlCompression");
+		this.save();
+	}
+
+	getCaveModeSettings(): { enabled: boolean; intensity: "lite" | "full" | "ultra"; toolCompression: boolean; mlCompression: boolean } {
 		return {
 			enabled: this.getCaveModeEnabled(),
 			intensity: this.getCaveModeIntensity(),
 			toolCompression: this.getCaveModeToolCompression(),
+			mlCompression: this.getCaveModeMLCompression(),
 		};
 	}
 

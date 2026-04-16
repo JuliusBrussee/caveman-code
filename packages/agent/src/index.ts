@@ -10,3 +10,5 @@ export * from "./router.js";
 export * from "./roles.js";
 // Types
 export * from "./types.js";
+// Compression
+export * from "./compression/index.js";

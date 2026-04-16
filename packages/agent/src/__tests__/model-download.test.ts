@@ -3,7 +3,7 @@ import { mkdir, unlink, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { LLMLINGUA2_MANIFEST, modelPath, modelsDir, verifyChecksum } from "../compression/model-download.js";
+import { LLMLINGUA2_MANIFEST, modelPath, modelsDir, verifyChecksum, vocabPath } from "../compression/model-download.js";
 
 describe("model-download", () => {
 	it("modelsDir points to ~/.cave/models", () => {
@@ -13,6 +13,12 @@ describe("model-download", () => {
 	it("modelPath joins dir + filename", () => {
 		expect(modelPath(LLMLINGUA2_MANIFEST)).toBe(
 			join(homedir(), ".cave", "models", LLMLINGUA2_MANIFEST.filename),
+		);
+	});
+
+	it("vocabPath joins dir + vocabFilename", () => {
+		expect(vocabPath(LLMLINGUA2_MANIFEST)).toBe(
+			join(homedir(), ".cave", "models", LLMLINGUA2_MANIFEST.vocabFilename!),
 		);
 	});
 
@@ -44,7 +50,9 @@ describe("model-download", () => {
 
 	it("LLMLINGUA2_MANIFEST has required fields", () => {
 		expect(LLMLINGUA2_MANIFEST.url).toContain("huggingface.co");
-		expect(LLMLINGUA2_MANIFEST.filename).toBe("llmlingua2-bert-base.onnx");
+		expect(LLMLINGUA2_MANIFEST.filename).toContain("llmlingua2");
 		expect(LLMLINGUA2_MANIFEST.sizeBytes).toBeGreaterThan(0);
+		expect(LLMLINGUA2_MANIFEST.vocabUrl).toContain("vocab.txt");
+		expect(LLMLINGUA2_MANIFEST.vocabFilename).toBeDefined();
 	});
 });

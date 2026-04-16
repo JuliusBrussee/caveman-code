@@ -19,6 +19,9 @@
 	"dependencies": {
 		"@cave/ai": "^0.65.2"
 	},
+	"optionalDependencies": {
+		"onnxruntime-node": "^1.20.0"
+	},
 	"keywords": [
 		"ai",
 		"agent",

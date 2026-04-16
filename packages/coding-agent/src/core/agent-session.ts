@@ -16,6 +16,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import type { Agent, AgentEvent, AgentMessage, AgentState, AgentTool, ThinkingLevel } from "@cave/agent";
+import { LLMLinguaMiddleware } from "@cave/agent";
 import type { AssistantMessage, ImageContent, Message, Model, TextContent } from "@cave/ai";
 import { isContextOverflow, modelsAreEqual, resetApiProviders, supportsXhigh } from "@cave/ai";
 import { getDocsPath } from "../config.js";
@@ -269,6 +270,7 @@ export class AgentSession {
 	// Extension system
 	private _extensionRunner: ExtensionRunner | undefined = undefined;
 	private _turnIndex = 0;
+	private _llmlingua: LLMLinguaMiddleware | null = null;
 
 	private _resourceLoader: ResourceLoader;
 	private _customTools: ToolDefinition[];
@@ -457,6 +459,30 @@ export class AgentSession {
 				} catch {
 					// Fallback: use original unmodified output if compression encounters an error
 					processedContent = result.content;
+				}
+
+				// ML compression (LLMLingua-2 ONNX) — optional 4th stage, must be explicitly enabled
+				if (this.settingsManager.getCaveModeMLCompression()) {
+					try {
+						if (!this._llmlingua) {
+							this._llmlingua = new LLMLinguaMiddleware(true);
+						}
+						const mlResults = await Promise.all(
+							(processedContent as Array<{ type: string; text?: string; [key: string]: unknown }>).map(
+								async (block) => {
+									if (block.type !== "text" || typeof block.text !== "string") return block;
+									const r = await this._llmlingua!.compressAsync(block.text, {
+										targetRatio: 0.5,
+										activationThreshold: 4000,
+									});
+									return r.compressed ? { ...block, text: r.bytes } : block;
+								},
+							),
+						);
+						processedContent = mlResults as typeof result.content;
+					} catch {
+						// ML compression failed — keep rule-based compressed content
+					}
 				}
 			}
 
