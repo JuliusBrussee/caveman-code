@@ -1,0 +1,1 @@
+Implement a type-safe state machine in a new file `state-machine.ts`. Create a StateMachine class that enforces valid state transitions: Idle->Loading (on Fetch), Loading->Success (on Resolve), Loading->Error (on Reject), Error->Idle (on Reset), Success->Idle (on Reset). Invalid transitions should throw. Export the class.

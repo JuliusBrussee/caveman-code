@@ -1,0 +1,1 @@
+Refactor Repository in repository.ts to use TypeScript generics. Replace all `any` types with a generic type parameter `T`. The class should be `Repository<T>` and all methods should be properly typed. Do not use `any` anywhere.

@@ -1,0 +1,1 @@
+Extract the input validation logic from processOrder() in main.ts into a separate exported function called validateOrder(). Update processOrder() to call it.

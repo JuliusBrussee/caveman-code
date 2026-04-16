@@ -1,0 +1,1 @@
+Wire up the UserService to emit events via the EventBus. In user-service.ts, emit a 'user:created' event after createUser() and a 'user:deleted' event after deleteUser(). Import EventBus from event-bus.ts.

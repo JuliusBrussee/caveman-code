@@ -1,0 +1,5 @@
+{
+  "difficulty": "medium",
+  "language": "typescript",
+  "tags": ["events", "integration", "multi-file", "wiring"]
+}

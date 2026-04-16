@@ -1,0 +1,1 @@
+Refactor the ReportGenerator class in report.py. Extract the header formatting logic from generate() into a private method called _format_header(). The generate() method should call _format_header().

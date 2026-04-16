@@ -1,0 +1,1 @@
+Implement the Cache<T> interface in cache.ts. Create a class MemoryCache<T> that uses a Map internally. The set method should support an optional ttlMs parameter.

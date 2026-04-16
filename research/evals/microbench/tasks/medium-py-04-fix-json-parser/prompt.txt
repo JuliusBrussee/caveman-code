@@ -1,0 +1,1 @@
+Run `python -m pytest test_parser.py -v` to see the failure. Fix parse_config() in parser.py to handle nested JSON objects correctly.

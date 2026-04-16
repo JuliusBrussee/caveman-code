@@ -1,0 +1,1 @@
+Fix the TypeScript type error in user.ts. The age field should be a number but a string is being assigned.

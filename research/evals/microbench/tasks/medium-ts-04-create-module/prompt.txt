@@ -1,0 +1,1 @@
+Create a new file `console-logger.ts` that implements the Logger interface from types.ts. The ConsoleLogger class should use console.log/warn/error and include a prefix string passed to the constructor.

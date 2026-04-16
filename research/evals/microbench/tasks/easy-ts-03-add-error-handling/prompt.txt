@@ -1,0 +1,1 @@
+Add error handling to the fetchUserData function in fetch-data.ts. Wrap the fetch call in a try/catch block and throw a descriptive error if the response is not ok.

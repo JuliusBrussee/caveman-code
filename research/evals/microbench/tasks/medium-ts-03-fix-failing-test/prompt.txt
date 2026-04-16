@@ -1,0 +1,1 @@
+Run the tests with `npx vitest run string-utils.test.ts --reporter=verbose` and fix the failing test. Read the test output to understand the bug.

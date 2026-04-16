@@ -1,0 +1,5 @@
+{
+  "difficulty": "hard",
+  "language": "typescript",
+  "tags": ["rename", "refactor", "multi-file", "cross-cutting"]
+}

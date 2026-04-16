@@ -1,0 +1,1 @@
+Run `python -m pytest test_worker_pool.py -v` to see the intermittent failure. The WorkerPool in worker_pool.py has a race condition -- the shared counter is modified without synchronization. Fix it using threading.Lock.

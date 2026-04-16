@@ -1,0 +1,1 @@
+Add a new `--format` argument to the CLI in cli.py. It should accept choices 'json', 'csv', or 'text' with a default of 'json'. Add it to the argument parser and include it in the help text.

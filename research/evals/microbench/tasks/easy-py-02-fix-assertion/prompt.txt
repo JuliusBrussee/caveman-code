@@ -1,0 +1,1 @@
+Run the tests with `python -m pytest test_calculator.py` and fix the failing test. The divide method should raise ZeroDivisionError when dividing by zero.

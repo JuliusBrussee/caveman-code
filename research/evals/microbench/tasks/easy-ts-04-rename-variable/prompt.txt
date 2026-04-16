@@ -1,0 +1,1 @@
+Rename the variable `apiUrl` to `apiBaseUrl` everywhere in config.ts.

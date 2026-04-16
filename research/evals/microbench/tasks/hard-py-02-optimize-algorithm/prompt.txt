@@ -1,0 +1,1 @@
+Run `python -m pytest test_search.py -v` to see the performance test fail. The find_pairs() function in search.py uses O(n^2) nested loops. Optimize it to O(n) using a hash set approach while maintaining correctness.

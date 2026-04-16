@@ -1,0 +1,1 @@
+Replace all deprecated fetch().then() patterns across all .ts files with async/await syntax. Each fetch call should use `const response = await fetch(url); const data = await response.json();`

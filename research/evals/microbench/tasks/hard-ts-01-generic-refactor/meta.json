@@ -1,0 +1,5 @@
+{
+  "difficulty": "hard",
+  "language": "typescript",
+  "tags": ["generics", "refactor", "type-safety", "repository-pattern"]
+}

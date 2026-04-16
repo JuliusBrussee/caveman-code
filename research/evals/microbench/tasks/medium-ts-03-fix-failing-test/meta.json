@@ -1,0 +1,5 @@
+{
+  "difficulty": "medium",
+  "language": "typescript",
+  "tags": ["bug-fix", "testing", "off-by-one"]
+}

@@ -1,0 +1,5 @@
+{
+  "difficulty": "medium",
+  "language": "typescript",
+  "tags": ["async-await", "fetch", "multi-file", "modernization"]
+}

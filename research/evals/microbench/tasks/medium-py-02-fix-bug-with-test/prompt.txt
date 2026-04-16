@@ -1,0 +1,1 @@
+Run `python -m pytest test_sorter.py -v` to see the failing test. Read the output, understand the bug in merge_sort, and fix it.

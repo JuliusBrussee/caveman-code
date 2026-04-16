@@ -1,0 +1,5 @@
+{
+  "difficulty": "hard",
+  "language": "python",
+  "tags": ["decorator", "retry", "design-pattern", "error-handling"]
+}

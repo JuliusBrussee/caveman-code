@@ -1,0 +1,5 @@
+{
+  "difficulty": "hard",
+  "language": "typescript",
+  "tags": ["state-machine", "design-pattern", "type-safety", "implementation"]
+}

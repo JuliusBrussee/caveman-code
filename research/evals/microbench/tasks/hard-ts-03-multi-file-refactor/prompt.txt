@@ -1,0 +1,1 @@
+Rename the type `UserData` to `UserProfile` across the entire codebase. Update the type definition in types.ts and all usages in api.ts, store.ts, components.ts, and utils.ts. Make sure no references to `UserData` remain.

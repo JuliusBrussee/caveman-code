@@ -1,0 +1,1 @@
+Convert the codebase from synchronous to async/await. Refactor all three files: data_fetcher.py functions should be `async def`, processor.py should await them, and main.py should use `asyncio.run()`. Maintain the same function signatures except adding async.

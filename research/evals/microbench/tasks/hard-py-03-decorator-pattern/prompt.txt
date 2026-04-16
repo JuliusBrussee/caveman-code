@@ -1,0 +1,1 @@
+Implement a `@retry(max_attempts=3, delay=0.1)` decorator in api_client.py that retries on Exception. Apply it to all three API methods (get, post, delete). The decorator should re-raise the exception after max_attempts failures.
