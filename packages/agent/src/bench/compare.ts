@@ -112,7 +112,11 @@ export function resultsToBaseline(results: any, system = "cave"): BaselineData {
 }
 
 function toRow(b: BaselineData): ComparisonRow {
-	const totalTokens = b.inputTokensTotal + b.outputTokensTotal;
+	// Cave splits prompt tokens into non-cached (input) + cached (cacheRead).
+	// External baselines report total prompt tokens in inputTokensTotal.
+	// Total prompt = input + cacheRead; total all = prompt + output.
+	const promptTokens = b.inputTokensTotal + (b.cacheReadTokensTotal ?? 0);
+	const totalTokens = promptTokens + b.outputTokensTotal;
 	const resolved = b.resolvedCount || 1; // avoid /0
 
 	return {
@@ -123,9 +127,7 @@ function toRow(b: BaselineData): ComparisonRow {
 		costPerResolved: b.dollarsTotal / resolved,
 		tokenEfficiencyRatio: totalTokens > 0 ? (b.resolvedCount / totalTokens) * 1_000_000 : 0,
 		cacheReadRatio:
-			b.cacheReadTokensTotal !== undefined
-				? b.cacheReadTokensTotal / (b.inputTokensTotal + b.cacheReadTokensTotal || 1)
-				: undefined,
+			b.cacheReadTokensTotal !== undefined ? b.cacheReadTokensTotal / (promptTokens || 1) : undefined,
 		outputTokenRatio: totalTokens > 0 ? b.outputTokensTotal / totalTokens : 0,
 	};
 }

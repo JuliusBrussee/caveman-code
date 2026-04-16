@@ -36,7 +36,7 @@ npm run bench:micro -- --dry-run             # list tasks without running
 
 Key metrics:
 - **$1.19 total cost** for full suite
-- **16k tokens per resolved task** (input + output)
+- **59k total tokens per resolved task** (non-cached input + cached input + output)
 - **75% prompt cache hit rate** (caveman compression)
 - **14 min** wall clock
 
@@ -65,11 +65,11 @@ npm run bench:compare -- --format json --output report.json
 
 | System | Benchmark | Resolved | Tok/Resolved | $/Resolved | Cache% |
 |--------|-----------|----------|-------------|------------|--------|
-| cave | microbench | 64.0% | 16k | $0.07 | 75.0% |
+| cave | microbench | 64.0% | 59k | $0.07 | 75.0% |
 | codex | swebench | 74.2% | 1,348k | $3.37 | n/a |
 | claude-code | swebench | 51.0% | 2,353k | $7.35 | n/a |
 
-Note: cave microbench vs SWE-bench is not apples-to-apples (different tasks, different difficulty). Run cave on SWE-bench for a direct comparison. The token-per-resolve metric demonstrates the compression thesis — cave uses 80-150x fewer tokens per resolved task.
+Note: cave microbench vs SWE-bench is not apples-to-apples (different tasks, different difficulty). Run cave on SWE-bench for a direct comparison. Tok/Resolved includes all prompt tokens (cached + non-cached) plus output tokens.
 
 ## Regenerating published numbers
 
