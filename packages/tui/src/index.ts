@@ -72,6 +72,7 @@ export {
 	type Multiplexer,
 	probeTerminal,
 	type ProbeResult,
+	queryOsc11Standalone,
 	queryTerminalBackground,
 	relativeLuminance,
 	type TerminalBackground,

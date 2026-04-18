@@ -643,18 +643,47 @@ export function getThemeByName(name: string): Theme | undefined {
 	}
 }
 
+/**
+ * Startup-cached background classification. Written once by main.ts after
+ * running `probeTerminal()` (terminal-blend R1). When unset, we fall back
+ * to COLORFGBG / CAVE_TERM_BG env parsing below. Never swaps mid-session
+ * per R3 AC4.
+ */
+let detectedBackground: "dark" | "light" | undefined;
+
+export function setDetectedBackground(classification: "dark" | "light"): void {
+	detectedBackground = classification;
+}
+
+export function getDetectedBackground(): "dark" | "light" | undefined {
+	return detectedBackground;
+}
+
 function detectTerminalBackground(): "dark" | "light" {
+	// 1. Probe result from main.ts (if available).
+	if (detectedBackground) return detectedBackground;
+
+	// 2. CAVE_TERM_BG override.
+	const override = (process.env.CAVE_TERM_BG || "").trim().toLowerCase();
+	if (override === "dark" || override === "light") {
+		return override;
+	}
+
+	// 3. COLORFGBG.
 	const colorfgbg = process.env.COLORFGBG || "";
 	if (colorfgbg) {
 		const parts = colorfgbg.split(";");
 		if (parts.length >= 2) {
-			const bg = parseInt(parts[1], 10);
+			const bg = parseInt(parts[parts.length - 1], 10);
 			if (!Number.isNaN(bg)) {
-				const result = bg < 8 ? "dark" : "light";
-				return result;
+				// 0-6, 8 = dark variants; 7, 9-15 = light.
+				if ((bg >= 0 && bg <= 6) || bg === 8) return "dark";
+				if (bg === 7 || (bg >= 9 && bg <= 15)) return "light";
 			}
 		}
 	}
+
+	// 4. Fall back to dark per terminal-blend R1 AC4.
 	return "dark";
 }
 

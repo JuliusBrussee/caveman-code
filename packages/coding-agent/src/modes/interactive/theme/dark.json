@@ -16,11 +16,11 @@
 		"accent": "#4fc3f7",
 		"brand": "#E8A840",
 		"selectedBg": "#1e2040",
-		"userMsgBg": "#131525",
-		"toolPendingBg": "#141727",
-		"toolSuccessBg": "#111a14",
+		"userMsgBg": "",
+		"toolPendingBg": "",
+		"toolSuccessBg": "",
 		"toolErrorBg": "#1a1113",
-		"customMsgBg": "#16142a"
+		"customMsgBg": ""
 	},
 	"colors": {
 		"accent": "accent",
@@ -83,7 +83,7 @@
 		"brand": "brand"
 	},
 	"export": {
-		"pageBg": "#0d0f17",
+		"pageBg": "",
 		"cardBg": "#141727",
 		"infoBg": "#111525"
 	}

@@ -1,0 +1,5 @@
+{
+  "triggered_at": "2026-04-18T21:30:08.685Z",
+  "command": "cd /Users/julb/Desktop/GitHub/caveman-cli && git stash && cd packages/coding-agent && npx vitest run 2>&1 | tail -5; cd /Users/julb/Desktop/GitHub/caveman-cli && git stash pop 2>&1 | tail -2",
+  "failure_excerpt": "      Tests  58 failed | 1021 passed | 66 skipped (1145)"
+}

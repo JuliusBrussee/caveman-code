@@ -1011,10 +1011,48 @@ export class TUI extends Container {
 		return null;
 	}
 
+	/**
+	 * Minimum terminal dimensions for a normal render.
+	 * Below these, we fall back to a degenerate-size placeholder per
+	 * cavekit-fullscreen-viewport R2 AC4 and R3 AC4.
+	 */
+	private static readonly MIN_ROWS = 4;
+	private static readonly MIN_COLS = 20;
+
+	private renderDegenerateFrame(width: number, height: number): string[] {
+		const msg = "terminal too small";
+		const lines: string[] = [];
+		if (height <= 0 || width <= 0) return lines;
+		if (width >= msg.length) {
+			const pad = " ".repeat(Math.max(0, Math.floor((width - msg.length) / 2)));
+			lines.push((pad + msg).slice(0, width));
+		} else {
+			lines.push(msg.slice(0, width));
+		}
+		while (lines.length < height) lines.push("");
+		return lines.slice(0, height);
+	}
+
 	private doRender(): void {
 		if (this.stopped) return;
 		const width = this.terminal.columns;
 		const height = this.terminal.rows;
+
+		// Degenerate-size placeholder — never crash, never write outside bounds.
+		if (height < TUI.MIN_ROWS || width < TUI.MIN_COLS) {
+			const frame = this.renderDegenerateFrame(width, height);
+			let buffer = "\x1b[?2026h\x1b[2J\x1b[H";
+			for (let i = 0; i < frame.length; i++) {
+				if (i > 0) buffer += "\r\n";
+				buffer += frame[i];
+			}
+			buffer += "\x1b[?2026l";
+			this.terminal.write(buffer);
+			this.previousLines = frame;
+			this.previousWidth = width;
+			this.previousHeight = height;
+			return;
+		}
 		const widthChanged = this.previousWidth !== 0 && this.previousWidth !== width;
 		const heightChanged = this.previousHeight !== 0 && this.previousHeight !== height;
 		const previousBufferLength = this.previousHeight > 0 ? this.previousViewportTop + this.previousHeight : height;

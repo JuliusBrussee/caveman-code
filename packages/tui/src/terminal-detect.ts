@@ -257,20 +257,127 @@ export async function queryTerminalBackground(
 }
 
 /**
+ * Standalone OSC 11 query that works before the TUI has started.
+ *
+ * Briefly installs its own stdin listener in raw mode, writes the OSC 11
+ * query, waits up to `timeoutMs` for the response, then restores stdin.
+ * Returns null on timeout / non-TTY / parse failure.
+ *
+ * Use this during startup when we need the background classification before
+ * theme init but haven't yet constructed a ProcessTerminal.
+ */
+export function queryOsc11Standalone(timeoutMs = 150): Promise<TerminalBackground | null> {
+	return new Promise((resolve) => {
+		if (!process.stdout.isTTY || !process.stdin.isTTY) {
+			resolve(null);
+			return;
+		}
+
+		const wasRaw = process.stdin.isRaw;
+		let settled = false;
+		let buffer = "";
+		let timer: NodeJS.Timeout | undefined;
+
+		const cleanup = () => {
+			if (settled) return;
+			settled = true;
+			if (timer) clearTimeout(timer);
+			try {
+				process.stdin.removeListener("data", onData);
+				if (process.stdin.setRawMode && !wasRaw) {
+					process.stdin.setRawMode(false);
+				}
+				process.stdin.pause();
+			} catch {
+				// swallow
+			}
+		};
+
+		const onData = (chunk: Buffer | string) => {
+			buffer += typeof chunk === "string" ? chunk : chunk.toString("utf8");
+			const rgb = parseOsc11Response(buffer);
+			if (rgb) {
+				cleanup();
+				const lum = relativeLuminance(rgb.r, rgb.g, rgb.b);
+				resolve({
+					r: rgb.r,
+					g: rgb.g,
+					b: rgb.b,
+					luminance: lum,
+					classification: classifyLuminance(lum),
+					source: "osc11",
+				});
+			}
+		};
+
+		try {
+			if (process.stdin.setRawMode) process.stdin.setRawMode(true);
+			process.stdin.resume();
+			process.stdin.on("data", onData);
+			process.stdout.write("\x1b]11;?\x07");
+		} catch {
+			cleanup();
+			resolve(null);
+			return;
+		}
+
+		timer = setTimeout(() => {
+			cleanup();
+			resolve(null);
+		}, timeoutMs);
+	});
+}
+
+/**
  * One-call probe: identity + background + final classification (with "dark" fallback).
  * The classification field is always concrete per R1.
  */
 export async function probeTerminal(options: {
-	terminal: ProcessTerminal | null;
+	terminal?: ProcessTerminal | null;
 	timeoutMs?: number;
 	env?: NodeJS.ProcessEnv;
+	/** Whether to run the standalone OSC 11 query (needs raw stdin). Default: true when no terminal is supplied. */
+	useStandaloneOsc?: boolean;
 }): Promise<ProbeResult> {
 	const env = options.env ?? process.env;
 	const identity = detectTerminalIdentity(env);
-	const background = await queryTerminalBackground(options.terminal, options.timeoutMs ?? 200, env);
-	return {
-		identity,
-		background,
-		classification: background?.classification ?? "dark",
-	};
+	const timeoutMs = options.timeoutMs ?? 200;
+	const useStandalone = options.useStandaloneOsc ?? !options.terminal;
+
+	// Override first (R1 AC7)
+	const override = parseOverride(env.CAVE_TERM_BG);
+	if (override) {
+		return { identity, background: override, classification: override.classification };
+	}
+
+	// Pre-TUI OSC 11 (R1 AC1+2)
+	if (useStandalone) {
+		const osc = await queryOsc11Standalone(Math.min(timeoutMs, 150));
+		if (osc) {
+			return { identity, background: osc, classification: osc.classification };
+		}
+	} else if (options.terminal) {
+		const bg = await queryTerminalBackground(options.terminal, timeoutMs, env);
+		if (bg) return { identity, background: bg, classification: bg.classification };
+	}
+
+	// COLORFGBG (R1 AC3)
+	const fgbg = parseColorFgBg(env.COLORFGBG);
+	if (fgbg) {
+		return {
+			identity,
+			background: {
+				r: fgbg === "dark" ? 0 : 255,
+				g: fgbg === "dark" ? 0 : 255,
+				b: fgbg === "dark" ? 0 : 255,
+				luminance: fgbg === "dark" ? 0 : 1,
+				classification: fgbg,
+				source: "colorfgbg",
+			},
+			classification: fgbg,
+		};
+	}
+
+	// Fallback (R1 AC4)
+	return { identity, background: null, classification: "dark" };
 }

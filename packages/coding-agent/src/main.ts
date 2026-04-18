@@ -8,7 +8,7 @@
 import { resolve } from "node:path";
 import { createInterface } from "node:readline";
 import { type ImageContent, modelsAreEqual, supportsXhigh } from "@cave/ai";
-import { detectTerminalIdentity, ProcessTerminal, queryTerminalBackground, setKeybindings, TUI } from "@cave/tui";
+import { detectTerminalIdentity, probeTerminal, ProcessTerminal, setKeybindings, TUI } from "@cave/tui";
 import chalk from "chalk";
 import { type Args, type Mode, parseArgs, printHelp } from "./cli/args.js";
 import { processFileArguments } from "./cli/file-processor.js";
@@ -42,7 +42,7 @@ import { allTools } from "./core/tools/index.js";
 import { runMigrations, showDeprecationWarnings } from "./migrations.js";
 import { InteractiveMode, runPrintMode, runRpcMode } from "./modes/index.js";
 import { ExtensionSelectorComponent } from "./modes/interactive/components/extension-selector.js";
-import { initTheme, stopThemeWatcher } from "./modes/interactive/theme/theme.js";
+import { initTheme, setDetectedBackground, stopThemeWatcher } from "./modes/interactive/theme/theme.js";
 import { handleConfigCommand, handlePackageCommand } from "./package-manager-cli.js";
 import { isLocalPath } from "./utils/paths.js";
 
@@ -447,14 +447,16 @@ async function emitDebugTermDiagnostic(): Promise<void> {
 	const identity = detectTerminalIdentity();
 	let bgPayload: Record<string, unknown> = {};
 	try {
-		// No ProcessTerminal yet at this point — fall back to env-driven detection only.
-		const bg = await queryTerminalBackground(null, 150);
-		if (bg) {
+		const probe = await probeTerminal({ timeoutMs: 150 });
+		if (probe.background) {
+			const bg = probe.background;
 			bgPayload = {
 				bg: `#${bg.r.toString(16).padStart(2, "0")}${bg.g.toString(16).padStart(2, "0")}${bg.b.toString(16).padStart(2, "0")}`,
 				isDark: bg.classification === "dark",
 				bgSource: bg.source,
 			};
+		} else {
+			bgPayload = { classification: probe.classification };
 		}
 	} catch {
 		// No-op — diagnostic is best-effort.
@@ -696,6 +698,18 @@ export async function main(args: string[]) {
 		stdinContent,
 	);
 	time("prepareInitialMessage");
+	// Probe host terminal so theme auto-selects dark/light (terminal-blend R1, R3).
+	// User-configured theme (settingsManager.getTheme()) still wins — the probe
+	// only informs the default when no theme is set. One-shot at startup, never
+	// swaps mid-session per R3 AC4. Capped at 150ms per R1 AC5.
+	if (appMode === "interactive" && !settingsManager.getTheme()) {
+		try {
+			const probe = await probeTerminal({ timeoutMs: 150 });
+			setDetectedBackground(probe.classification);
+		} catch {
+			// Probe is best-effort; theme.ts falls back to COLORFGBG/CAVE_TERM_BG/dark.
+		}
+	}
 	initTheme(settingsManager.getTheme(), appMode === "interactive");
 	time("initTheme");
 

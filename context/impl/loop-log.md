@@ -14,3 +14,18 @@
   - `packages/coding-agent/src/main.ts` (CAVE_DEBUG_TERM + exit safety net)
 - **Validation:** tui tsc P, coding-agent tsc P, scroll-buffer vitest 11/11 P, `CAVE_DEBUG_TERM=1 cave --version` emits single JSON line
 - **Next:** Tier 1 — T11 (ambient theme selection), T9 (viewport bounds), T13 (scroll keybindings), T14 (wheel routing)
+
+### Iteration 2 — 2026-04-18
+- **Tasks:** T11, T9, T15, T16 (Tier 1 partial — blend + bounds)
+- **Tier:** 1
+- **Status:** DONE
+- **Files:**
+  - `packages/tui/src/terminal-detect.ts` (added `queryOsc11Standalone` + enhanced `probeTerminal`)
+  - `packages/tui/src/tui.ts` (degenerate-size placeholder in `doRender`)
+  - `packages/tui/src/index.ts` (barrel exports)
+  - `packages/coding-agent/src/main.ts` (wire `probeTerminal()` → `setDetectedBackground()` before `initTheme()`)
+  - `packages/coding-agent/src/modes/interactive/theme/theme.ts` (exported `setDetectedBackground`, enhanced `detectTerminalBackground` with full R1 chain)
+  - `packages/coding-agent/src/modes/interactive/theme/dark.json` (stripped pageBg, userMsgBg, toolPendingBg, toolSuccessBg, customMsgBg)
+  - `packages/coding-agent/src/modes/interactive/theme/light.json` (same)
+- **Validation:** tui + coding-agent tsc P; theme-export pre-existing failures unchanged (not caused by these edits); `CAVE_TERM_BG=light cave --version` respected
+- **Next:** Tier 2 — T17 contrast-zone registry, T18 fg legibility, T19 luminance harmonization, T20 scroll indicator; then Tier 3 — T23 SDD scroll-buffer integration (this is the big one — requires interactive-mode.ts refactor to route chat through ScrollBuffer)
