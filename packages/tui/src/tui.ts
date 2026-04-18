@@ -486,10 +486,12 @@ export class TUI extends Container {
 
 	start(): void {
 		this.stopped = false;
+		this.terminal.enterAltScreen();
 		this.terminal.start(
 			(data) => this.handleInput(data),
 			() => this.requestRender(),
 		);
+		this.terminal.enableMouseTracking();
 		this.terminal.hideCursor();
 		this.queryCellSize();
 		this.requestRender();
@@ -517,23 +519,16 @@ export class TUI extends Container {
 	}
 
 	stop(): void {
+		if (this.stopped) return;
 		this.stopped = true;
 		if (this.renderTimer) {
 			clearTimeout(this.renderTimer);
 			this.renderTimer = undefined;
 		}
-		// Move cursor to the end of the content to prevent overwriting/artifacts on exit
-		if (this.previousLines.length > 0) {
-			const targetRow = this.previousLines.length; // Line after the last content
-			const lineDiff = targetRow - this.hardwareCursorRow;
-			if (lineDiff > 0) {
-				this.terminal.write(`\x1b[${lineDiff}B`);
-			} else if (lineDiff < 0) {
-				this.terminal.write(`\x1b[${-lineDiff}A`);
-			}
-			this.terminal.write("\r\n");
-		}
 
+		// In alt-screen mode the primary buffer is already preserved, so we
+		// don't need to position the cursor below rendered content. The
+		// leaveAltScreen call in terminal.stop() will restore the primary buffer.
 		this.terminal.showCursor();
 		this.terminal.stop();
 	}

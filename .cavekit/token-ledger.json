@@ -1,0 +1,10 @@
+{
+  "session_used": 0,
+  "session_budget": 500000,
+  "task_budgets": {
+    "quick": 8000,
+    "standard": 20000,
+    "thorough": 45000
+  },
+  "tasks": {}
+}

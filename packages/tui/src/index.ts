@@ -59,8 +59,25 @@ export {
 } from "./keys.js";
 // Input buffering for batch splitting
 export { StdinBuffer, type StdinBufferEventMap, type StdinBufferOptions } from "./stdin-buffer.js";
+// Color depth emission
+export { type ColorDepth, detectColorDepth, hexToSgr, resetColorDepthCache, sgrReset } from "./color-depth.js";
+// Scroll buffer (in-app scrollback)
+export { ScrollBuffer, type ScrollBufferOptions, type ScrollMode } from "./scroll-buffer.js";
 // Terminal interface and implementations
 export { ProcessTerminal, type Terminal } from "./terminal.js";
+// Terminal identity + background detection
+export {
+	type BackgroundClassification,
+	detectTerminalIdentity,
+	type Multiplexer,
+	probeTerminal,
+	type ProbeResult,
+	queryTerminalBackground,
+	relativeLuminance,
+	type TerminalBackground,
+	type TerminalIdentity,
+	type TerminalProgram,
+} from "./terminal-detect.js";
 // Terminal image support
 export {
 	allocateImageId,

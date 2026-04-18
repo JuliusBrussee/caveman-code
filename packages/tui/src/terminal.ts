@@ -48,6 +48,16 @@ export interface Terminal {
 
 	// Title operations
 	setTitle(title: string): void; // Set terminal window title
+
+	// Alt-screen + mouse (optional, no-op on non-TTY implementations)
+	enterAltScreen(): void;
+	leaveAltScreen(): void;
+	enableMouseTracking(): void;
+	disableMouseTracking(): void;
+	isTTY(): boolean;
+
+	// Query an OSC sequence and read the response within a timeout.
+	queryOsc(sequence: string, responsePrefix: string, timeoutMs: number): Promise<string | null>;
 }
 
 /**
@@ -59,8 +69,21 @@ export class ProcessTerminal implements Terminal {
 	private resizeHandler?: () => void;
 	private _kittyProtocolActive = false;
 	private _modifyOtherKeysActive = false;
+	private _altScreenActive = false;
+	private _mouseTrackingActive = false;
 	private stdinBuffer?: StdinBuffer;
 	private stdinDataHandler?: (data: string) => void;
+	private oscListeners: {
+		prefix: string;
+		resolve: (value: string | null) => void;
+		timer: NodeJS.Timeout;
+	}[] = [];
+	private signalHandlers: {
+		signal: "SIGINT" | "SIGTERM" | "SIGHUP";
+		handler: () => void;
+	}[] = [];
+	private uncaughtExceptionHandler?: (err: Error) => void;
+	private unhandledRejectionHandler?: (reason: unknown) => void;
 	private writeLogPath = (() => {
 		const env = process.env.PI_TUI_WRITE_LOG || "";
 		if (!env) return "";
@@ -78,6 +101,121 @@ export class ProcessTerminal implements Terminal {
 
 	get kittyProtocolActive(): boolean {
 		return this._kittyProtocolActive;
+	}
+
+	isTTY(): boolean {
+		return Boolean(process.stdout.isTTY);
+	}
+
+	enterAltScreen(): void {
+		if (this._altScreenActive || !this.isTTY()) return;
+		// CSI ?1049h: save primary screen, enter alt screen, position cursor at 1,1
+		// CSI 2J: clear visible area
+		// CSI H: move cursor home
+		// CSI ?25l: hide cursor
+		process.stdout.write("\x1b[?1049h\x1b[2J\x1b[H\x1b[?25l");
+		this._altScreenActive = true;
+	}
+
+	leaveAltScreen(): void {
+		if (!this._altScreenActive) return;
+		// CSI ?25h: show cursor
+		// CSI ?1049l: leave alt screen, restore primary
+		process.stdout.write("\x1b[?25h\x1b[?1049l");
+		this._altScreenActive = false;
+	}
+
+	enableMouseTracking(): void {
+		if (this._mouseTrackingActive || !this.isTTY()) return;
+		// CSI ?1000h: send mouse press/release events
+		// CSI ?1006h: SGR-encoded mouse events (wider coordinate range)
+		process.stdout.write("\x1b[?1000h\x1b[?1006h");
+		this._mouseTrackingActive = true;
+	}
+
+	disableMouseTracking(): void {
+		if (!this._mouseTrackingActive) return;
+		process.stdout.write("\x1b[?1006l\x1b[?1000l");
+		this._mouseTrackingActive = false;
+	}
+
+	async queryOsc(sequence: string, responsePrefix: string, timeoutMs: number): Promise<string | null> {
+		if (!this.isTTY()) return null;
+		return new Promise<string | null>((resolve) => {
+			const timer = setTimeout(() => {
+				const idx = this.oscListeners.findIndex((l) => l.resolve === resolve);
+				if (idx !== -1) this.oscListeners.splice(idx, 1);
+				resolve(null);
+			}, timeoutMs);
+			this.oscListeners.push({ prefix: responsePrefix, resolve, timer });
+			process.stdout.write(sequence);
+		});
+	}
+
+	private handleOscResponse(data: string): boolean {
+		for (let i = 0; i < this.oscListeners.length; i++) {
+			if (data.includes(this.oscListeners[i].prefix)) {
+				const { resolve, timer } = this.oscListeners[i];
+				clearTimeout(timer);
+				this.oscListeners.splice(i, 1);
+				resolve(data);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private installSignalHandlers(): void {
+		const teardown = (exitCode: number | null) => {
+			try {
+				this.stop();
+			} catch {
+				// best-effort
+			}
+			if (exitCode !== null) {
+				process.exit(exitCode);
+			}
+		};
+		const signals: Array<"SIGINT" | "SIGTERM" | "SIGHUP"> = ["SIGINT", "SIGTERM", "SIGHUP"];
+		const signalCodes: Record<string, number> = { SIGINT: 130, SIGTERM: 143, SIGHUP: 129 };
+		for (const sig of signals) {
+			const handler = () => teardown(signalCodes[sig] ?? 128);
+			process.on(sig, handler);
+			this.signalHandlers.push({ signal: sig, handler });
+		}
+		this.uncaughtExceptionHandler = (err: Error) => {
+			try {
+				this.stop();
+			} catch {}
+			// Log after teardown so it actually shows.
+			process.stderr.write(`\nUncaught exception: ${err?.stack ?? err}\n`);
+			process.exit(1);
+		};
+		this.unhandledRejectionHandler = (reason: unknown) => {
+			try {
+				this.stop();
+			} catch {}
+			const msg = reason instanceof Error ? (reason.stack ?? reason.message) : String(reason);
+			process.stderr.write(`\nUnhandled rejection: ${msg}\n`);
+			process.exit(1);
+		};
+		process.on("uncaughtException", this.uncaughtExceptionHandler);
+		process.on("unhandledRejection", this.unhandledRejectionHandler);
+	}
+
+	private removeSignalHandlers(): void {
+		for (const { signal, handler } of this.signalHandlers) {
+			process.removeListener(signal, handler);
+		}
+		this.signalHandlers = [];
+		if (this.uncaughtExceptionHandler) {
+			process.removeListener("uncaughtException", this.uncaughtExceptionHandler);
+			this.uncaughtExceptionHandler = undefined;
+		}
+		if (this.unhandledRejectionHandler) {
+			process.removeListener("unhandledRejection", this.unhandledRejectionHandler);
+			this.unhandledRejectionHandler = undefined;
+		}
 	}
 
 	start(onInput: (data: string) => void, onResize: () => void): void {
@@ -114,6 +252,9 @@ export class ProcessTerminal implements Terminal {
 		// The query handler intercepts input temporarily, then installs the user's handler
 		// See: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
 		this.queryAndEnableKittyProtocol();
+
+		// Install signal + uncaught handlers so we always restore terminal state on exit.
+		this.installSignalHandlers();
 	}
 
 	/**
@@ -147,6 +288,11 @@ export class ProcessTerminal implements Terminal {
 					process.stdout.write("\x1b[>7u");
 					return; // Don't forward protocol response to TUI
 				}
+			}
+
+			// Intercept OSC responses (e.g. background color query)
+			if (this.oscListeners.length > 0 && this.handleOscResponse(sequence)) {
+				return;
 			}
 
 			if (this.inputHandler) {
@@ -261,6 +407,16 @@ export class ProcessTerminal implements Terminal {
 	}
 
 	stop(): void {
+		// Cancel any pending OSC listeners
+		for (const listener of this.oscListeners) {
+			clearTimeout(listener.timer);
+			listener.resolve(null);
+		}
+		this.oscListeners = [];
+
+		// Disable mouse tracking
+		this.disableMouseTracking();
+
 		// Disable bracketed paste mode
 		process.stdout.write("\x1b[?2004l");
 
@@ -301,6 +457,16 @@ export class ProcessTerminal implements Terminal {
 		if (process.stdin.setRawMode) {
 			process.stdin.setRawMode(this.wasRaw);
 		}
+
+		// Leave alt screen AFTER restoring stdin so terminal state transitions atomically.
+		this.leaveAltScreen();
+
+		// Reset any leftover SGR state in the restored primary buffer.
+		if (this.isTTY()) {
+			process.stdout.write("\x1b[0m");
+		}
+
+		this.removeSignalHandlers();
 	}
 
 	write(data: string): void {

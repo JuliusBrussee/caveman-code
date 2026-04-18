@@ -8,7 +8,7 @@
 import { resolve } from "node:path";
 import { createInterface } from "node:readline";
 import { type ImageContent, modelsAreEqual, supportsXhigh } from "@cave/ai";
-import { ProcessTerminal, setKeybindings, TUI } from "@cave/tui";
+import { detectTerminalIdentity, ProcessTerminal, queryTerminalBackground, setKeybindings, TUI } from "@cave/tui";
 import chalk from "chalk";
 import { type Args, type Mode, parseArgs, printHelp } from "./cli/args.js";
 import { processFileArguments } from "./cli/file-processor.js";
@@ -418,8 +418,62 @@ async function promptForMissingSessionCwd(
 	});
 }
 
+/**
+ * Best-effort process.on("exit") safety net: if we die while the TUI is in
+ * alt-screen mode with mouse tracking on, this restores the terminal so the
+ * user's shell isn't unusable afterward. Idempotent — the TUI's own teardown
+ * runs first in all normal paths.
+ */
+function installExitSafetyNet(): void {
+	process.on("exit", () => {
+		if (!process.stdout.isTTY) return;
+		try {
+			// Disable mouse, leave alt screen, show cursor, reset SGR.
+			process.stdout.write("\x1b[?1006l\x1b[?1000l\x1b[?1049l\x1b[?25h\x1b[0m");
+		} catch {
+			// Can't do anything if stdout is gone.
+		}
+	});
+}
+
+/**
+ * Emit a single-line JSON diagnostic to stderr before the UI boots, when
+ * CAVE_DEBUG_TERM=1. Used to verify terminal detection under different hosts
+ * (ghostty, iTerm, tmux, ssh, etc.) without starting the full UI.
+ * Must not block boot more than 200ms per cavekit-terminal-blend R2.
+ */
+async function emitDebugTermDiagnostic(): Promise<void> {
+	if (process.env.CAVE_DEBUG_TERM !== "1") return;
+	const identity = detectTerminalIdentity();
+	let bgPayload: Record<string, unknown> = {};
+	try {
+		// No ProcessTerminal yet at this point — fall back to env-driven detection only.
+		const bg = await queryTerminalBackground(null, 150);
+		if (bg) {
+			bgPayload = {
+				bg: `#${bg.r.toString(16).padStart(2, "0")}${bg.g.toString(16).padStart(2, "0")}${bg.b.toString(16).padStart(2, "0")}`,
+				isDark: bg.classification === "dark",
+				bgSource: bg.source,
+			};
+		}
+	} catch {
+		// No-op — diagnostic is best-effort.
+	}
+	const line = JSON.stringify({
+		program: identity.program,
+		hostProgram: identity.hostProgram,
+		version: identity.version,
+		multiplexer: identity.multiplexer,
+		isSsh: identity.isSsh,
+		...bgPayload,
+	});
+	process.stderr.write(`[cave-term] ${line}\n`);
+}
+
 export async function main(args: string[]) {
 	resetTimings();
+	installExitSafetyNet();
+	await emitDebugTermDiagnostic();
 	const offlineMode = args.includes("--offline") || isTruthyEnvFlag(process.env.PI_OFFLINE);
 	if (offlineMode) {
 		process.env.PI_OFFLINE = "1";

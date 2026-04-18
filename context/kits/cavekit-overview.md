@@ -1,28 +1,52 @@
 ---
 cavekit: overview
-version: 1.3.0
+version: 1.4.0
 status: approved
 created: 2026-04-08
-updated: 2026-04-16
+updated: 2026-04-18
 ---
 
-# Cavekit Overview: Caveman Code Rebrand
+# Cavekit Overview: Caveman Code
 
 ## Summary
 
-This project rebrands the `caveman-cli` fork (formerly "Cave Pi", upstream `pi-mono`) to **Caveman Code**. The rebrand is cosmetic only -- no package names (`@cavepi/*`), import paths, or architectural changes. The binary remains `cave`.
+Domain index for all cavekit requirements in the `caveman-cli` monorepo. Originally scoped to the Caveman Code rebrand; now hosts multiple initiatives (rebrand, token efficiency, extension workflow, terminal integration). Each section below lists the kits in one initiative, their dependencies, and their execution order.
 
-## Kit Index
+## Active Ship Run (2026-04-18) — Terminal Integration
+
+Scope of the current `/ck:ship` run: make the `cave` TUI blend into whatever terminal the user is running (ghostty, iTerm2, Terminal.app, Kitty, WezTerm, Alacritty, tmux, screen, cmux, Linux console, ssh-over-any-of-the-above), run as a full-terminal scroll-locked app like Claude Code / Codex CLI, and keep the SDD (`/ck:*`) workflow UI fully compatible with the new viewport.
+
+| Kit | File | Description | Reqs |
+|-----|------|-------------|:----:|
+| Terminal Blend | [cavekit-terminal-blend.md](cavekit-terminal-blend.md) | Host terminal bg/identity detection, ambient theme selection, transparent-bg policy, contrast-zone inventory, low-color degradation | 8 |
+| Fullscreen Viewport | [cavekit-fullscreen-viewport.md](cavekit-fullscreen-viewport.md) | Alt-screen entry/exit, full-viewport render, resize, scroll-lock against host scrollback, in-app scroll buffer, SDD UI integration, clean exit | 9 |
+
+### Dependency Graph
+
+```
+terminal-blend ──┐
+                 ├── (independent: can land together)
+fullscreen-viewport ──┘
+
+Both layer on top of existing cavekit-visual-theme (palette tokens)
+and integrate with cavekit-extension-workflow (review overlays).
+```
+
+### Execution Order
+
+- **Wave 1 (parallel):** terminal-blend, fullscreen-viewport
+  - No inter-kit requirement dependency; terminal-blend R5(d) and R5(f) reference fullscreen-viewport surfaces but only as contrast-zone inventory entries. Neither kit blocks the other.
+
+## Kit Index — Rebrand Initiative
 
 | Kit | File | Description | Requirements | Acceptance Criteria |
 |-----|------|-------------|:------------:|:-------------------:|
 | Brand Cleanup | [cavekit-brand-cleanup.md](cavekit-brand-cleanup.md) | Remove user-facing "Pi" references from code strings | 10 | 24 |
-| Visual Theme | [cavekit-visual-theme.md](cavekit-visual-theme.md) | New navy-dark palette with cyan accent and amber brand color | 6 | 16 |
+| Visual Theme | [cavekit-visual-theme.md](cavekit-visual-theme.md) | Navy-dark palette with cyan accent and amber brand color | 6 | 16 |
 | Startup Experience | [cavekit-startup-experience.md](cavekit-startup-experience.md) | ASCII art logo, version, keybindings, cave mode status | 5 | 14 |
 | Documentation | [cavekit-documentation.md](cavekit-documentation.md) | Rewrite READMEs, CONTRIBUTING, AGENTS, package.json URLs | 7 | 18 |
-| **Totals** | | | **28** | **72** |
 
-## Dependency Graph
+### Dependency Graph
 
 ```
 brand-cleanup ─────────────┐
@@ -33,30 +57,13 @@ visual-theme ──────────────┤
 brand-cleanup (R9) ────────┘
 ```
 
-**Reading the graph:**
-- `documentation` depends on `brand-cleanup` (naming conventions must be established first)
-- `startup-experience` depends on `visual-theme` (brand/accent colors) and `brand-cleanup` R9 (fallback text)
-- `brand-cleanup` and `visual-theme` are independent of each other and can be worked in parallel
-
-**No circular dependencies exist.**
-
-## Execution Order
+### Execution Order
 
 1. **Wave 1 (parallel):** brand-cleanup, visual-theme
-2. **Wave 2:** startup-experience (after both Wave 1 kits are complete)
-3. **Wave 3:** documentation (after brand-cleanup is complete; can overlap with Wave 2)
+2. **Wave 2:** startup-experience
+3. **Wave 3:** documentation
 
-## Cross-Cutting Rules
-
-These rules apply across all kits:
-
-- The `LICENSE` file is never modified -- upstream copyright must remain intact
-- `@cavepi/*` package names and import paths are intentionally preserved
-- The binary name remains `cave`
-- "Pi" or "Cave Pi" becomes "Caveman Code" or "Cave" in all user-facing text
-- CHANGELOG.md files are historical records -- upstream issue links are not altered
-
-## Active Kits
+## Kit Index — Extension & RTK
 
 | Kit | File | Description | Requirements | Acceptance Criteria |
 |-----|------|-------------|:------------:|:-------------------:|
@@ -74,11 +81,9 @@ R1 (Detection) ──┤
 
 R1 and R3 are independent. R2 depends on R1. R4 depends on R1, R2, and R3.
 
-## Token Efficiency Initiative (2026-04-16)
+## Kit Index — Token Efficiency Initiative
 
 Initiative-scoped kits deriving from `context/refs/research-brief-token-efficiency.md`. Goal: stack prompt caching + repomap + architect/editor routing + executable verification + checkpoints + sandbox + MCP into a top-tier SWE-bench Verified harness at 30-40% of competitor token cost. Plugin-layer only (no self-hosted inference).
-
-### Kit Index
 
 | Kit | File | Description | Reqs |
 |-----|------|-------------|:----:|
@@ -113,7 +118,6 @@ model-routing ─────> localizer-verifier (verify role)
                 └─<─ cost-trace (cap-aware downgrade)
 
 cost-trace ────────> localizer-verifier (subagent budgets)
-                └──> session-checkpoints (no, independent)
                 └──> bench-research-distro (cost caps drive eval gate)
 
 input-compression ─> cost-trace (activation logging)
@@ -127,19 +131,28 @@ bench-research-distro depends on all 1-10 producing real numbers
 ### Execution Order (waves)
 
 - **Wave 1 (parallel, no deps):** prompt-cache, model-routing, sandbox-mcp, session-checkpoints, input-compression
-- **Wave 2 (deps on Wave 1):** tool-result-cache (after prompt-cache), repomap (after prompt-cache), cost-trace (after prompt-cache + model-routing)
-- **Wave 3 (deps on Wave 2):** edit-tools (after repomap + prompt-cache)
-- **Wave 4:** localizer-verifier (after repomap + edit-tools + model-routing + cost-trace)
-- **Wave 5:** bench-research-distro (after all)
+- **Wave 2 (deps on Wave 1):** tool-result-cache, repomap, cost-trace
+- **Wave 3 (deps on Wave 2):** edit-tools
+- **Wave 4:** localizer-verifier
+- **Wave 5:** bench-research-distro
 
 ### Source
 
 Research brief: [context/refs/research-brief-token-efficiency.md](../refs/research-brief-token-efficiency.md)
 
+## Cross-Cutting Rules
+
+- The `LICENSE` file is never modified — upstream copyright must remain intact
+- `@cavepi/*` package names and import paths are intentionally preserved for backwards compat where present
+- The binary name remains `cave`
+- "Pi" or "Cave Pi" becomes "Caveman Code" or "Cave" in all user-facing text
+- CHANGELOG.md files are historical records — upstream issue links are not altered
+
 ## Changelog
 
 | Date       | Version | Change         |
 |------------|---------|----------------|
+| 2026-04-18 | 1.4.0   | Added Terminal Integration ship run — terminal-blend + fullscreen-viewport (2 kits, 17 reqs) |
 | 2026-04-16 | 1.3.0   | Added Token Efficiency Initiative — 11 kits |
 | 2026-04-11 | 1.2.0   | Added Extension Workflow kit; RTK Integration updated to 5 reqs |
 | 2026-04-09 | 1.1.0   | Added RTK Integration kit |

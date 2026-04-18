@@ -1,477 +1,145 @@
-# Build Site: CaveKit Extension Delivery
-**Generated:** 2026-04-11
-**Source:** /Users/julb/Desktop/GitHub/caveman-cli/context/blueprints
-**Total Tasks:** 25
-**Tiers:** 5
-**Coverage:** 167/167 ACs mapped
+# Build Site: Terminal Blend + Fullscreen Viewport
 
-## Tier 0 — Foundation (no dependencies)
+Source kits:
+- `context/kits/cavekit-terminal-blend.md` (R1–R8)
+- `context/kits/cavekit-fullscreen-viewport.md` (R1–R9)
 
-### T-001: Fork identity naming, scope, config dir, and license baseline
-**Kit Refs:** fork-identity/R1 (AC-1, AC-2, AC-3), fork-identity/R2 (AC-1, AC-2, AC-3), fork-identity/R3 (AC-1, AC-2, AC-3), fork-identity/R6 (AC-1, AC-2)
-**Dependencies:** none
-**Complexity:** M
-**Status:** done
-
-Establish fork-facing identity primitives that every later feature assumes: binary naming, package scope rename, default configuration directory, and preservation of upstream license obligations. This task creates single source-of-truth identifiers so commands, config discovery, packaging, and startup surfaces all resolve to consistent fork identity semantics.
+All tasks are M-sized unless marked S/L. Each task row is self-contained and can be executed with only the referenced kit R-number(s) plus this row.
 
 ---
 
-### T-002: Upstream remote tracking and fork sync metadata
-**Kit Refs:** fork-identity/R5 (AC-1, AC-2, AC-3)
-**Dependencies:** none
-**Complexity:** S
-**Status:** done
+## Tier 0 — No Blockers (parallel start)
 
-Define repository-level upstream tracking expectations so fork maintenance remains explicit and auditable. This task covers remote naming, tracking references, and discoverable sync metadata needed to keep fork relationship intact without leaking ambiguity into user-facing identity.
+Low-level enablers. These unblock everything else.
 
----
+| T#  | Title | Kit / R | Scope | Files touched | Depends on |
+|-----|-------|---------|-------|---------------|------------|
+| T1  | Terminal identity probe (env-var chain) | blend/R2 | M | `packages/tui/src/terminal-detect.ts` (new), `packages/tui/src/index.ts` (export) | — |
+| T2  | Terminal background probe (OSC 11 + COLORFGBG + override) | blend/R1 | M | `packages/tui/src/terminal-detect.ts` (extend), `packages/tui/src/terminal.ts` (query helper on `ProcessTerminal`) | — |
+| T3  | Alt-screen enter/exit + cursor hide/show in `ProcessTerminal` | viewport/R1 | M | `packages/tui/src/terminal.ts` (add `enterAltScreen`, `leaveAltScreen`, TTY guard), `packages/tui/src/tui.ts` (call on start/stop) | — |
+| T4  | Signal + uncaught-exception teardown hooks | viewport/R9 (partial) | M | `packages/tui/src/terminal.ts` (process-level handlers), `packages/coding-agent/src/main.ts` (wire cleanup) | — |
+| T5  | Color-depth degradation emitter (24bit / 256 / 16) | blend/R7 | M | `packages/tui/src/color-depth.ts` (new), `packages/tui/src/tui.ts` (route SGR emission through it) | — |
+| T6  | In-app scroll buffer primitive (data structure + tail/paused mode) | viewport/R5 | M | `packages/tui/src/scroll-buffer.ts` (new), unit test file `packages/tui/test/scroll-buffer.test.ts` (new) | — |
+| T7  | `CAVE_DEBUG_TERM=1` stderr diagnostic line | blend/R2 (last AC) | S | `packages/coding-agent/src/main.ts` (emit before UI boot) | — |
 
-### T-003: Extension entry point, configuration system, and shared types
-**Kit Refs:** extension-core/R1 (AC-1, AC-2, AC-3, AC-4), extension-core/R2 (AC-1, AC-2, AC-3, AC-4), extension-core/R3 (AC-1, AC-2, AC-3, AC-4, AC-5, AC-6)
-**Dependencies:** none
-**Complexity:** L
-**Status:** done
+## Tier 1 — Depends on Tier 0 only
 
-Create extension runtime foundation: loadable entry point, configuration resolution, and strongly typed shared contracts used across commands, UI, and runtime hooks. This task is prerequisite for nearly every other extension capability because it defines how features register, how settings flow, and how data structures stay consistent across boundaries.
+| T#  | Title | Kit / R | Scope | Files touched | Depends on |
+|-----|-------|---------|-------|---------------|------------|
+| T8  | Mouse-event reporting enable/disable (`?1000h` + `?1006h`) | viewport/R7 | M | `packages/tui/src/terminal.ts` (enable on entry, disable on exit) | T3 |
+| T9  | Viewport sizing (full rows x cols, no trailing newline past last row) | viewport/R2 | M | `packages/tui/src/tui.ts` (renderer bounds check), `packages/tui/src/terminal.ts` (rows/cols accessors) | T3 |
+| T10 | SIGWINCH resize handler (re-measure + re-render <=100ms) | viewport/R3 | M | `packages/tui/src/tui.ts` (resize listener), `packages/tui/src/scroll-buffer.ts` (reflow hook) | T6, T9 |
+| T11 | Ambient theme selection driver (dark/light from R1, user override wins) | blend/R3 | M | `packages/coding-agent/src/modes/interactive/theme/theme.ts` (auto-select), `packages/coding-agent/src/modes/interactive/interactive-mode.ts` (wire probe result) | T2 |
+| T12 | Full-teardown exit path unified (cursor + mouse + alt + SGR reset) | viewport/R9 | M | `packages/tui/src/terminal.ts` (single `teardown()`), callers in `packages/tui/src/tui.ts` and `packages/coding-agent/src/main.ts` | T3, T4, T8 |
+| T13 | Scroll keybindings handler (PageUp/Down, Shift+Up/Down, Ctrl+U/D, End) | viewport/R6 (kbd part) | M | `packages/coding-agent/src/modes/interactive/interactive-mode.ts` (key router), `packages/tui/src/scroll-buffer.ts` (scrollBy/jumpToTail) | T6 |
+| T14 | Mouse-wheel routing to scroll buffer (SGR 64/65 -> scrollBy ±3) | viewport/R6 (wheel AC) + viewport/R7 (routing) | M | `packages/tui/src/terminal.ts` (wheel event parse), `packages/coding-agent/src/modes/interactive/interactive-mode.ts` (dispatch) | T6, T8 |
+| T15 | Minimum-size placeholder frame (rows<4 or cols<20) | viewport/R2 (AC 4), viewport/R3 (AC 4) | S | `packages/tui/src/tui.ts` (degenerate-size render branch) | T9 |
 
----
+## Tier 2 — Depends on Tier 1
 
-### T-004: Skill bundling, resource discovery, and vanilla Pi compatibility
-**Kit Refs:** extension-core/R4 (AC-1, AC-2, AC-3), extension-core/R6 (AC-1, AC-2), extension-core/R8 (AC-1, AC-2, AC-3)
-**Dependencies:** none
-**Complexity:** M
-**Status:** done
+| T#  | Title | Kit / R | Scope | Files touched | Depends on |
+|-----|-------|---------|-------|---------------|------------|
+| T16 | Strip bulk-bg fills from non-contrast-zone components | blend/R4 | M | `packages/coding-agent/src/modes/interactive/components/{user-message,assistant-message,tool-execution,bash-execution,footer,startup-header,custom-message}.ts`, `packages/tui/src/tui.ts` (remove/gate `setGlobalBackground`) | T11 |
+| T17 | Contrast zone inventory enforcement (enumerate + lint) | blend/R5 | M | `packages/coding-agent/src/modes/interactive/theme/contrast-zones.ts` (new registry), touch same components as T16 for prompt/selection/code-block/overlay/toast | T11, T16 |
+| T18 | Foreground legibility pass on palette usage | blend/R6 | M | `packages/coding-agent/src/modes/interactive/theme/theme.ts` (contrast asserts), palette JSONs under `packages/coding-agent/src/modes/interactive/theme/{dark,light}.json` (token audit, no hex redefinition) | T11 |
+| T19 | Contrast-zone background luminance harmonization | blend/R8 | M | `packages/coding-agent/src/modes/interactive/theme/contrast-zones.ts`, `packages/coding-agent/src/modes/interactive/theme/{dark,light}.json` (verify token luminance bands, add lint) | T11, T17 |
+| T20 | Scroll-position indicator rendering (new-content marker above input) | viewport/R6 (indicator AC), blend/R5 (f) | M | `packages/coding-agent/src/modes/interactive/components/scroll-indicator.ts` (new), wired in `interactive-mode.ts` | T13, T17 |
+| T21 | Line wrapping at viewport width + reflow on resize | viewport/R8 (AC 2) | M | `packages/tui/src/scroll-buffer.ts` (wrap engine), `packages/tui/src/tui.ts` (reflow on SIGWINCH) | T10, T13 |
+| T22 | Non-TTY / piped-stdout non-interactive bypass | viewport/R1 (last AC) | S | `packages/coding-agent/src/main.ts` (TTY guard branches around TUI construction), `packages/tui/src/terminal.ts` (no-op when not TTY) | T12 |
 
-Provide packaging and compatibility layer for bundled CaveKit resources while preserving operation in vanilla Pi-compatible environments. This task ensures skills and related assets can be discovered reliably, and that extension behavior degrades cleanly when host capability surface is narrower than full CaveKit mode.
+## Tier 3 — SDD Workflow Integration
 
----
+Depends on both scroll buffer (Tier 1) and theme-adaptive palette (Tier 2).
 
-### T-006: Kit parser, build-site parser, and format/path consistency
-**Kit Refs:** extension-commands/R12 (AC-1, AC-2, AC-3), extension-commands/R13 (AC-1, AC-2, AC-3), extension-commands/R18 (AC-1, AC-2), extension-commands/R19 (AC-1, AC-2)
-**Dependencies:** none
-**Complexity:** L
-**Status:** done
-
-Implement canonical parsing and path resolution for kit files and build sites, including consistency rules for draft output and generated plan locations. This task creates deterministic structured IO contracts that later commands rely on for reading kits, generating plans, and keeping file layout stable across phases.
-
----
-
-### T-007: Subagent dispatch baseline, safe staging, and stderr handling
-**Kit Refs:** extension-commands/R20 (AC-1, AC-2), extension-commands/R21 (AC-1, AC-2), extension-commands/R22 (AC-1, AC-2)
-**Dependencies:** none
-**Complexity:** M
-**Status:** done
-
-Define subagent process invocation baseline, including binary name selection, git-safe staging constraints for build commits, and robust stderr capture behavior. This task is isolated early because build execution, retry, and tool-call workflows all depend on reliable subprocess semantics and non-destructive git operations.
-
----
-
-## Tier 1 — Runtime hooks and parsing
-
-### T-005: Compaction protection and subagent context injection hooks
-**Kit Refs:** extension-core/R5 (AC-1, AC-2, AC-3), extension-core/R7 (AC-1, AC-2, AC-3, AC-4)
-**Dependencies:** T-003
-**Complexity:** M
-**Status:** done
-
-Add runtime hooks that protect critical CaveKit context from compaction loss and inject scoped build context into subagent execution. This task closes core lifecycle gaps between static configuration and actual runtime behavior, enabling downstream command orchestration and cave-mode behavior to operate with correct contextual guarantees.
+| T#  | Title | Kit / R | Scope | Files touched | Depends on |
+|-----|-------|---------|-------|---------------|------------|
+| T23 | Route `/ck:*` streamed output through scroll buffer | viewport/R8 (AC 1, 3, 6) | M | `packages/cavekit-extension/src/**` (replace direct stdout writes with agent chat-stream API), `packages/coding-agent/src/modes/interactive/interactive-mode.ts` (sink wiring) | T13, T21 |
+| T24 | Review overlay renders as modal contrast zone over viewport | viewport/R8 (AC 4, 5), blend/R5 (d) | M | `packages/cavekit-extension/src/**` (overlay component), `packages/coding-agent/src/modes/interactive/components/overlay.ts` (new or extend), uses contrast-zone registry from T17 | T17, T23 |
+| T25 | Long-kit scroll verification (300-line fixture, reachable top-to-bottom) | viewport/R8 (AC 3) | S | `packages/tui/test/scroll-buffer.long-fixture.test.ts` (new), `packages/cavekit-extension/test/scroll-long-kit.test.ts` (new) | T21, T23 |
+| T26 | SDD-output control-sequence sanitizer (no raw cursor-home, no direct stdout) | viewport/R8 (AC 6) | M | `packages/cavekit-extension/src/output-sanitizer.ts` (new), integrated at T23's sink | T23 |
 
 ---
 
-### T-008: Draft command workflow
-**Kit Refs:** extension-commands/R1 (AC-1, AC-2, AC-3, AC-4, AC-5)
-**Dependencies:** T-003, T-006
-**Complexity:** M
-**Status:** done
+## Dependency graph
 
-Implement `/ck:draft` end-to-end flow from natural-language prompt to generated kit artifacts, using canonical parser-facing output format and configured project paths. This task owns user-visible draft lifecycle behavior, including input handling, kit generation contract, write targets, and command-level completion semantics.
-
----
-
-### T-009: Architect command and build-site generation workflow
-**Kit Refs:** extension-commands/R2 (AC-1, AC-2, AC-3, AC-4, AC-5)
-**Dependencies:** T-003, T-006
-**Complexity:** L
-**Status:** done
-
-Implement `/ck:architect` so approved kits can be transformed into dependency-ordered build sites using parser-backed plan format and stable output paths. This task turns specification artifacts into execution-ready plans and creates data consumed later by build execution, graph visualization, and inspection.
-
----
-
-### T-010: Config, progress, and help command suite
-**Kit Refs:** extension-commands/R9 (AC-1, AC-2, AC-3), extension-commands/R10 (AC-1, AC-2, AC-3), extension-commands/R11 (AC-1, AC-2)
-**Dependencies:** T-003
-**Complexity:** S
-**Status:** done
-
-Deliver lightweight command surfaces for configuration inspection, build/session progress reporting, and user help. This task provides operator visibility and discoverability around extension state without depending on full build orchestration, making it safe to parallelize after shared config/types exist.
-
----
-
-### T-011: Research and design command surfaces
-**Kit Refs:** extension-commands/R7 (AC-1, AC-2, AC-3), extension-commands/R8 (AC-1, AC-2, AC-3)
-**Dependencies:** T-003, T-006
-**Complexity:** M
-**Status:** done
-
-Implement `/ck:research` and `/ck:design` command workflows as structured, parser-compatible generators for discovery and design artifacts. This task expands non-build authoring capabilities while reusing common command foundation, path resolution, and structured output contracts.
-
----
-
-### T-012: Scoped context builder and LLM-callable tool surface
-**Kit Refs:** extension-commands/R14 (AC-1, AC-2, AC-3), extension-commands/R16 (AC-1, AC-2, AC-3, AC-4)
-**Dependencies:** T-003, T-006, T-007
-**Complexity:** L
-**Status:** done
-
-Build scoped-context assembly and expose LLM-callable tools that let agents inspect kit/build state through bounded, deterministic interfaces. This task is central integration glue between specs, build execution, subagents, and UI because it defines what context is handed to automation and how programmatic access remains structured.
+```mermaid
+graph LR
+    T1
+    T2 --> T11
+    T3 --> T8
+    T3 --> T9
+    T3 --> T12
+    T4 --> T12
+    T5
+    T6 --> T10
+    T6 --> T13
+    T6 --> T14
+    T7
+    T8 --> T12
+    T8 --> T14
+    T9 --> T10
+    T9 --> T15
+    T11 --> T16
+    T11 --> T17
+    T11 --> T18
+    T11 --> T19
+    T10 --> T21
+    T12 --> T22
+    T13 --> T20
+    T13 --> T21
+    T13 --> T23
+    T16 --> T17
+    T17 --> T19
+    T17 --> T20
+    T17 --> T24
+    T21 --> T23
+    T21 --> T25
+    T23 --> T24
+    T23 --> T25
+    T23 --> T26
+```
 
 ---
 
-### T-013: Cave-mode runtime injection and graceful degradation
-**Kit Refs:** cave-mode/R1 (AC-1, AC-2, AC-3, AC-4), cave-mode/R6 (AC-1, AC-2)
-**Dependencies:** T-003, T-005
-**Complexity:** M
-**Status:** done
+## Coverage matrix
 
-Implement cave-mode runtime behavior for system prompt injection while ensuring fail-open degradation when cave-specific facilities are unavailable. This task defines baseline cave-mode semantics and fallback behavior so later controls, compaction features, and tool compression can layer on top without threatening host stability.
+Every R in both kits maps to at least one T. Criteria-level coverage noted where a single R splits across tasks.
 
----
+### cavekit-terminal-blend
 
-### T-014: Cave-mode intensity toggle and settings manager integration
-**Kit Refs:** cave-mode/R2 (AC-1, AC-2, AC-3, AC-4, AC-5), cave-mode/R3 (AC-1, AC-2, AC-3)
-**Dependencies:** T-003, T-013
-**Complexity:** M
-**Status:** done
+| R | Task(s) | Notes |
+|---|---------|-------|
+| R1 (background detection) | T2 | OSC 11, COLORFGBG, fallback to dark, `CAVE_TERM_BG` override, 200ms cap all in T2 |
+| R2 (identity detection) | T1, T7 | T1 = probe; T7 = `CAVE_DEBUG_TERM=1` stderr line |
+| R3 (ambient theme selection) | T11 | Explicit-config-wins + one-shot-at-startup enforced here |
+| R4 (transparent bg policy) | T16 | Strips bulk bg fills across all listed components |
+| R5 (contrast zone inventory) | T17, T20, T24 | T17 = registry (a,b,c,e); T20 = (f) scroll indicator; T24 = (d) overlay |
+| R6 (foreground legibility) | T18 | WCAG 4.5:1 text / 3:1 dim / 3:1 accent against both refs |
+| R7 (multiplexer + low-color degradation) | T5 | 24bit/256/16 emitter with tmux cap and no-stray-escape guarantee |
+| R8 (theme harmonization) | T19 | Luminance bands for dark (<0.35) / light (>0.65), border-delta, shared brand tokens |
 
-Add user-facing controls for cave-mode intensity and settings management so mode selection is discoverable, persistent, and command-accessible. This task covers command/UI-adjacent control flow, setting persistence, and state exposure needed for practical adoption of cave-mode beyond hardcoded defaults.
+### cavekit-fullscreen-viewport
 
----
+| R | Task(s) | Notes |
+|---|---------|-------|
+| R1 (alt screen) | T3, T22 | T3 = enter/exit + cursor hide/show + clear; T22 = non-TTY bypass |
+| R2 (full viewport) | T9, T15 | T9 = bounds; T15 = degenerate-size placeholder |
+| R3 (resize) | T10, T15, T21 | T10 = SIGWINCH + buffer retention; T15 = minimum size; T21 = reflow |
+| R4 (scroll-lock vs host scrollback) | T3, T14 | Alt-screen inherently locks (T3); wheel consumption enforced in T14 |
+| R5 (in-app scroll buffer) | T6 | Tail/paused, transitions, persistence-for-process-life |
+| R6 (keybindings + indicator) | T13, T14, T20 | T13 = keyboard bindings; T14 = wheel binding; T20 = indicator rendering |
+| R7 (mouse wheel capture) | T8, T14 | T8 = enable/disable sequences; T14 = route + swallow non-wheel |
+| R8 (SDD workflow integration) | T21, T23, T24, T25, T26 | Wrap (T21), stream (T23), overlay (T24), long-kit verification (T25), sanitizer (T26) |
+| R9 (clean exit under all paths) | T4, T12, T22 | T4 = signal + uncaught hooks; T12 = unified teardown; T22 = non-TTY path |
 
-### T-025: Startup banner and branded launch surface
-**Kit Refs:** fork-identity/R4 (AC-1, AC-2, AC-3)
-**Dependencies:** T-001
-**Complexity:** S
-**Status:** pending
-
-Implement startup banner and branded launch presentation aligned with fork identity primitives established earlier. This task is isolated from deeper command/runtime behavior because it only needs finalized naming and should be able to ship independently of full extension feature completion.
-
----
-
-## Tier 2 — Execution and UI base
-
-### T-015: Caveman compaction and tool-result compression pipeline
-**Kit Refs:** cave-mode/R4 (AC-1, AC-2, AC-3, AC-4), cave-mode/R5 (AC-1, AC-2, AC-3, AC-4, AC-5)
-**Dependencies:** T-012, T-013
-**Complexity:** L
-**Status:** done
-
-Implement caveman-aware compaction and tool-result compression pipeline so prompt budget savings apply both to model context and tool output flows. This task depends on runtime cave-mode semantics and callable tool/context plumbing because compression must integrate safely with actual agent execution surfaces rather than operate as isolated text transforms.
+No R left uncovered.
 
 ---
 
-### T-016: Build command orchestration engine
-**Kit Refs:** extension-commands/R3 (AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7)
-**Dependencies:** T-008, T-009, T-012, T-007
-**Complexity:** L
-**Status:** done
+## Notes for builders
 
-Implement `/ck:build` as orchestration engine that reads build sites, dispatches wave/tier execution, coordinates subagents, and persists progress/status. This task is main execution backbone for CaveKit and is intentionally separated from review, convergence, and retry so core run loop can stabilize before adjacent control logic is added.
-
----
-
-### T-021: Build dashboard widget and keyboard shortcuts
-**Kit Refs:** extension-ui/R1 (AC-1, AC-2, AC-3, AC-4), extension-ui/R5 (AC-1, AC-2, AC-3)
-**Dependencies:** T-003, T-016
-**Complexity:** M
-**Status:** done
-
-Deliver persistent build dashboard widget plus shortcut registration so active build state is visible and quickly accessible during sessions. This task depends on build orchestration because dashboard content and toggle behavior need live execution data rather than placeholder wiring.
-
----
-
-### T-022: Kit reviewer overlay and draft/architect integration
-**Kit Refs:** extension-ui/R2 (AC-1, AC-2, AC-3, AC-4), extension-ui/R6 (AC-1, AC-2)
-**Dependencies:** T-003, T-008, T-009
-**Complexity:** M
-**Status:** done
-
-Implement interactive kit review overlay and wire it into draft-to-architect handoff so approval decisions directly determine which kits proceed to planning. This task sits after both draft and architect workflows exist because it mediates real artifacts between those phases rather than mocking either side.
-
----
-
-### T-024: Dependency graph visualization
-**Kit Refs:** extension-ui/R4 (AC-1, AC-2, AC-3)
-**Dependencies:** T-003, T-009
-**Complexity:** M
-**Status:** pending
-
-Implement dependency graph visualization for architected build sites, showing task grouping by tier and directional dependency edges. This task depends on build-site generation and shared UI contracts because graph structure must reflect real plan data rather than inferred placeholders.
-
----
-
-## Tier 3 — Execution control and review
-
-### T-017: Tier gate review engine
-**Kit Refs:** extension-commands/R4 (AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7)
-**Dependencies:** T-016, T-012
-**Complexity:** L
-**Status:** done
-
-Add tier gate review process that evaluates completed build tiers, produces severity-ranked findings, and returns machine-actionable outcomes for continue, fix, or abort paths. This task sits after base build orchestration because gate reviews consume build artifacts and scoped evidence produced during actual execution.
-
----
-
-### T-018: Convergence monitoring and convergence command
-**Kit Refs:** extension-commands/R5 (AC-1, AC-2, AC-3, AC-4, AC-5), extension-commands/R15 (AC-1, AC-2, AC-3, AC-4)
-**Dependencies:** T-016
-**Complexity:** M
-**Status:** done
-
-Implement convergence analysis over build iterations and expose it through dedicated monitoring and command surfaces. This task turns raw build history into actionable signal about progress vs. plateau, supporting operator decisions and automation loops without being coupled to individual task implementation details.
-
----
-
-### T-019: Failed task retry workflow
-**Kit Refs:** extension-commands/R17 (AC-1, AC-2, AC-3)
-**Dependencies:** T-016, T-007
-**Complexity:** M
-**Status:** done
-
-Implement retry handling for failed build tasks with correct dependency checks, subprocess semantics, and safe git behavior. This task extends base build engine with recovery capability once failure states and dispatch contracts are already established.
-
----
-
-### T-023: Tier gate findings overlay
-**Kit Refs:** extension-ui/R3 (AC-1, AC-2, AC-3, AC-4)
-**Dependencies:** T-003, T-017
-**Complexity:** M
-**Status:** pending
-
-Build UI overlay for tier gate findings so users can inspect severity-ranked review output and explicitly choose continue, fix, or abort. This task depends on review engine completion because overlay semantics and actions are driven by actual gate outcomes.
-
----
-
-## Tier 4 — Inspection and verification
-
-### T-020: Inspect command and spec-to-build gap analysis
-**Kit Refs:** extension-commands/R6 (AC-1, AC-2, AC-3, AC-4, AC-5)
-**Dependencies:** T-009, T-016, T-017, T-018
-**Complexity:** L
-**Status:** done
-
-Implement `/ck:inspect` to compare specification artifacts against build output, synthesize findings, and report implementation gaps with traceability. This task intentionally lands last because meaningful inspection requires stable plan generation, completed build evidence, gate review output, and convergence history.
-
----
-
-## Coverage Matrix
-| Req | AC | Task |
-|-----|----|------|
-| cave-mode/R1 | AC-1 | T-013 |
-| cave-mode/R1 | AC-2 | T-013 |
-| cave-mode/R1 | AC-3 | T-013 |
-| cave-mode/R1 | AC-4 | T-013 |
-| cave-mode/R2 | AC-1 | T-014 |
-| cave-mode/R2 | AC-2 | T-014 |
-| cave-mode/R2 | AC-3 | T-014 |
-| cave-mode/R2 | AC-4 | T-014 |
-| cave-mode/R2 | AC-5 | T-014 |
-| cave-mode/R3 | AC-1 | T-014 |
-| cave-mode/R3 | AC-2 | T-014 |
-| cave-mode/R3 | AC-3 | T-014 |
-| cave-mode/R4 | AC-1 | T-015 |
-| cave-mode/R4 | AC-2 | T-015 |
-| cave-mode/R4 | AC-3 | T-015 |
-| cave-mode/R4 | AC-4 | T-015 |
-| cave-mode/R5 | AC-1 | T-015 |
-| cave-mode/R5 | AC-2 | T-015 |
-| cave-mode/R5 | AC-3 | T-015 |
-| cave-mode/R5 | AC-4 | T-015 |
-| cave-mode/R5 | AC-5 | T-015 |
-| cave-mode/R6 | AC-1 | T-013 |
-| cave-mode/R6 | AC-2 | T-013 |
-| extension-commands/R1 | AC-1 | T-008 |
-| extension-commands/R1 | AC-2 | T-008 |
-| extension-commands/R1 | AC-3 | T-008 |
-| extension-commands/R1 | AC-4 | T-008 |
-| extension-commands/R1 | AC-5 | T-008 |
-| extension-commands/R2 | AC-1 | T-009 |
-| extension-commands/R2 | AC-2 | T-009 |
-| extension-commands/R2 | AC-3 | T-009 |
-| extension-commands/R2 | AC-4 | T-009 |
-| extension-commands/R2 | AC-5 | T-009 |
-| extension-commands/R3 | AC-1 | T-016 |
-| extension-commands/R3 | AC-2 | T-016 |
-| extension-commands/R3 | AC-3 | T-016 |
-| extension-commands/R3 | AC-4 | T-016 |
-| extension-commands/R3 | AC-5 | T-016 |
-| extension-commands/R3 | AC-6 | T-016 |
-| extension-commands/R3 | AC-7 | T-016 |
-| extension-commands/R4 | AC-1 | T-017 |
-| extension-commands/R4 | AC-2 | T-017 |
-| extension-commands/R4 | AC-3 | T-017 |
-| extension-commands/R4 | AC-4 | T-017 |
-| extension-commands/R4 | AC-5 | T-017 |
-| extension-commands/R4 | AC-6 | T-017 |
-| extension-commands/R4 | AC-7 | T-017 |
-| extension-commands/R5 | AC-1 | T-018 |
-| extension-commands/R5 | AC-2 | T-018 |
-| extension-commands/R5 | AC-3 | T-018 |
-| extension-commands/R5 | AC-4 | T-018 |
-| extension-commands/R5 | AC-5 | T-018 |
-| extension-commands/R6 | AC-1 | T-020 |
-| extension-commands/R6 | AC-2 | T-020 |
-| extension-commands/R6 | AC-3 | T-020 |
-| extension-commands/R6 | AC-4 | T-020 |
-| extension-commands/R6 | AC-5 | T-020 |
-| extension-commands/R7 | AC-1 | T-011 |
-| extension-commands/R7 | AC-2 | T-011 |
-| extension-commands/R7 | AC-3 | T-011 |
-| extension-commands/R8 | AC-1 | T-011 |
-| extension-commands/R8 | AC-2 | T-011 |
-| extension-commands/R8 | AC-3 | T-011 |
-| extension-commands/R9 | AC-1 | T-010 |
-| extension-commands/R9 | AC-2 | T-010 |
-| extension-commands/R9 | AC-3 | T-010 |
-| extension-commands/R10 | AC-1 | T-010 |
-| extension-commands/R10 | AC-2 | T-010 |
-| extension-commands/R10 | AC-3 | T-010 |
-| extension-commands/R11 | AC-1 | T-010 |
-| extension-commands/R11 | AC-2 | T-010 |
-| extension-commands/R12 | AC-1 | T-006 |
-| extension-commands/R12 | AC-2 | T-006 |
-| extension-commands/R12 | AC-3 | T-006 |
-| extension-commands/R13 | AC-1 | T-006 |
-| extension-commands/R13 | AC-2 | T-006 |
-| extension-commands/R13 | AC-3 | T-006 |
-| extension-commands/R14 | AC-1 | T-012 |
-| extension-commands/R14 | AC-2 | T-012 |
-| extension-commands/R14 | AC-3 | T-012 |
-| extension-commands/R15 | AC-1 | T-018 |
-| extension-commands/R15 | AC-2 | T-018 |
-| extension-commands/R15 | AC-3 | T-018 |
-| extension-commands/R15 | AC-4 | T-018 |
-| extension-commands/R16 | AC-1 | T-012 |
-| extension-commands/R16 | AC-2 | T-012 |
-| extension-commands/R16 | AC-3 | T-012 |
-| extension-commands/R16 | AC-4 | T-012 |
-| extension-commands/R17 | AC-1 | T-019 |
-| extension-commands/R17 | AC-2 | T-019 |
-| extension-commands/R17 | AC-3 | T-019 |
-| extension-commands/R18 | AC-1 | T-006 |
-| extension-commands/R18 | AC-2 | T-006 |
-| extension-commands/R19 | AC-1 | T-006 |
-| extension-commands/R19 | AC-2 | T-006 |
-| extension-commands/R20 | AC-1 | T-007 |
-| extension-commands/R20 | AC-2 | T-007 |
-| extension-commands/R21 | AC-1 | T-007 |
-| extension-commands/R21 | AC-2 | T-007 |
-| extension-commands/R22 | AC-1 | T-007 |
-| extension-commands/R22 | AC-2 | T-007 |
-| extension-core/R1 | AC-1 | T-003 |
-| extension-core/R1 | AC-2 | T-003 |
-| extension-core/R1 | AC-3 | T-003 |
-| extension-core/R1 | AC-4 | T-003 |
-| extension-core/R2 | AC-1 | T-003 |
-| extension-core/R2 | AC-2 | T-003 |
-| extension-core/R2 | AC-3 | T-003 |
-| extension-core/R2 | AC-4 | T-003 |
-| extension-core/R3 | AC-1 | T-003 |
-| extension-core/R3 | AC-2 | T-003 |
-| extension-core/R3 | AC-3 | T-003 |
-| extension-core/R3 | AC-4 | T-003 |
-| extension-core/R3 | AC-5 | T-003 |
-| extension-core/R3 | AC-6 | T-003 |
-| extension-core/R4 | AC-1 | T-004 |
-| extension-core/R4 | AC-2 | T-004 |
-| extension-core/R4 | AC-3 | T-004 |
-| extension-core/R5 | AC-1 | T-005 |
-| extension-core/R5 | AC-2 | T-005 |
-| extension-core/R5 | AC-3 | T-005 |
-| extension-core/R6 | AC-1 | T-004 |
-| extension-core/R6 | AC-2 | T-004 |
-| extension-core/R7 | AC-1 | T-005 |
-| extension-core/R7 | AC-2 | T-005 |
-| extension-core/R7 | AC-3 | T-005 |
-| extension-core/R7 | AC-4 | T-005 |
-| extension-core/R8 | AC-1 | T-004 |
-| extension-core/R8 | AC-2 | T-004 |
-| extension-core/R8 | AC-3 | T-004 |
-| extension-ui/R1 | AC-1 | T-021 |
-| extension-ui/R1 | AC-2 | T-021 |
-| extension-ui/R1 | AC-3 | T-021 |
-| extension-ui/R1 | AC-4 | T-021 |
-| extension-ui/R2 | AC-1 | T-022 |
-| extension-ui/R2 | AC-2 | T-022 |
-| extension-ui/R2 | AC-3 | T-022 |
-| extension-ui/R2 | AC-4 | T-022 |
-| extension-ui/R3 | AC-1 | T-023 |
-| extension-ui/R3 | AC-2 | T-023 |
-| extension-ui/R3 | AC-3 | T-023 |
-| extension-ui/R3 | AC-4 | T-023 |
-| extension-ui/R4 | AC-1 | T-024 |
-| extension-ui/R4 | AC-2 | T-024 |
-| extension-ui/R4 | AC-3 | T-024 |
-| extension-ui/R5 | AC-1 | T-021 |
-| extension-ui/R5 | AC-2 | T-021 |
-| extension-ui/R5 | AC-3 | T-021 |
-| extension-ui/R6 | AC-1 | T-022 |
-| extension-ui/R6 | AC-2 | T-022 |
-| fork-identity/R1 | AC-1 | T-001 |
-| fork-identity/R1 | AC-2 | T-001 |
-| fork-identity/R1 | AC-3 | T-001 |
-| fork-identity/R2 | AC-1 | T-001 |
-| fork-identity/R2 | AC-2 | T-001 |
-| fork-identity/R2 | AC-3 | T-001 |
-| fork-identity/R3 | AC-1 | T-001 |
-| fork-identity/R3 | AC-2 | T-001 |
-| fork-identity/R3 | AC-3 | T-001 |
-| fork-identity/R4 | AC-1 | T-025 |
-| fork-identity/R4 | AC-2 | T-025 |
-| fork-identity/R4 | AC-3 | T-025 |
-| fork-identity/R5 | AC-1 | T-002 |
-| fork-identity/R5 | AC-2 | T-002 |
-| fork-identity/R5 | AC-3 | T-002 |
-| fork-identity/R6 | AC-1 | T-001 |
-| fork-identity/R6 | AC-2 | T-001 |
-
-## Tier 0
-
-- T-001: Fork identity naming, scope, config dir, and license baseline --> fork-identity/R1, fork-identity/R2, fork-identity/R3, fork-identity/R6
-- T-002: Upstream remote tracking and fork sync metadata --> fork-identity/R5
-- T-003: Extension entry point, configuration system, and shared types --> extension-core/R1, extension-core/R2, extension-core/R3
-- T-004: Skill bundling, resource discovery, and vanilla Pi compatibility --> extension-core/R4, extension-core/R6, extension-core/R8
-- T-006: Kit parser, build-site parser, and format/path consistency --> extension-commands/R12, extension-commands/R13, extension-commands/R18, extension-commands/R19
-- T-007: Subagent dispatch baseline, safe staging, and stderr handling --> extension-commands/R20, extension-commands/R21, extension-commands/R22
-
-## Tier 1
-
-- T-005: Compaction protection and subagent context injection hooks (blockedBy: T-003) --> extension-core/R5, extension-core/R7
-- T-008: Draft command workflow (blockedBy: T-003, T-006) --> extension-commands/R1
-- T-009: Architect command and build-site generation workflow (blockedBy: T-003, T-006) --> extension-commands/R2
-- T-010: Config, progress, and help command suite (blockedBy: T-003) --> extension-commands/R9, extension-commands/R10, extension-commands/R11
-- T-011: Research and design command surfaces (blockedBy: T-003, T-006) --> extension-commands/R7, extension-commands/R8
-- T-012: Scoped context builder and LLM-callable tool surface (blockedBy: T-003, T-006, T-007) --> extension-commands/R14, extension-commands/R16
-- T-013: Cave-mode runtime injection and graceful degradation (blockedBy: T-003, T-005) --> cave-mode/R1, cave-mode/R6
-- T-014: Cave-mode intensity toggle and settings manager integration (blockedBy: T-003, T-013) --> cave-mode/R2, cave-mode/R3
-- T-025: Startup banner and branded launch surface (blockedBy: T-001) --> fork-identity/R4
-
-## Tier 2
-
-- T-015: Caveman compaction and tool-result compression pipeline (blockedBy: T-012, T-013) --> cave-mode/R4, cave-mode/R5
-- T-016: Build command orchestration engine (blockedBy: T-008, T-009, T-012, T-007) --> extension-commands/R3
-- T-021: Build dashboard widget and keyboard shortcuts (blockedBy: T-003, T-016) --> extension-ui/R1, extension-ui/R5
-- T-022: Kit reviewer overlay and draft/architect integration (blockedBy: T-003, T-008, T-009) --> extension-ui/R2, extension-ui/R6
-- T-024: Dependency graph visualization (blockedBy: T-003, T-009) --> extension-ui/R4
-
-## Tier 3
-
-- T-017: Tier gate review engine (blockedBy: T-016, T-012) --> extension-commands/R4
-- T-018: Convergence monitoring and convergence command (blockedBy: T-016) --> extension-commands/R5, extension-commands/R15
-- T-019: Failed task retry workflow (blockedBy: T-016, T-007) --> extension-commands/R17
-- T-023: Tier gate findings overlay (blockedBy: T-003, T-017) --> extension-ui/R3
-
-## Tier 4
-
-- T-020: Inspect command and spec-to-build gap analysis (blockedBy: T-009, T-016, T-017, T-018) --> extension-commands/R6
+- Tasks T1–T7 can all be picked up in parallel; none read each other's output.
+- T12 (unified teardown) is the first place where alt-screen, mouse, and signals all meet. Land T3/T4/T8 before opening T12.
+- T16 is mechanical but wide-ranging; keep it a single PR so the "no bulk bg" invariant lands atomically.
+- T23 is the contract point between `packages/cavekit-extension` and the coding-agent chat sink. Define the sink interface in T13/T21 so T23 is a pure wire-up.
+- No `DESIGN.md` at repo root, so UI tasks carry no `Design Ref`.

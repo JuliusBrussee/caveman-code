@@ -1,0 +1,78 @@
+{
+  "session_budget": 500000,
+  "max_iterations": 60,
+  "task_budgets": {
+    "quick": 8000,
+    "standard": 20000,
+    "thorough": 45000
+  },
+  "default_depth": "standard",
+  "auto_backprop": true,
+  "caveman": {
+    "enabled": true,
+    "default_intensity": "full"
+  },
+  "parallelism": {
+    "max_concurrent_agents": 3,
+    "max_concurrent_per_repo": 2
+  },
+  "hooks_config": {
+    "test_filter": true,
+    "tool_cache": true,
+    "tool_cache_ttl_ms": 120000,
+    "progress_tracker": true
+  },
+  "model_routing": {
+    "enabled": true,
+    "cost_weights": {
+      "haiku": 1,
+      "sonnet": 5,
+      "opus": 25
+    },
+    "role_baselines": {
+      "ck:complexity": {
+        "min": "haiku",
+        "preferred": "haiku",
+        "max": "haiku"
+      },
+      "ck:researcher": {
+        "min": "haiku",
+        "preferred": "sonnet",
+        "max": "sonnet"
+      },
+      "ck:task-builder": {
+        "min": "haiku",
+        "preferred": "sonnet",
+        "max": "opus"
+      },
+      "ck:builder": {
+        "min": "sonnet",
+        "preferred": "sonnet",
+        "max": "opus"
+      },
+      "ck:inspector": {
+        "min": "sonnet",
+        "preferred": "sonnet",
+        "max": "opus"
+      },
+      "ck:drafter": {
+        "min": "sonnet",
+        "preferred": "opus",
+        "max": "opus"
+      },
+      "ck:architect": {
+        "min": "sonnet",
+        "preferred": "opus",
+        "max": "opus"
+      }
+    }
+  },
+  "verification": {
+    "enabled": true,
+    "min_depth": "standard"
+  },
+  "review": {
+    "enabled": true,
+    "min_depth": "standard"
+  }
+}

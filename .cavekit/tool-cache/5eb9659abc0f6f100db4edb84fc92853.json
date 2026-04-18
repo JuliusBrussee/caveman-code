@@ -1,0 +1,1 @@
+{"tool":"Grep","stored_at":1776547257866,"ttl_ms":120000,"response":"{\"mode\":\"content\",\"numFiles\":0,\"filenames\":[],\"content\":\"421:export async function main(args: string[]) {\",\"numLines\":1}"}
