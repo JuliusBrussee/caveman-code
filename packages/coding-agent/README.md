@@ -318,28 +318,6 @@ More: [docs/settings.md](docs/settings.md)
 
 ---
 
-## CaveKit
-
-CaveKit is the structured development workflow bundled with Caveman Code.
-
-| Command | Phase | Description |
-|---------|-------|-------------|
-| `/ck:draft` | Draft | Turn a description into kits with requirements + acceptance criteria |
-| `/ck:research` | Draft | Research a topic before spec work |
-| `/ck:design` | Draft | Create or audit structured design docs |
-| `/ck:architect` | Architect | Build tiered task graph from approved kits |
-| `/ck:build` | Build | Execute tasks with tier gates + convergence tracking |
-| `/ck:inspect` | Inspect | Verify work against acceptance criteria |
-| `/ck:progress` | Any | Show task and wave status |
-| `/ck:config` | Any | Read or update CaveKit config |
-
-Context layout:
-- `context/kits/` — requirements
-- `context/plans/` — implementation plans
-- `context/designs/` — design artifacts
-
----
-
 ## Customization
 
 ### Prompt Templates

@@ -45,25 +45,6 @@ describe("resolveRetention (T-047, T-048, T-049)", () => {
 			resolveRetention({ roleDefault: "long", cliFlag: "none" }),
 		).toBe("none");
 	});
-
-	it("CaveKit phase override wins over role default", () => {
-		expect(
-			resolveRetention({
-				roleDefault: "short",
-				cavekitPhaseOverride: "long",
-			}),
-		).toBe("long");
-	});
-
-	it("CLI flag wins over CaveKit phase override", () => {
-		expect(
-			resolveRetention({
-				roleDefault: "short",
-				cavekitPhaseOverride: "long",
-				cliFlag: "none",
-			}),
-		).toBe("none");
-	});
 });
 
 describe("trimMiddle (T-050, T-051, T-052)", () => {

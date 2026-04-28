@@ -2992,15 +2992,7 @@ export class InteractiveMode {
 			caveModeIntensity: caveState.intensity,
 			queuedMessageCount: this.compactionQueuedMessages.length,
 			isBashMode: this.isBashMode,
-			cavekitActive: this.detectCavekitActive(),
 		};
-	}
-
-	private detectCavekitActive(): boolean {
-		for (const key of this.skillCommands.keys()) {
-			if (key.startsWith("ck:")) return true;
-		}
-		return false;
 	}
 
 	private updateEditorBorderColor(): void {

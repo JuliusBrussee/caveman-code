@@ -295,7 +295,6 @@ cave --mode json "List todos"       # structured JSON output
 | [`@cave/web-ui`](packages/web-ui) | Web components for AI chat |
 | [`@cave/mom`](packages/mom) | Slack bot → coding agent |
 | [`@cave/pods`](packages/pods) | vLLM on GPU pods |
-| [`@cave/cavekit`](packages/cavekit-extension) | CaveKit SDD extension |
 
 ## Contributing
 

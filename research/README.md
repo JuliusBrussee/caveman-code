@@ -126,5 +126,4 @@ following the commands above. No hand-edited artifacts.
 
 ## Related
 
-- Cavekit: `context/kits/cavekit-bench-research-distro.md`
-- Impl: `context/impl/T-te-132.md` .. `T-te-143.md`
+- Historical kits and impl tracking: `context/archive/cavekit/`

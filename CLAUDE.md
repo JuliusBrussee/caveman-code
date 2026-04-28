@@ -6,14 +6,16 @@ Minimal terminal coding agent + multi-provider LLM toolkit. TypeScript monorepo.
 
 | Package | CLI | Purpose |
 |---------|-----|---------|
+**v2 core (load-bearing):**
 | `packages/coding-agent` | `cave` | Coding agent: sessions, extensions, skills, themes |
 | `packages/ai` | `pi-ai` | Unified LLM API: OpenAI, Anthropic, Google, more |
 | `packages/agent` | — | Agent runtime: tool calling, state management |
 | `packages/tui` | — | Terminal UI: differential rendering |
+
+**Out of scope for v2 (separate product surfaces, kept independent):**
 | `packages/web-ui` | — | Web components for AI chat |
 | `packages/mom` | `mom` | Slack bot → delegates to coding agent |
 | `packages/pods` | `cave-pods` | vLLM deployment on GPU pods |
-| `packages/cavekit-extension` | — | CaveKit SDD workflow: Draft→Architect→Build→Inspect |
 
 ## Key Commands
 
@@ -26,7 +28,8 @@ npm run format       # biome format
 
 ## Context Hierarchy
 
-See `context/CLAUDE.md`. Kits live in `context/kits/`, plans in `context/plans/`.
+See `context/CLAUDE.md`. The active plan is `context/plans/cave-v2-best-in-class.md`.
+Legacy CaveKit kits/plans/impl have been moved to `context/archive/`.
 
 ## Conventions
 
@@ -38,5 +41,8 @@ See `context/CLAUDE.md`. Kits live in `context/kits/`, plans in `context/plans/`
 ## Agent Guidance
 
 - Read package-specific CLAUDE.md before touching that package.
-- Kits define WHAT. Plans define HOW. Never conflate.
-- CaveKit extension commands: `/ck:*`.
+- Before building from scratch, run the **pi-check**: search `pi-code` upstream,
+  the `pi-*` npm scope, and pi extensions for an existing module. Vendor or wrap
+  if found. Note "borrowed from pi: <name>" in the deliverable. See plan §0.
+- CaveKit (`@cave/cavekit`) has been removed; its workflow is being replaced by
+  plan mode (read-only exploration), markdown skills, and recipes.

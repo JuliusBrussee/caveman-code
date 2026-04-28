@@ -56,10 +56,6 @@ describe("resolveRetention", () => {
 		expect(resolveRetention({ roleDefault: "short", cliFlag: "long" })).toBe("long");
 	});
 
-	it("returns cavekitPhaseOverride when no cliFlag", () => {
-		expect(resolveRetention({ roleDefault: "short", cavekitPhaseOverride: "none" })).toBe("none");
-	});
-
 	it("returns roleDefault as fallback", () => {
 		expect(resolveRetention({ roleDefault: "long" })).toBe("long");
 	});

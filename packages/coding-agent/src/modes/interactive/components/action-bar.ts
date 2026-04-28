@@ -11,7 +11,6 @@ export interface ActionBarState {
 	caveModeIntensity: string;
 	queuedMessageCount: number;
 	isBashMode: boolean;
-	cavekitActive: boolean;
 }
 
 interface Chip {
@@ -118,13 +117,6 @@ export class ActionBarComponent implements Component {
 		// Cave mode
 		if (state.caveModeEnabled) {
 			chips.push(labelChip(`cave:${state.caveModeIntensity}`, "accent"));
-		}
-
-		// Cavekit commands when active
-		if (state.cavekitActive) {
-			chips.push(labelChip("/ck:progress", "dim"));
-			chips.push(labelChip("/ck:check", "dim"));
-			chips.push(labelChip("/ck:make", "dim"));
 		}
 
 		return chips;

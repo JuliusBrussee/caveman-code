@@ -1,12 +1,8 @@
 # Plans
 
-Plans define HOW to implement kits. Task dependency graphs.
+Active plans driving cave development.
 
-## Conventions
+- `cave-v2-best-in-class.md` — master plan, 19 workstreams across 3 phases.
 
-- Start: `plan-overview.md`
-- Tasks: T-numbered, organized into dependency tiers
-- Each task references cavekit requirements by R-ID
-- Primary build site: `build-site.md`
-- Feature sites: `build-site-{feature}.md`
-- Generate: `/ck:map`
+The legacy CaveKit `build-site*.md` plan files and T-numbered impl trackers
+have been moved to `../archive/cavekit/`.

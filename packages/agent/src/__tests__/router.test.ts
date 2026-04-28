@@ -1,11 +1,5 @@
-// T-011, T-012, T-013
 import { describe, expect, it } from "vitest";
-import {
-	DEFAULT_PROFILE,
-	DefaultModelRouter,
-	fixedRouter,
-	type RoutingProfile,
-} from "../router.js";
+import { DefaultModelRouter, fixedRouter } from "../router.js";
 
 describe("DefaultModelRouter", () => {
 	it("resolves plan to long retention, verify to short", () => {
@@ -25,17 +19,7 @@ describe("DefaultModelRouter", () => {
 		}
 	});
 
-	it("honors CaveKit phase → role folding (R7 single-lookup semantics)", () => {
-		const profile: RoutingProfile = {
-			...DEFAULT_PROFILE,
-			cavekitPhaseRole: { architect: "plan", build: "edit", inspect: "verify" },
-		};
-		const r = new DefaultModelRouter(profile);
-		expect(r.route({ role: "explore", cavekitPhase: "architect" }).retention).toBe("long");
-		expect(r.route({ role: "explore", cavekitPhase: "build" }).retention).toBe("short");
-	});
-
-	it("downgrades non-plan role at 90% cost cap (T-131 seed)", () => {
+	it("downgrades non-plan role at 90% cost cap", () => {
 		const r = new DefaultModelRouter();
 		const atCap = r.route({
 			role: "edit",

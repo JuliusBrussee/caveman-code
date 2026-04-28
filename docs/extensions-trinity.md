@@ -1,7 +1,5 @@
 # Cave Extensions: the Skills / Subagents / Hooks Trinity
 
-T-022 / cavekit-sandbox-mcp R8.
-
 Cave exposes three in-process extension surfaces. Together they are the
 authoritative way to extend the agent — no new plugin API is introduced.
 
@@ -41,5 +39,5 @@ Cave does not expose a generic plugin loader or RPC extension API. The
 trinity above covers all extension use cases. If you need more than
 skills/subagents/hooks can provide, upstream a PR or fork.
 
-This constraint keeps the surface area auditable for sandboxing
-(cavekit-sandbox-mcp R1–R4) and keeps the build deterministic.
+This constraint keeps the surface area auditable for sandboxing and keeps
+the build deterministic.
