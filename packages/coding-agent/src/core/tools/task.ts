@@ -9,7 +9,6 @@
  *       * `.cave/agents/<name>.md` discovery (loader.ts)
  *       * `isolation: worktree` via `git worktree add .cave/worktrees/<id>`
  *       * 7 parallel cap (Claude Code parity)
- *       * permissionMode passthrough (plan mode wired)
  *       * structured `SubagentResult` envelope
  *
  * Modes (exactly one must be set per call):
@@ -23,7 +22,7 @@
  */
 
 import { spawn } from "node:child_process";
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { createWriteStream, existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import {
@@ -33,13 +32,27 @@ import {
 	detectRepoRoot,
 	MAX_PARALLEL_SUBAGENTS,
 	type SubagentDef,
+	type SubagentDefWithOutputSchema,
 	type SubagentResult,
 	sanitizeId,
+	validateSubagentOutput,
 } from "@cave/agent";
 import { Text } from "@cave/tui";
 import { type Static, Type } from "@sinclair/typebox";
-import { findAgentDef, formatAgentList, type LoadAgentDefsResult, loadAgentDefs } from "../agent-defs/loader.js";
+import {
+	filterAgentsByMcpAvailability,
+	findAgentDef,
+	formatAgentList,
+	type LoadAgentDefsResult,
+	loadAgentDefs,
+} from "../agent-defs/loader.js";
 import type { ToolDefinition } from "../extensions/types.js";
+import {
+	type BackgroundSubagent,
+	getTaskOutputPath,
+	registerBackground,
+	updateBackground,
+} from "../subagent-registry.js";
 
 const MAX_CONCURRENCY = 4;
 
@@ -63,18 +76,32 @@ const TaskItemSchema = Type.Object({
 	agent: Type.String({ description: "Name of the agent to invoke (must exist in .cave/agents/)" }),
 	task: Type.String({ description: "Task description handed to the agent" }),
 	cwd: Type.Optional(Type.String({ description: "Override working directory for this invocation" })),
+	model: Type.Optional(
+		Type.String({
+			description: "Override the agent's frontmatter model (e.g. anthropic/claude-haiku-4-5)",
+		}),
+	),
+	mode: Type.Optional(
+		Type.Union([Type.Literal("plan"), Type.Literal("auto")], {
+			description: "Override chat mode for this subagent run (plan = read-only, auto = full)",
+		}),
+	),
 });
 
 const ChainItemSchema = Type.Object({
 	agent: Type.String({ description: "Name of the agent to invoke" }),
 	task: Type.String({ description: "Task; use {previous} to splice prior agent's output" }),
 	cwd: Type.Optional(Type.String({ description: "Override working directory" })),
+	model: Type.Optional(Type.String({ description: "Override the agent's frontmatter model for this step" })),
+	mode: Type.Optional(Type.Union([Type.Literal("plan"), Type.Literal("auto")])),
 });
 
 const TaskSchema = Type.Object({
 	agent: Type.Optional(Type.String({ description: "Single-mode: agent name" })),
 	task: Type.Optional(Type.String({ description: "Single-mode: task description" })),
 	cwd: Type.Optional(Type.String({ description: "Single-mode: override working directory" })),
+	model: Type.Optional(Type.String({ description: "Single-mode: override the agent's frontmatter model" })),
+	mode: Type.Optional(Type.Union([Type.Literal("plan"), Type.Literal("auto")])),
 	tasks: Type.Optional(Type.Array(TaskItemSchema, { description: "Parallel mode: array of {agent,task}" })),
 	chain: Type.Optional(
 		Type.Array(ChainItemSchema, { description: "Chain mode: sequential {agent,task}, {previous} substituted" }),
@@ -86,11 +113,34 @@ export type TaskToolInput = Static<typeof TaskSchema>;
 // ─── Details (returned for renderer / observability) ──────────────────────
 
 export interface TaskToolDetails {
-	mode: "single" | "parallel" | "chain";
+	mode: "single" | "parallel" | "chain" | "async_launched";
 	results: SubagentResult[];
+	asyncLaunches?: AsyncLaunch[];
+}
+
+export interface AsyncLaunch {
+	agentId: string;
+	subagentName: string;
+	outputFile: string;
+	name?: string;
 }
 
 // ─── Spawning a child cave process for a subagent ─────────────────────────
+
+/**
+ * Per-event progress callback for streaming subagent updates back to the
+ * parent. Fires on every JSON event the spawned cave child emits (turn_start,
+ * tool_execution_start, message_end, etc.), so consumers can render live
+ * activity in the TUI without waiting for the child to exit.
+ */
+export interface SubagentProgressEvent {
+	subagentName: string;
+	subagentId: string;
+	phase: "started" | "tool" | "message" | "completed" | "failed";
+	detail?: string;
+}
+
+export type SubagentProgressCallback = (event: SubagentProgressEvent) => void;
 
 interface SpawnOptions {
 	cwd: string;
@@ -100,6 +150,10 @@ interface SpawnOptions {
 	caveBin?: string;
 	/** Inject a fake spawner for tests. */
 	mockSpawn?: typeof spawn;
+	/** Subagent invocation id (parent → TUI correlation). Defaults to agent name. */
+	subagentId?: string;
+	/** Per-JSON-event progress sink. */
+	onProgress?: SubagentProgressCallback;
 	/**
 	 * Resolve the model to actually spawn the subagent with. If the agent's
 	 * frontmatter model isn't reachable (e.g. the user has no Anthropic key
@@ -167,9 +221,11 @@ async function spawnSubagent(opts: SpawnOptions): Promise<SpawnResult> {
 		const filtered = opts.agent.tools.filter((t) => !blocked.has(t));
 		if (filtered.length > 0) args.push("--tools", filtered.join(","));
 	}
-	if (opts.agent.permissionMode) args.push("--permission-mode", opts.agent.permissionMode);
 	if (typeof opts.agent.effort === "string" && VALID_EFFORT_LEVELS.has(opts.agent.effort)) {
 		args.push("--thinking", opts.agent.effort);
+	}
+	if (typeof opts.agent.maxTurns === "number" && opts.agent.maxTurns > 0) {
+		args.push("--max-turns", String(Math.floor(opts.agent.maxTurns)));
 	}
 
 	let tmpDir: string | null = null;
@@ -196,6 +252,9 @@ async function spawnSubagent(opts: SpawnOptions): Promise<SpawnResult> {
 		...(opts.envOverrides ?? {}),
 		[SUBAGENT_DEPTH_ENV]: String(childDepth),
 	};
+	if (opts.agent.omitClaudeMd === true) {
+		childEnv.CAVE_OMIT_CLAUDE_MD = "1";
+	}
 
 	const exitCode = await new Promise<number>((resolve) => {
 		const child = spawner(invocation.command, invocation.args, {
@@ -205,11 +264,23 @@ async function spawnSubagent(opts: SpawnOptions): Promise<SpawnResult> {
 			env: childEnv,
 		});
 		let buf = "";
+		const subagentId = opts.subagentId ?? opts.agent.name;
+		const emitProgress = (phase: SubagentProgressEvent["phase"], detail?: string) => {
+			opts.onProgress?.({
+				subagentName: opts.agent.name,
+				subagentId,
+				phase,
+				detail,
+			});
+		};
+		emitProgress("started", opts.task.slice(0, 80));
 		const flushLine = (line: string) => {
 			if (!line.trim()) return;
 			try {
 				const event = JSON.parse(line);
-				if (event.type === "message_end" && event.message?.role === "assistant") {
+				if (event.type === "tool_execution_start" && typeof event.toolName === "string") {
+					emitProgress("tool", event.toolName);
+				} else if (event.type === "message_end" && event.message?.role === "assistant") {
 					const content = event.message.content;
 					if (Array.isArray(content)) {
 						for (const part of content) {
@@ -217,6 +288,9 @@ async function spawnSubagent(opts: SpawnOptions): Promise<SpawnResult> {
 								finalText = part.text;
 							}
 						}
+					}
+					if (typeof finalText === "string" && finalText.length > 0) {
+						emitProgress("message", finalText.slice(0, 80));
 					}
 				}
 			} catch {
@@ -236,9 +310,13 @@ async function spawnSubagent(opts: SpawnOptions): Promise<SpawnResult> {
 		});
 		child.on("close", (code: number | null) => {
 			if (buf.trim()) flushLine(buf);
+			emitProgress(code === 0 || code === null ? "completed" : "failed", `exit ${code ?? 0}`);
 			resolve(code ?? 0);
 		});
-		child.on("error", () => resolve(1));
+		child.on("error", () => {
+			emitProgress("failed", "spawn error");
+			resolve(1);
+		});
 		if (opts.signal) {
 			const kill = () => {
 				try {
@@ -275,6 +353,130 @@ async function spawnSubagent(opts: SpawnOptions): Promise<SpawnResult> {
 	}
 
 	return { exitCode, stdout, stderr, finalText };
+}
+
+// ─── Background (async) subagent dispatch ────────────────────────────────
+
+interface SpawnBackgroundOptions extends Omit<SpawnOptions, "signal"> {
+	/** Optional addressable name to register in the subagent registry. */
+	name?: string;
+}
+
+/**
+ * Spawn a cave child detached and return immediately. JSONL events are
+ * tee'd to a per-agentId output file under `~/.cave/tasks/{agentId}/`.
+ *
+ * Mirrors claude-code Task.ts:108-125 — the parent reads the output file
+ * (via Read or `tail`) to learn what the child has done so far.
+ */
+function spawnSubagentBackground(opts: SpawnBackgroundOptions): {
+	agentId: string;
+	outputFile: string;
+	entry: BackgroundSubagent;
+} {
+	const args: string[] = ["--mode", "json", "-p", "--no-session"];
+	const effectiveModel = opts.resolveModel ? opts.resolveModel(opts.agent.model) : opts.agent.model;
+	if (effectiveModel) args.push("--model", effectiveModel);
+	if (opts.agent.tools && opts.agent.tools.length > 0) {
+		const blocked = new Set(opts.agent.disallowedTools ?? []);
+		const filtered = opts.agent.tools.filter((t) => !blocked.has(t));
+		if (filtered.length > 0) args.push("--tools", filtered.join(","));
+	}
+	if (typeof opts.agent.effort === "string" && VALID_EFFORT_LEVELS.has(opts.agent.effort)) {
+		args.push("--thinking", opts.agent.effort);
+	}
+	if (typeof opts.agent.maxTurns === "number" && opts.agent.maxTurns > 0) {
+		args.push("--max-turns", String(Math.floor(opts.agent.maxTurns)));
+	}
+
+	let tmpDir: string | null = null;
+	let promptPath: string | null = null;
+	if (opts.agent.prompt && opts.agent.prompt.trim()) {
+		tmpDir = mkdtempSync(join(tmpdir(), "cave-subagent-"));
+		promptPath = join(tmpDir, `${opts.agent.name}.md`);
+		writeFileSync(promptPath, opts.agent.prompt, { encoding: "utf-8", mode: 0o600 });
+		args.push("--append-system-prompt", promptPath);
+	}
+	args.push(`Task: ${opts.task}`);
+
+	const subagentId = opts.subagentId ?? `${opts.agent.name}-${Date.now().toString(36)}`;
+	const outputFile = getTaskOutputPath(subagentId);
+	const out = createWriteStream(outputFile, { flags: "w", mode: 0o600 });
+
+	const invocation = resolveCaveInvocation(args, opts.caveBin);
+	const childDepth = currentSubagentDepth() + 1;
+	const childEnv: NodeJS.ProcessEnv = {
+		...process.env,
+		...(opts.envOverrides ?? {}),
+		[SUBAGENT_DEPTH_ENV]: String(childDepth),
+	};
+	if (opts.agent.omitClaudeMd === true) childEnv.CAVE_OMIT_CLAUDE_MD = "1";
+
+	const spawner = opts.mockSpawn ?? spawn;
+	const child = spawner(invocation.command, invocation.args, {
+		cwd: opts.cwd,
+		shell: false,
+		stdio: ["ignore", "pipe", "pipe"],
+		env: childEnv,
+		detached: false,
+	});
+	child.unref?.();
+
+	const entry: BackgroundSubagent = {
+		agentId: subagentId,
+		name: opts.name,
+		subagentName: opts.agent.name,
+		task: opts.task,
+		startedAt: Date.now(),
+		status: "running",
+		outputFile,
+		mailbox: [],
+		child,
+	};
+	registerBackground(entry);
+
+	child.stdout?.on("data", (chunk: Buffer) => {
+		out.write(chunk);
+	});
+	child.stderr?.on("data", (chunk: Buffer) => {
+		// Forward stderr to the same file with a `stderr:` prefix per line so the
+		// reader can distinguish stream sources without a second file.
+		const text = chunk.toString("utf-8");
+		for (const line of text.split("\n")) {
+			if (line.length > 0) out.write(`stderr: ${line}\n`);
+		}
+	});
+	child.on("close", (code: number | null) => {
+		const exitCode = code ?? 0;
+		out.end();
+		updateBackground(subagentId, {
+			status: exitCode === 0 ? "completed" : "failed",
+			exitCode,
+			finishedAt: Date.now(),
+			child: undefined,
+		});
+		if (promptPath) {
+			try {
+				rmSync(promptPath);
+			} catch {}
+		}
+		if (tmpDir) {
+			try {
+				rmSync(tmpDir, { recursive: true, force: true });
+			} catch {}
+		}
+	});
+	child.on("error", () => {
+		out.end();
+		updateBackground(subagentId, {
+			status: "failed",
+			exitCode: 1,
+			finishedAt: Date.now(),
+			child: undefined,
+		});
+	});
+
+	return { agentId: subagentId, outputFile, entry };
 }
 
 // ─── Worktree isolation orchestration ─────────────────────────────────────
@@ -330,6 +532,11 @@ async function runOne(
 		idSuffix?: string;
 		resolveModel?: SpawnOptions["resolveModel"];
 		envOverrides?: SpawnOptions["envOverrides"];
+		onProgress?: SubagentProgressCallback;
+		/** Per-call override for the agent's frontmatter model. */
+		modelOverride?: string;
+		/** Per-call chat-mode override (plan = read-only, auto = full). */
+		modeOverride?: "plan" | "auto";
 	} = {},
 ): Promise<SubagentResult> {
 	const found = findAgentDef(loaded, agentName);
@@ -347,17 +554,24 @@ async function runOne(
 	const wt = await maybeCreateWorktree(found.def, cwdOverride ?? parentCwd, id);
 	const startCwd = wt.cwd;
 
+	const effectiveDef: SubagentDef = options.modelOverride ? { ...found.def, model: options.modelOverride } : found.def;
+	const childEnvForMode: Record<string, string> | undefined = options.modeOverride
+		? { ...(options.envOverrides ?? {}), CAVE_CHAT_MODE: options.modeOverride }
+		: options.envOverrides;
+
 	let spawnRes: SpawnResult;
 	try {
 		spawnRes = await spawnSubagent({
 			cwd: startCwd,
-			agent: found.def,
+			agent: effectiveDef,
 			task,
 			signal,
 			caveBin: options.caveBin,
 			mockSpawn: options.mockSpawn,
 			resolveModel: options.resolveModel,
-			envOverrides: options.envOverrides,
+			envOverrides: childEnvForMode,
+			subagentId: id,
+			onProgress: options.onProgress,
 		});
 	} catch (err) {
 		const cleaned = await maybeCleanupWorktree(parentCwd, wt.worktree);
@@ -375,13 +589,37 @@ async function runOne(
 	}
 
 	const cleaned = await maybeCleanupWorktree(parentCwd, wt.worktree);
+
+	// Optional: if the agent declared an outputSchema, parse finalText as JSON
+	// and validate. Failure surfaces as an error so the parent session can
+	// retry with a clarifying message instead of silently passing bad data on.
+	let parsedData: unknown;
+	let validationError: string | undefined;
+	const schemaDef = found.def as SubagentDefWithOutputSchema;
+	if (schemaDef.outputSchema && spawnRes.exitCode === 0 && spawnRes.finalText.trim()) {
+		try {
+			parsedData = JSON.parse(spawnRes.finalText);
+		} catch {
+			validationError = "outputSchema set but agent did not return valid JSON";
+		}
+		if (!validationError) {
+			const result = validateSubagentOutput(found.def, parsedData);
+			if (!result.ok) {
+				validationError = `outputSchema violation:\n  ${result.errors.join("\n  ")}`;
+			}
+		}
+	}
+
 	return {
 		agent: agentName,
 		source: found.def.source,
 		task,
 		output: spawnRes.finalText,
-		exitCode: spawnRes.exitCode,
-		error: spawnRes.exitCode !== 0 ? spawnRes.stderr.trim() || `exit ${spawnRes.exitCode}` : undefined,
+		exitCode: validationError ? 2 : spawnRes.exitCode,
+		error:
+			validationError ??
+			(spawnRes.exitCode !== 0 ? spawnRes.stderr.trim() || `exit ${spawnRes.exitCode}` : undefined),
+		data: parsedData,
 		worktreeDir: wt.worktree?.worktreeDir,
 		branchName: wt.worktree?.branchName,
 		worktreeCleaned: cleaned,
@@ -416,6 +654,12 @@ export interface TaskToolOptions {
 	/** Override the loader (test injection). */
 	loader?: () => LoadAgentDefsResult;
 	/**
+	 * Per-event progress sink. Invoked for every JSON event the spawned cave
+	 * child emits — used by AgentSession to forward `subagent_progress` events
+	 * to the TUI so users see live activity instead of silence until exit.
+	 */
+	onProgress?: SubagentProgressCallback;
+	/**
 	 * Resolve which model the spawned cave child should use.
 	 *
 	 * Receives the agent's frontmatter `model` (may be undefined) and returns
@@ -434,13 +678,26 @@ export interface TaskToolOptions {
 	 * `--api-key` (in-memory only) reach the child cave.
 	 */
 	envOverrides?: SpawnOptions["envOverrides"];
+	/**
+	 * Returns the list of MCP server names currently available to the parent.
+	 * When set, agents whose `requiredMcpServers` are not satisfied are hidden
+	 * from the model and refused at invocation time.
+	 * Reference: claude-code AgentTool.tsx:367-407.
+	 */
+	getAvailableMcpServers?: () => string[];
 }
 
 export function createTaskToolDefinition(
 	cwd: string,
 	options?: TaskToolOptions,
 ): ToolDefinition<typeof TaskSchema, TaskToolDetails | undefined> {
-	const loader = options?.loader ?? (() => loadAgentDefs({ cwd }));
+	const baseLoader = options?.loader ?? (() => loadAgentDefs({ cwd }));
+	const loader = (): LoadAgentDefsResult => {
+		const loaded = baseLoader();
+		const available = options?.getAvailableMcpServers?.();
+		if (!available) return loaded;
+		return filterAgentsByMcpAvailability(loaded, available);
+	};
 
 	// Render the agent menu into the tool's description so the model sees it
 	// in the tool spec, not just in the registry. Without this, the model has
@@ -470,7 +727,8 @@ export function createTaskToolDefinition(
 			"Subagents inherit cwd; agents with `isolation: worktree` run in a fresh git worktree. Plan-mode agents are read-only.",
 			agentMenu,
 		].join(" "),
-		promptSnippet: "Delegate to a subagent (use `explore` for codebase reconnaissance instead of running grep/find yourself)",
+		promptSnippet:
+			"Delegate to a subagent (use `explore` for codebase reconnaissance instead of running grep/find yourself)",
 		promptGuidelines: [
 			"For codebase exploration ('where is X', 'how does Y work', 'what files touch Z'), prefer launching the `explore` subagent over running grep/find/read sequentially yourself.",
 			"For independent units of work, launch them in parallel via `task({ tasks: [...] })` rather than serially.",
@@ -523,11 +781,56 @@ export function createTaskToolDefinition(
 			}
 
 			if (hasSingle) {
+				// Async dispatch path — when the agent declares `background: true`
+				// (or per-call `background: true`), spawn detached and return
+				// immediately with `{agentId, outputFile}`. The parent uses the
+				// `task_status` / `read` tools to poll progress.
+				const def = findAgentDef(loaded, params.agent!)?.def;
+				if (def?.background === true) {
+					const { agentId, outputFile, entry } = spawnSubagentBackground({
+						cwd: params.cwd ?? cwd,
+						agent: params.model ? { ...def, model: params.model } : def,
+						task: params.task!,
+						caveBin: options?.caveBin,
+						mockSpawn: options?.mockSpawn,
+						resolveModel: options?.resolveModel,
+						envOverrides: params.mode
+							? { ...(options?.envOverrides ?? {}), CAVE_CHAT_MODE: params.mode }
+							: options?.envOverrides,
+					});
+					return {
+						content: [
+							{
+								type: "text" as const,
+								text:
+									`Subagent "${def.name}" launched in background.\n` +
+									`agentId: ${agentId}\n` +
+									`outputFile: ${outputFile}\n` +
+									`Use the \`read\` tool on outputFile to inspect progress, or \`send_message\` to steer.`,
+							},
+						],
+						details: {
+							mode: "async_launched" as const,
+							results: [],
+							asyncLaunches: [
+								{
+									agentId,
+									subagentName: entry.subagentName,
+									outputFile,
+								},
+							],
+						},
+					};
+				}
+
 				const r = await runOne(loaded, params.agent!, params.task!, cwd, params.cwd, signal, {
 					caveBin: options?.caveBin,
 					mockSpawn: options?.mockSpawn,
 					resolveModel: options?.resolveModel,
 					envOverrides: options?.envOverrides,
+					onProgress: options?.onProgress,
+					modelOverride: params.model,
+					modeOverride: params.mode,
 				});
 				const text =
 					r.exitCode === 0
@@ -547,6 +850,9 @@ export function createTaskToolDefinition(
 						idSuffix: String(idx),
 						resolveModel: options?.resolveModel,
 						envOverrides: options?.envOverrides,
+						onProgress: options?.onProgress,
+						modelOverride: t.model,
+						modeOverride: t.mode,
 					}),
 				);
 				const ok = results.filter((r) => r.exitCode === 0).length;
@@ -576,6 +882,9 @@ export function createTaskToolDefinition(
 					idSuffix: `chain-${i}`,
 					resolveModel: options?.resolveModel,
 					envOverrides: options?.envOverrides,
+					onProgress: options?.onProgress,
+					modelOverride: step.model,
+					modeOverride: step.mode,
 				});
 				results.push(r);
 				if (r.exitCode !== 0) {

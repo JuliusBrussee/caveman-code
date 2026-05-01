@@ -20,6 +20,12 @@ export {
 	createLocalBashOperations,
 } from "./bash.js";
 export {
+	ClarifySchema,
+	type ClarifyToolDetails,
+	type ClarifyToolInput,
+	clarifyToolDefinition,
+} from "./clarify.js";
+export {
 	createEditTool,
 	createEditToolDefinition,
 	type EditOperations,
@@ -71,11 +77,12 @@ export {
 	readToolDefinition,
 } from "./read.js";
 export {
-	ClarifySchema,
-	type ClarifyToolDetails,
-	type ClarifyToolInput,
-	clarifyToolDefinition,
-} from "./clarify.js";
+	type SendMessageDetails,
+	type SendMessageInput,
+	sendMessageToolDefinition,
+	type TaskStatusInput,
+	taskStatusToolDefinition,
+} from "./send-message.js";
 // WS6: Subagents & Plan Mode
 export {
 	createTaskToolDefinition,
@@ -127,6 +134,7 @@ import {
 	readTool,
 	readToolDefinition,
 } from "./read.js";
+import { sendMessageToolDefinition, taskStatusToolDefinition } from "./send-message.js";
 import { createTaskToolDefinition, type TaskToolOptions } from "./task.js";
 import { wrapToolDefinition } from "./tool-definition-wrapper.js";
 import { createWriteTool, createWriteToolDefinition, writeTool, writeToolDefinition } from "./write.js";
@@ -140,6 +148,8 @@ export type ToolDef = ToolDefinition<any, any>;
 const taskTool: Tool = wrapToolDefinition(createTaskToolDefinition(process.cwd()));
 const agentTool: Tool = wrapToolDefinition(createAgentToolDefinition(process.cwd()));
 const clarifyTool: Tool = wrapToolDefinition(clarifyToolDefinition);
+const sendMessageTool: Tool = wrapToolDefinition(sendMessageToolDefinition);
+const taskStatusTool: Tool = wrapToolDefinition(taskStatusToolDefinition);
 
 export const codingTools: Tool[] = [readTool, bashTool, editTool, writeTool];
 export const readOnlyTools: Tool[] = [readTool, grepTool, findTool, lsTool];
@@ -155,6 +165,8 @@ export const allTools = {
 	clarify: clarifyTool,
 	task: taskTool,
 	agent: agentTool,
+	send_message: sendMessageTool,
+	task_status: taskStatusTool,
 };
 
 export const allToolDefinitions = {
@@ -168,6 +180,8 @@ export const allToolDefinitions = {
 	clarify: clarifyToolDefinition,
 	task: createTaskToolDefinition(process.cwd()),
 	agent: createAgentToolDefinition(process.cwd()),
+	send_message: sendMessageToolDefinition,
+	task_status: taskStatusToolDefinition,
 };
 
 export type ToolName = keyof typeof allTools;
@@ -208,6 +222,8 @@ export function createAllToolDefinitions(cwd: string, options?: ToolsOptions): R
 		clarify: clarifyToolDefinition,
 		task: createTaskToolDefinition(cwd, options?.task),
 		agent: createAgentToolDefinition(cwd, options?.task),
+		send_message: sendMessageToolDefinition,
+		task_status: taskStatusToolDefinition,
 	};
 }
 
@@ -236,5 +252,7 @@ export function createAllTools(cwd: string, options?: ToolsOptions): Record<Tool
 		clarify: wrapToolDefinition(clarifyToolDefinition),
 		task: wrapToolDefinition(createTaskToolDefinition(cwd, options?.task)),
 		agent: wrapToolDefinition(createAgentToolDefinition(cwd, options?.task)),
+		send_message: wrapToolDefinition(sendMessageToolDefinition),
+		task_status: wrapToolDefinition(taskStatusToolDefinition),
 	};
 }
