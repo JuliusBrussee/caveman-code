@@ -1,14 +1,6 @@
 import { appendFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
-import {
-	Container,
-	getKeybindings,
-	type OverlayHandle,
-	Spacer,
-	Text,
-	type TUI,
-	visibleWidth,
-} from "@cave/tui";
+import { Container, getKeybindings, type OverlayHandle, Spacer, Text, type TUI, visibleWidth } from "@cave/tui";
 import { theme } from "../theme/theme.js";
 
 export interface SecretPromptOptions {
@@ -46,13 +38,7 @@ export class SecretPromptComponent extends Container {
 		this.inputText = new Text("", 3, 0);
 		this.addChild(this.inputText);
 		this.addChild(new Spacer(1));
-		this.addChild(
-			new Text(
-				theme.fg("dim", "Enter submit · Backspace edit · Esc cancel · ^C cancel"),
-				1,
-				0,
-			),
-		);
+		this.addChild(new Text(theme.fg("dim", "Enter submit · Backspace edit · Esc cancel · ^C cancel"), 1, 0));
 		this.addChild(new Text(theme.fg("border", doubleBorderBottom()), 0, 0));
 		this.refresh();
 	}

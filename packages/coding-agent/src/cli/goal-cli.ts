@@ -13,7 +13,7 @@
 
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import chalk from "chalk";
-import { ensureCaveBinary, runGoal } from "../core/goal-loop/goal-runner.js";
+import { resolveGoalInvocation, runGoal } from "../core/goal-loop/goal-runner.js";
 import {
 	DEFAULT_COMPLETION_SENTINEL,
 	DEFAULT_MAX_ITERATIONS,
@@ -285,7 +285,7 @@ const handleList = (): number => {
 
 const runDriver = async (cwd: string, id: string, verbose: boolean): Promise<number> => {
 	const paths = goalPaths(cwd, id);
-	const { caveBin, caveScript } = ensureCaveBinary();
+	const { caveCommand, caveArgsPrefix } = resolveGoalInvocation();
 	const ac = new AbortController();
 	const onSig = () => {
 		console.error(chalk.yellow("\n[goal] received signal — finishing current iteration then exiting"));
@@ -298,8 +298,8 @@ const runDriver = async (cwd: string, id: string, verbose: boolean): Promise<num
 			cwd,
 			id,
 			paths,
-			caveBin,
-			caveScript,
+			caveCommand,
+			caveArgsPrefix,
 			verbose,
 			signal: ac.signal,
 		});

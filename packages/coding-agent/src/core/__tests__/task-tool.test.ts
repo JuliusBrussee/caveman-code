@@ -64,13 +64,7 @@ describe("WS6 Task tool", () => {
 			loader: () => stubLoaded,
 		});
 
-		const result = await tool.execute(
-			"call-1",
-			{ agent: "tester", task: "say hi" },
-			undefined,
-			undefined,
-			{} as any,
-		);
+		const result = await tool.execute("call-1", { agent: "tester", task: "say hi" }, undefined, undefined, {} as any);
 
 		expect(result.content[0]).toMatchObject({ type: "text", text: "hello from subagent" });
 		expect(result.details?.mode).toBe("single");
@@ -85,13 +79,7 @@ describe("WS6 Task tool", () => {
 			loader: () => stubLoaded,
 		});
 
-		const result = await tool.execute(
-			"call-2",
-			{ agent: "nonexistent", task: "x" },
-			undefined,
-			undefined,
-			{} as any,
-		);
+		const result = await tool.execute("call-2", { agent: "nonexistent", task: "x" }, undefined, undefined, {} as any);
 
 		const text = result.content[0]?.type === "text" ? result.content[0].text : "";
 		expect(text).toContain("Subagent failed");

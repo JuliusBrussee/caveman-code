@@ -110,12 +110,8 @@ export class SkillsHubComponent extends Container {
 	private renderSkills(category: SkillCategory): void {
 		this.stage = "skills";
 		this.currentCategory = category;
-		this.titleText.setText(
-			`${theme.bold(theme.fg("accent", "Skills"))}  ${theme.fg("dim", `· ${category.label}`)}`,
-		);
-		this.hintText.setText(
-			theme.fg("dim", "↑/↓ select · Enter actions · Esc back"),
-		);
+		this.titleText.setText(`${theme.bold(theme.fg("accent", "Skills"))}  ${theme.fg("dim", `· ${category.label}`)}`);
+		this.hintText.setText(theme.fg("dim", "↑/↓ select · Enter actions · Esc back"));
 		const items = category.skills.length
 			? category.skills.map((s) => ({
 					value: s.name,
@@ -141,8 +137,7 @@ export class SkillsHubComponent extends Container {
 		);
 		this.hintText.setText(theme.fg("dim", "i inspect · x install · Esc back"));
 		const inspectLabel = `inspect  ${theme.fg("dim", "show metadata")}`;
-		const installLabel =
-			skill.source === "marketplace" ? "install" : `${theme.fg("dim", "install (already local)")}`;
+		const installLabel = skill.source === "marketplace" ? "install" : `${theme.fg("dim", "install (already local)")}`;
 		const items = [
 			{ value: "inspect", label: inspectLabel, description: skill.description },
 			{ value: "install", label: installLabel, description: skill.location },

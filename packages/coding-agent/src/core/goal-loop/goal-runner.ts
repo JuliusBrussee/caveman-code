@@ -13,8 +13,9 @@
 
 import { type ChildProcessWithoutNullStreams, execSync, spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { resolveCurrentCaveInvocation } from "../../utils/cave-invocation.js";
 import { buildIterPrompt, detectSentinel, extractSummaryTail } from "./goal-prompts.js";
 import {
 	acquireLock,
@@ -39,8 +40,8 @@ export interface RunGoalOptions {
 	cwd: string;
 	id: string;
 	paths: GoalPaths;
-	caveBin: string;
-	caveScript: string;
+	caveCommand: string;
+	caveArgsPrefix: string[];
 	model?: string;
 	verbose?: boolean;
 	signal?: AbortSignal;
@@ -92,13 +93,13 @@ const writeIterOutput = (paths: GoalPaths, iter: number, payload: { stdout: stri
 
 const runIteration = (opts: RunGoalOptions, prompt: string, maxTurns: number, model?: string): Promise<IterOutcome> => {
 	return new Promise((resolve) => {
-		const args = [opts.caveScript, "-p", "--mode", "json", "--max-turns", String(maxTurns)];
+		const args = [...opts.caveArgsPrefix, "-p", "--mode", "json", "--max-turns", String(maxTurns)];
 		if (model) {
 			args.push("--model", model);
 		}
 		// Pass goal id via env so child can mark sessions if it wants to.
 		const env = { ...process.env, CAVE_GOAL_ID: opts.id };
-		const child: ChildProcessWithoutNullStreams = spawn(opts.caveBin, args, {
+		const child: ChildProcessWithoutNullStreams = spawn(opts.caveCommand, args, {
 			cwd: opts.cwd,
 			env,
 			stdio: ["pipe", "pipe", "pipe"],
@@ -355,13 +356,10 @@ export const runGoal = async (opts: RunGoalOptions): Promise<RunGoalResult> => {
 	}
 };
 
-export const ensureCaveBinary = (): { caveBin: string; caveScript: string } => {
-	// Use the same Node process and same CLI script we were launched with.
-	// argv[0] = node, argv[1] = path to cli.js (for `cave goal _run`).
-	const caveBin = process.execPath;
-	const caveScript = process.argv[1];
-	if (!existsSync(caveScript)) {
-		throw new Error(`Cannot locate cave CLI script at ${caveScript}`);
-	}
-	return { caveBin, caveScript };
+export const resolveGoalInvocation = (): { caveCommand: string; caveArgsPrefix: string[] } => {
+	const invocation = resolveCurrentCaveInvocation();
+	return {
+		caveCommand: invocation.command,
+		caveArgsPrefix: invocation.argsPrefix,
+	};
 };

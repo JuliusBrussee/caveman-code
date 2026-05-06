@@ -12,7 +12,7 @@ import { EventEmitter } from "node:events";
 import { Readable } from "node:stream";
 import { describe, expect, it } from "vitest";
 import type { LoadAgentDefsResult } from "../agent-defs/loader.js";
-import { allTools, allToolDefinitions } from "../tools/index.js";
+import { allToolDefinitions, allTools } from "../tools/index.js";
 import { createTaskToolDefinition } from "../tools/task.js";
 
 describe("WS6 subagent wiring", () => {

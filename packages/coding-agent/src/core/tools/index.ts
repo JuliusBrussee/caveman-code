@@ -57,16 +57,6 @@ export {
 	grepToolDefinition,
 } from "./grep.js";
 export {
-	createMemorySaveToolDefinition,
-	createMemorySearchToolDefinition,
-	createMemoryTools,
-	type MemorySaveDetails,
-	type MemorySaveInput,
-	type MemorySearchDetails,
-	type MemorySearchInput,
-	type MemoryTools,
-} from "./memory.js";
-export {
 	createLsTool,
 	createLsToolDefinition,
 	type LsOperations,
@@ -76,6 +66,16 @@ export {
 	lsTool,
 	lsToolDefinition,
 } from "./ls.js";
+export {
+	createMemorySaveToolDefinition,
+	createMemorySearchToolDefinition,
+	createMemoryTools,
+	type MemorySaveDetails,
+	type MemorySaveInput,
+	type MemorySearchDetails,
+	type MemorySearchInput,
+	type MemoryTools,
+} from "./memory.js";
 export {
 	createReadTool,
 	createReadToolDefinition,

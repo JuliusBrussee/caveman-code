@@ -106,8 +106,8 @@ describe("FooterComponent width handling", () => {
 				cost: { total: 0.29 },
 			},
 		});
-		(session.sessionManager as unknown as { getCwd(): string }).getCwd =
-			() => "/Users/julb/Desktop/GitHub/caveman-cli";
+		(session.sessionManager as unknown as { getCwd(): string }).getCwd = () =>
+			"/Users/julb/Desktop/GitHub/caveman-cli";
 		const footer = new FooterComponent(session, createFooterData(1));
 
 		const lines = footer.render(width);

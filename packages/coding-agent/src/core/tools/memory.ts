@@ -7,8 +7,7 @@
  * write a fact mid-turn without taking the user-driven `/memory` slash route.
  */
 
-import type { AgentTool } from "@cave/agent";
-import { type memory as memoryNs } from "@cave/agent";
+import type { AgentTool, memory as memoryNs } from "@cave/agent";
 import { Text } from "@cave/tui";
 import { type Static, Type } from "@sinclair/typebox";
 import type { ToolDefinition } from "../extensions/types.js";
@@ -73,13 +72,20 @@ export function createMemorySearchToolDefinition(
 			const available = await provider.isAvailable().catch(() => false);
 			if (!available) {
 				return {
-					content: [{ type: "text" as const, text: "Memory backend unavailable; install `cavemem` or initialise `.cave/memory/`." }],
+					content: [
+						{
+							type: "text" as const,
+							text: "Memory backend unavailable; install `cavemem` or initialise `.cave/memory/`.",
+						},
+					],
 					details: { hitCount: 0, available: false },
 				};
 			}
 			const k = Math.max(1, Math.min(HARD_LIMIT, limit ?? 5));
 			const hits = await provider.search(query, { limit: k }).catch((e) => {
-				return [{ id: -1, preview: `search error: ${e instanceof Error ? e.message : String(e)}` }] as memoryNs.MemoryHit[];
+				return [
+					{ id: -1, preview: `search error: ${e instanceof Error ? e.message : String(e)}` },
+				] as memoryNs.MemoryHit[];
 			});
 			if (hits.length === 0) {
 				return {
@@ -120,7 +126,12 @@ export function createMemorySaveToolDefinition(
 			const available = await provider.isAvailable().catch(() => false);
 			if (!available) {
 				return {
-					content: [{ type: "text" as const, text: "Memory backend unavailable; install `cavemem` or initialise `.cave/memory/`." }],
+					content: [
+						{
+							type: "text" as const,
+							text: "Memory backend unavailable; install `cavemem` or initialise `.cave/memory/`.",
+						},
+					],
 					details: { available: false },
 				};
 			}
@@ -128,7 +139,9 @@ export function createMemorySaveToolDefinition(
 				throw new Error(`memory_save failed: ${e instanceof Error ? e.message : String(e)}`);
 			});
 			return {
-				content: [{ type: "text" as const, text: id !== undefined ? `Saved as #${id}` : "Saved (id not surfaced)" }],
+				content: [
+					{ type: "text" as const, text: id !== undefined ? `Saved as #${id}` : "Saved (id not surfaced)" },
+				],
 				details: { id, available: true },
 			};
 		},
@@ -140,11 +153,7 @@ export function createMemorySaveToolDefinition(
 		renderResult(result, _options, theme) {
 			const details = result.details as MemorySaveDetails | undefined;
 			if (!details?.available) return new Text(theme.fg("warning", "(memory unavailable)"), 0, 0);
-			return new Text(
-				theme.fg("success", details.id !== undefined ? `→ #${details.id}` : "→ saved"),
-				0,
-				0,
-			);
+			return new Text(theme.fg("success", details.id !== undefined ? `→ #${details.id}` : "→ saved"), 0, 0);
 		},
 	};
 }

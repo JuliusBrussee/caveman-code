@@ -1,4 +1,4 @@
-import { type SpinnerName, type SpinnerVariant, SPINNERS, getSpinner } from "../spinners.js";
+import { getSpinner, SPINNERS, type SpinnerName, type SpinnerVariant } from "../spinners.js";
 import type { TUI } from "../tui.js";
 import { Text } from "./text.js";
 

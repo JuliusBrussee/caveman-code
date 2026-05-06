@@ -76,6 +76,8 @@ import {
 import { buildDefaultCavememHooks } from "./hooks/cavemem-hooks.js";
 import type { HooksConfig } from "./hooks/events.js";
 import { createHooksExtension, HooksManager } from "./hooks/index.js";
+import { composeStartupPrelude } from "./memory-bridge.js";
+import { resolveMemoryProvider } from "./memory-factory.js";
 import type { BashExecutionMessage, CustomMessage } from "./messages.js";
 import type { ModelRegistry } from "./model-registry.js";
 import { expandPromptTemplate, type PromptTemplate } from "./prompt-templates.js";
@@ -91,8 +93,6 @@ import { type BashOperations, createLocalBashOperations } from "./tools/bash.js"
 import { createAllToolDefinitions } from "./tools/index.js";
 import { createMemorySaveToolDefinition, createMemorySearchToolDefinition } from "./tools/memory.js";
 import { createToolDefinitionFromAgentTool, wrapToolDefinition } from "./tools/tool-definition-wrapper.js";
-import { resolveMemoryProvider } from "./memory-factory.js";
-import { composeStartupPrelude } from "./memory-bridge.js";
 
 // ============================================================================
 // Skill Block Parsing
@@ -830,9 +830,7 @@ export class AgentSession {
 					return p;
 				})
 				.catch((err) => {
-					console.warn(
-						`[cave/memory] provider init failed: ${err instanceof Error ? err.message : String(err)}`,
-					);
+					console.warn(`[cave/memory] provider init failed: ${err instanceof Error ? err.message : String(err)}`);
 					return undefined;
 				});
 		}
@@ -858,10 +856,11 @@ export class AgentSession {
 	/** Build the search query from chat-state + last user message. */
 	private _memoryQuery(messages: AgentMessage[]): string {
 		const text = this._latestUserText(messages).slice(0, 500);
-		const fileNames = [...this._repomapAddedFiles, ...this._repomapMentionedFiles]
-			.slice(-5)
-			.map((p) => basename(p));
-		return [text, ...fileNames].filter((s) => s && s.length > 0).join("  ").trim();
+		const fileNames = [...this._repomapAddedFiles, ...this._repomapMentionedFiles].slice(-5).map((p) => basename(p));
+		return [text, ...fileNames]
+			.filter((s) => s && s.length > 0)
+			.join("  ")
+			.trim();
 	}
 
 	private _memoryHash(query: string): string {
@@ -900,7 +899,11 @@ export class AgentSession {
 		const ids = hits.map((h) => h.id).filter((id) => Number.isFinite(id) && id >= 0);
 		let bodies: memoryNs.MemoryObservation[] = [];
 		if (ids.length > 0) {
-			bodies = await this._withTimeout(provider.getObservations(ids, { expand: false }), this._memoryRecallTimeoutMs, []);
+			bodies = await this._withTimeout(
+				provider.getObservations(ids, { expand: false }),
+				this._memoryRecallTimeoutMs,
+				[],
+			);
 		}
 		const byId = new Map(bodies.map((b) => [b.id, b]));
 		const rows = hits
@@ -1050,8 +1053,14 @@ export class AgentSession {
 		afterMemory: AgentMessage[],
 		afterRepomap: AgentMessage[],
 	): AgentMessage[] {
-		const memoryBlocks = afterMemory.length > original.length ? afterMemory.slice(0, afterMemory.length - original.length).filter((m) => !original.includes(m)) : [];
-		const repomapBlocks = afterRepomap.length > original.length ? afterRepomap.slice(0, afterRepomap.length - original.length).filter((m) => !original.includes(m)) : [];
+		const memoryBlocks =
+			afterMemory.length > original.length
+				? afterMemory.slice(0, afterMemory.length - original.length).filter((m) => !original.includes(m))
+				: [];
+		const repomapBlocks =
+			afterRepomap.length > original.length
+				? afterRepomap.slice(0, afterRepomap.length - original.length).filter((m) => !original.includes(m))
+				: [];
 
 		// Token-budget enforcement: drop memory blocks first when memory + repomap
 		// together exceed 25% of the context window. Repomap is structural and
@@ -3235,9 +3244,7 @@ export class AgentSession {
 				);
 			}
 		} catch (err) {
-			console.warn(
-				`[cave/memory] tool registration skipped: ${err instanceof Error ? err.message : String(err)}`,
-			);
+			console.warn(`[cave/memory] tool registration skipped: ${err instanceof Error ? err.message : String(err)}`);
 		}
 
 		const extensionsResult = this._resourceLoader.getExtensions();

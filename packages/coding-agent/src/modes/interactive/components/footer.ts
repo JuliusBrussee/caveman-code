@@ -64,19 +64,6 @@ export class FooterComponent implements Component {
 	render(width: number): string[] {
 		const state = this.session.state;
 
-		// Cumulative usage from ALL session entries
-		let totalInput = 0;
-		let totalOutput = 0;
-		let totalCost = 0;
-
-		for (const entry of this.session.sessionManager.getEntries()) {
-			if (entry.type === "message" && entry.message.role === "assistant") {
-				totalInput += entry.message.usage.input;
-				totalOutput += entry.message.usage.output;
-				totalCost += entry.message.usage.cost.total;
-			}
-		}
-
 		// Context usage
 		const contextUsage = this.session.getContextUsage();
 		const contextWindow = contextUsage?.contextWindow ?? state.model?.contextWindow ?? 0;
@@ -95,14 +82,7 @@ export class FooterComponent implements Component {
 			pwd = `${pwd}:${branch}`;
 		}
 
-		// Plain-text left: pwd + stats, then context % at the end (kept separate so
-		// we can apply per-segment styling without nesting ANSI resets).
-		const statsParts: string[] = [];
-		if (totalInput) statsParts.push(`↑${formatTokens(totalInput)}`);
-		if (totalOutput) statsParts.push(`↓${formatTokens(totalOutput)}`);
-		if (totalCost) statsParts.push(`$${totalCost.toFixed(2)}`);
-		const beforeContext = [pwd, ...statsParts].join("  ");
-		const leftPrefixRaw = beforeContext.length > 0 ? `${beforeContext}  ` : "";
+		const leftPrefixRaw = `${pwd}  `;
 		const leftRaw = leftPrefixRaw + contextDisplay;
 
 		// Right side: model + thinking. Prefix with provider when the bare model id

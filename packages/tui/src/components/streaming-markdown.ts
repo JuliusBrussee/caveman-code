@@ -21,13 +21,7 @@ export class StreamingMarkdown implements Component {
 		private readonly theme: MarkdownTheme,
 		private readonly defaultTextStyle?: DefaultTextStyle,
 	) {
-		this.inner = new Markdown(
-			balancePartial(initial),
-			paddingX,
-			paddingY,
-			theme,
-			defaultTextStyle,
-		);
+		this.inner = new Markdown(balancePartial(initial), paddingX, paddingY, theme, defaultTextStyle);
 		this.rawBuffer = initial;
 	}
 

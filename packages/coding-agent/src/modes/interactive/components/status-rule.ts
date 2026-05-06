@@ -1,4 +1,4 @@
-import { Container, Text, truncateToWidth, type TUI, visibleWidth } from "@cave/tui";
+import { Container, Text, type TUI, truncateToWidth, visibleWidth } from "@cave/tui";
 import { FACES } from "../content/faces.js";
 import { VERBS } from "../content/verbs.js";
 import { theme } from "../theme/theme.js";
@@ -42,7 +42,10 @@ export class StatusRuleComponent extends Container {
 	private label: Text;
 	private settings: Required<StatusRuleSettings>;
 
-	constructor(private readonly ui: TUI, settings: StatusRuleSettings = {}) {
+	constructor(
+		private readonly ui: TUI,
+		settings: StatusRuleSettings = {},
+	) {
 		super();
 		this.settings = {
 			position: settings.position ?? "bottom",
@@ -164,12 +167,14 @@ export class StatusRuleComponent extends Container {
 		const depthRatio = s.depthCap > 0 ? s.depth / s.depthCap : 0;
 		const concRatio = s.concurrencyCap > 0 ? s.concurrency / s.concurrencyCap : 0;
 		const ratio = Math.max(depthRatio, concRatio);
-		const colorKey: "success" | "warning" | "error" =
-			ratio >= 1 ? "error" : ratio >= 0.7 ? "warning" : "success";
+		const colorKey: "success" | "warning" | "error" = ratio >= 1 ? "error" : ratio >= 0.7 ? "warning" : "success";
 		const warn = ratio >= 1 ? "⚠ " : "";
 		const extra = s.extraActive && s.extraActive > 0 ? `+${s.extraActive}` : "";
 		const paused = s.paused ? " ⏸" : "";
-		return theme.fg(colorKey, `${warn}d${s.depth}/${s.depthCap} ⚡${s.concurrency}/${s.concurrencyCap}${extra}${paused}`);
+		return theme.fg(
+			colorKey,
+			`${warn}d${s.depth}/${s.depthCap} ⚡${s.concurrency}/${s.concurrencyCap}${extra}${paused}`,
+		);
 	}
 }
 

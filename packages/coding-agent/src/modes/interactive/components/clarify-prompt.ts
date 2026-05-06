@@ -1,11 +1,4 @@
-import {
-	Container,
-	getKeybindings,
-	type OverlayHandle,
-	Spacer,
-	Text,
-	type TUI,
-} from "@cave/tui";
+import { Container, getKeybindings, type OverlayHandle, Spacer, Text, type TUI } from "@cave/tui";
 import { theme } from "../theme/theme.js";
 
 export interface ClarifyPromptOptions {
@@ -37,11 +30,7 @@ export class ClarifyPromptComponent extends Container {
 		const choices = opts.choices ?? [];
 		const allowFree = opts.allowFreeText ?? choices.length === 0;
 		this.effectiveChoices =
-			choices.length === 0
-				? [OTHER_LABEL]
-				: allowFree
-					? [...choices, OTHER_LABEL]
-					: [...choices];
+			choices.length === 0 ? [OTHER_LABEL] : allowFree ? [...choices, OTHER_LABEL] : [...choices];
 
 		this.addChild(new Text(theme.bold(`ask ${opts.question}`), 1, 0));
 		this.addChild(new Spacer(1));
@@ -148,9 +137,7 @@ export class ClarifyPromptComponent extends Container {
 				this.listContainer.addChild(new Text(`${prefix}${numStyled} ${labelStyled}`, 1, 0));
 			}
 			this.inputText.setText("");
-			this.hintText.setText(
-				theme.fg("dim", "↑/↓ select · Enter confirm · 1-9 quick · Esc cancel"),
-			);
+			this.hintText.setText(theme.fg("dim", "↑/↓ select · Enter confirm · 1-9 quick · Esc cancel"));
 			return;
 		}
 		// typing

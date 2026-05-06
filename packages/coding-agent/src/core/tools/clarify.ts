@@ -1,5 +1,5 @@
-import { type Static, Type } from "@sinclair/typebox";
 import { Text } from "@cave/tui";
+import { type Static, Type } from "@sinclair/typebox";
 import { ClarifyPromptComponent } from "../../modes/interactive/components/clarify-prompt.js";
 import type { ToolDefinition } from "../extensions/types.js";
 
@@ -41,17 +41,20 @@ export const clarifyToolDefinition: ToolDefinition<typeof ClarifySchema, Clarify
 				details: { answer: null },
 			};
 		}
-		const answer = await ctx.ui.custom<string | null>((tui, _theme, _kb, done) => {
-			const component = new ClarifyPromptComponent({
-				question: params.question,
-				choices: params.choices,
-				allowFreeText: params.allowFreeText,
-				onSubmit: (s) => done(s),
-				onCancel: () => done(null),
-			});
-			void tui;
-			return component;
-		}, { overlay: true, overlayOptions: { anchor: "center" } });
+		const answer = await ctx.ui.custom<string | null>(
+			(tui, _theme, _kb, done) => {
+				const component = new ClarifyPromptComponent({
+					question: params.question,
+					choices: params.choices,
+					allowFreeText: params.allowFreeText,
+					onSubmit: (s) => done(s),
+					onCancel: () => done(null),
+				});
+				void tui;
+				return component;
+			},
+			{ overlay: true, overlayOptions: { anchor: "center" } },
+		);
 
 		if (signal?.aborted) {
 			return {

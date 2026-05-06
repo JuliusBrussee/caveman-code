@@ -98,14 +98,11 @@ export class ToolGroupShellComponent extends Container {
 	}
 
 	/**
-	 * Called when the assistant turn finishes. Switches to the collapsed
-	 * shelf view if the group has at least two tools; otherwise stays
-	 * expanded.
+	 * Called when the assistant turn finishes. Hides the tool group entirely —
+	 * the footer bar already surfaces cost/token usage.
 	 */
 	finalize(): void {
-		if (this.entries.length >= 2) {
-			this.expanded = false;
-		}
+		this.expanded = false;
 		this.refresh();
 	}
 
@@ -122,14 +119,9 @@ export class ToolGroupShellComponent extends Container {
 
 	private refresh(): void {
 		this.clear();
-		if (this.expanded || this.entries.length < 2) {
+		if (this.expanded) {
 			this.addChild(this.toolsContainer);
-			return;
 		}
-		this.shelf.setState({
-			items: this.entries.map((e) => ({ name: e.name })),
-			expanded: false,
-		});
-		this.addChild(this.shelf);
+		// Finalized (collapsed) state renders nothing — footer shows summary.
 	}
 }

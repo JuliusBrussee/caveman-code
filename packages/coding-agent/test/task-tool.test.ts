@@ -90,15 +90,7 @@ beforeEach(() => {
 	// Seed two simple agents.
 	writeFileSync(
 		join(cwd, ".cave", "agents", "explore.md"),
-		[
-			"---",
-			"name: explore",
-			"description: scout",
-			"tools: read, grep",
-			"---",
-			"",
-			"You are explore.",
-		].join("\n"),
+		["---", "name: explore", "description: scout", "tools: read, grep", "---", "", "You are explore."].join("\n"),
 	);
 	writeFileSync(
 		join(cwd, ".cave", "agents", "reviewer.md"),

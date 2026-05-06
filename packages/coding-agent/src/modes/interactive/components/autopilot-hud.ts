@@ -61,7 +61,8 @@ export class AutopilotHudComponent extends Container {
 			segments.push(theme.fg("warning", `⏸ ${Math.round(this.state.stallSeconds)}s stall`));
 		}
 		if (this.state.turnsSinceUserInput !== undefined && this.state.turnsSinceUserInput > 5) {
-			const colorFn = this.state.turnsSinceUserInput > 15 ? theme.fg.bind(theme, "error") : theme.fg.bind(theme, "warning");
+			const colorFn =
+				this.state.turnsSinceUserInput > 15 ? theme.fg.bind(theme, "error") : theme.fg.bind(theme, "warning");
 			segments.push(colorFn(`${this.state.turnsSinceUserInput} turns since input`));
 		}
 

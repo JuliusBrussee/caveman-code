@@ -32,7 +32,6 @@ import {
 	Loader,
 	Markdown,
 	matchesKey,
-	NULL_SUBAGENT_REGISTRY,
 	notify,
 	ProcessTerminal,
 	renderStatusLineDefault,
@@ -59,7 +58,7 @@ import {
 import { type AgentSession, type AgentSessionEvent, parseSkillBlock } from "../../core/agent-session.js";
 import type { AgentSessionRuntime } from "../../core/agent-session-runtime.js";
 import { type ArchitectModeState, defaultArchitectState } from "../../core/chat-modes/architect.js";
-import { formatInlineCostWithRates, formatSessionEndSummary } from "../../core/cost-formatter.js";
+import { formatSessionEndSummary } from "../../core/cost-formatter.js";
 import { persistSessionCost } from "../../core/cost-persistence.js";
 import type {
 	ExtensionContext,
@@ -78,6 +77,7 @@ import { formatMissingSessionCwdPrompt, MissingSessionCwdError } from "../../cor
 import { type SessionContext, SessionManager } from "../../core/session-manager.js";
 import { runActCommand } from "../../core/slash-commands/act.js";
 import { runCheckpointCommand } from "../../core/slash-commands/checkpoint.js";
+import { runGoalSlashCommand } from "../../core/slash-commands/goal.js";
 import { runMcpSlashCommand } from "../../core/slash-commands/mcp.js";
 import { runPlanCommand } from "../../core/slash-commands/plan.js";
 import { runRollbackCommand } from "../../core/slash-commands/rollback.js";
@@ -94,6 +94,7 @@ import {
 import type { SourceInfo } from "../../core/source-info.js";
 import { InMemorySubagentRegistry } from "../../core/subagents-registry.js";
 import type { TruncationResult } from "../../core/tools/truncate.js";
+import { resolveCurrentCaveInvocation } from "../../utils/cave-invocation.js";
 import { getChangelogPath, getNewEntries, parseChangelog } from "../../utils/changelog.js";
 import { copyToClipboard } from "../../utils/clipboard.js";
 import { extensionForImageMimeType, readClipboardImage } from "../../utils/clipboard-image.js";
@@ -315,10 +316,6 @@ export class InteractiveMode {
 	private extensionWidgetsBelow = new Map<string, Component & { dispose?(): void }>();
 	private widgetContainerAbove!: Container;
 	private widgetContainerBelow!: Container;
-
-	// Smoke Signal: per-turn token tracking for cave mode dashboard
-	private smokeSignalTurnCount = 0;
-	private smokeSignalTotalTokens = 0;
 
 	// Tribal Signal: context drift warning state
 	private tribalSignalAmberFired = false;
@@ -2408,6 +2405,12 @@ export class InteractiveMode {
 				await this.handleRollbackSlashCommand(args);
 				return;
 			}
+			if (text === "/goal" || text.startsWith("/goal ")) {
+				const args = text.startsWith("/goal ") ? text.slice(6) : "";
+				this.editor.setText("");
+				await this.handleGoalSlashCommand(args);
+				return;
+			}
 			if (text === "/plan" || text.startsWith("/plan ")) {
 				const args = text.startsWith("/plan ") ? text.slice(6) : "";
 				this.editor.setText("");
@@ -2637,21 +2640,6 @@ export class InteractiveMode {
 						this.currentToolGroup = undefined;
 					}
 					this.streamingComponent = undefined;
-					// WS19: render inline cost after each successful assistant message
-					if (event.message.role === "assistant") {
-						const assistantMsg = event.message;
-						const u = assistantMsg.usage;
-						const pricingKnown = u.cost.total > 0;
-						const inlineLine = formatInlineCostWithRates({
-							dollarsTotal: u.cost.total,
-							pricingKnown,
-							dollarsCachedRead: u.cost.cacheRead,
-							cachedInput: u.cacheRead,
-							inputTokens: u.input,
-							outputTokens: u.output,
-						});
-						this.chatContainer.addChild(new Text(theme.fg("dim", inlineLine), 1, 0));
-					}
 					this.streamingMessage = undefined;
 					this.footer.invalidate();
 				}
@@ -2833,11 +2821,6 @@ export class InteractiveMode {
 			}
 
 			case "checkpoint_taken": {
-				// Gap 6: surface auto-checkpoint boundaries as a dim transcript line
-				// so the user can see where they can `cave rollback` to.
-				this.showStatus(
-					`▽ checkpoint @ ${event.toolName} · ${event.fileCount} file${event.fileCount === 1 ? "" : "s"} · #${event.checkpointId.slice(0, 8)}`,
-				);
 				break;
 			}
 
@@ -4507,6 +4490,22 @@ export class InteractiveMode {
 		this.appendSlashOutput(result.output, result.exitCode !== 0);
 	}
 
+	private async handleGoalSlashCommand(args: string): Promise<void> {
+		const result = await runGoalSlashCommand(args, {
+			cwd: this.sessionManager.getCwd(),
+			spawnDriver: (id) => {
+				const invocation = resolveCurrentCaveInvocation();
+				const child = spawn(invocation.command, [...invocation.argsPrefix, "goal", "resume", id], {
+					cwd: this.sessionManager.getCwd(),
+					detached: true,
+					stdio: "ignore",
+				});
+				child.unref();
+			},
+		});
+		this.appendSlashOutput(result.output, result.exitCode !== 0);
+	}
+
 	private handlePlanSlashCommand(args: string): void {
 		const result = runPlanCommand(args, {
 			getChatMode: () => this.session.chatMode,
@@ -5469,26 +5468,7 @@ export class InteractiveMode {
 	}
 
 	private updateSmokeSignal(): void {
-		const caveState = this.session.getCaveModeSessionState();
-		if (!caveState.enabled) {
-			this.setExtensionWidget("smoke-signal", undefined);
-			return;
-		}
-
-		const stats = this.session.getSessionStats();
-		this.smokeSignalTurnCount++;
-		this.smokeSignalTotalTokens += stats.tokens.input + stats.tokens.output;
-
-		const avgPerTurn =
-			this.smokeSignalTurnCount > 0 ? Math.round(this.smokeSignalTotalTokens / this.smokeSignalTurnCount) : 0;
-		const avgStr = avgPerTurn >= 1000 ? `${(avgPerTurn / 1000).toFixed(1)}k` : `${avgPerTurn}`;
-		const costStr = `$${stats.cost.toFixed(3)}`;
-
-		const contextUsage = stats.contextUsage;
-		const ctxStr = contextUsage?.percent != null ? `${Math.round(contextUsage.percent)}%` : "?";
-
-		const line = theme.fg("dim", `avg ${avgStr}/turn  cost ${costStr}  ctx ${ctxStr}  cave:${caveState.intensity}`);
-		this.setExtensionWidget("smoke-signal", [line], { placement: "belowEditor" });
+		this.setExtensionWidget("smoke-signal", undefined);
 	}
 
 	private updateTribalSignal(): void {

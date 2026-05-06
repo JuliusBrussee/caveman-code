@@ -1,12 +1,4 @@
-import {
-	Container,
-	getKeybindings,
-	type OverlayHandle,
-	Spacer,
-	Text,
-	type TUI,
-	truncateToWidth,
-} from "@cave/tui";
+import { Container, getKeybindings, type OverlayHandle, Spacer, Text, type TUI, truncateToWidth } from "@cave/tui";
 import { theme } from "../theme/theme.js";
 
 export type QueuedMode = "steer" | "followUp";
@@ -43,14 +35,7 @@ export class QueuedMessagesComponent extends Container {
 		this.addChild(this.listContainer);
 		this.addChild(new Spacer(1));
 		this.addChild(
-			new Text(
-				theme.fg(
-					"dim",
-					"↑/↓ select · Enter edit · Del remove · Tab switch mode · Esc cancel",
-				),
-				1,
-				0,
-			),
+			new Text(theme.fg("dim", "↑/↓ select · Enter edit · Del remove · Tab switch mode · Esc cancel"), 1, 0),
 		);
 		this.refreshList();
 	}
@@ -118,16 +103,13 @@ export class QueuedMessagesComponent extends Container {
 			const item = this.items[i];
 			const isSelected = i === this.selected;
 			const num = `${i + 1}.`;
-			const tag =
-				item.mode === "steer" ? theme.fg("warning", "[steer]   ") : theme.fg("muted", "[followUp]");
+			const tag = item.mode === "steer" ? theme.fg("warning", "[steer]   ") : theme.fg("muted", "[followUp]");
 			const flat = item.text.replace(/\s+/g, " ").trim();
 			const line = truncateToWidth(flat, budget, "…");
 			const prefix = isSelected ? theme.fg("accent", "▸ ") : "  ";
 			const numStyled = isSelected ? theme.fg("accent", num) : theme.fg("dim", num);
 			const lineStyled = isSelected ? theme.fg("accent", line) : theme.fg("text", line);
-			this.listContainer.addChild(
-				new Text(`${prefix}${numStyled} ${tag} ${lineStyled}`, 1, 0),
-			);
+			this.listContainer.addChild(new Text(`${prefix}${numStyled} ${tag} ${lineStyled}`, 1, 0));
 		}
 	}
 }

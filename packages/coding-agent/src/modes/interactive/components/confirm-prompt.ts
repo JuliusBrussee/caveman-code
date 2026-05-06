@@ -38,13 +38,7 @@ export class ConfirmPromptComponent extends Container {
 		this.listContainer = new Container();
 		this.addChild(this.listContainer);
 		this.addChild(new Spacer(1));
-		this.addChild(
-			new Text(
-				theme.fg("dim", "↑/↓ select · Enter confirm · Y/N quick · Esc cancel"),
-				1,
-				0,
-			),
-		);
+		this.addChild(new Text(theme.fg("dim", "↑/↓ select · Enter confirm · Y/N quick · Esc cancel"), 1, 0));
 		this.addChild(new Text(theme.fg(borderColor, doubleBorderBottom()), 0, 0));
 		this.updateList();
 	}

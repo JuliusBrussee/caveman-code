@@ -50,9 +50,7 @@ export class StartupHeaderComponent extends Container {
 
 		if (caveModeEnabled) {
 			const compression = caveModeIntensity ?? "enabled";
-			this.addChild(
-				new Text(theme.fg("accent", `cave mode: active | compression: ${compression}`), 1, 0),
-			);
+			this.addChild(new Text(theme.fg("accent", `cave mode: active | compression: ${compression}`), 1, 0));
 		}
 	}
 }

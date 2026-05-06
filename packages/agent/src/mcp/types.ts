@@ -7,7 +7,6 @@
 //   user may pass through.
 //
 
-
 export type McpTransportKind = "stdio" | "http" | "inproc";
 
 /** OAuth 2.1 + PKCE config (matches pi-mcp-adapter shape). */

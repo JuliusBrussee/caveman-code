@@ -34,7 +34,13 @@ describe("memory tools (native)", () => {
 		const saveDef = createMemorySaveToolDefinition(provider);
 		const searchDef = createMemorySearchToolDefinition(provider);
 
-		const saved = await saveDef.execute("call-1", { content: "the magic word is xyzzy" }, undefined, undefined, execCtx());
+		const saved = await saveDef.execute(
+			"call-1",
+			{ content: "the magic word is xyzzy" },
+			undefined,
+			undefined,
+			execCtx(),
+		);
 		expect(saved.details?.available).toBe(true);
 		const text = (saved.content[0] as { text: string }).text;
 		expect(text).toMatch(/Saved/);
@@ -48,7 +54,13 @@ describe("memory tools (native)", () => {
 
 	it("memory_search reports zero hits cleanly", async () => {
 		const searchDef = createMemorySearchToolDefinition(provider);
-		const r = await searchDef.execute("call-3", { query: "absolutely-nothing-here" }, undefined, undefined, execCtx());
+		const r = await searchDef.execute(
+			"call-3",
+			{ query: "absolutely-nothing-here" },
+			undefined,
+			undefined,
+			execCtx(),
+		);
 		expect(r.details?.available).toBe(true);
 		expect(r.details?.hitCount).toBe(0);
 	});

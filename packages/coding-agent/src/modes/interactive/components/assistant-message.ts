@@ -76,13 +76,7 @@ export class AssistantMessageComponent extends Container {
 					.some((c) => (c.type === "text" && c.text.trim()) || (c.type === "thinking" && c.thinking.trim()));
 
 				if (this.hideThinkingBlock) {
-					// Collapsed thinking label
-					this.contentContainer.addChild(
-						new Text(theme.italic(theme.fg("thinkingText", this.hiddenThinkingLabel)), 1, 0),
-					);
-					if (hasVisibleContentAfter) {
-						this.contentContainer.addChild(new Spacer(1));
-					}
+					// Thinking block suppressed — no placeholder label.
 				} else {
 					// Visible thinking — left-bordered block
 					const thinkingMd = new Markdown(content.thinking.trim(), 1, 0, this.markdownTheme, {
