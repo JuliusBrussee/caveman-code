@@ -32,6 +32,7 @@ syntax.jsonl
 out.jsonl
 pi-*.html
 cave-session-*.html
+.cave/goal/
 out.html
 packages/coding-agent/binaries/
 todo.md
