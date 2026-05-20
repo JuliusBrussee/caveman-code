@@ -1,5 +1,5 @@
-import type { AssistantMessage } from "@cave/ai";
-import type { ExtensionAPI } from "cave";
+import type { AssistantMessage } from "@juliusbrussee/caveman-ai";
+import type { ExtensionAPI } from "@juliusbrussee/caveman-code";
 
 function isAssistantMessage(message: unknown): message is AssistantMessage {
 	if (!message || typeof message !== "object") return false;

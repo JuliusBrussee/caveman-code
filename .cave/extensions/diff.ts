@@ -5,9 +5,9 @@
  * the selected file in VS Code's diff view.
  */
 
-import type { ExtensionAPI } from "cave";
-import { DynamicBorder } from "cave";
-import { Container, Key, matchesKey, type SelectItem, SelectList, Text } from "@cave/tui";
+import type { ExtensionAPI } from "@juliusbrussee/caveman-code";
+import { DynamicBorder } from "@juliusbrussee/caveman-code";
+import { Container, Key, matchesKey, type SelectItem, SelectList, Text } from "@juliusbrussee/caveman-tui";
 
 interface FileInfo {
 	status: string;
