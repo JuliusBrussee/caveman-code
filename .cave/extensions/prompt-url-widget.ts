@@ -1,5 +1,5 @@
-import { DynamicBorder, type ExtensionAPI, type ExtensionContext } from "cave";
-import { Container, Text } from "@cave/tui";
+import { DynamicBorder, type ExtensionAPI, type ExtensionContext } from "@juliusbrussee/caveman-code";
+import { Container, Text } from "@juliusbrussee/caveman-tui";
 
 const PR_PROMPT_PATTERN = /^\s*You are given one or more GitHub PR URLs:\s*(\S+)/im;
 const ISSUE_PROMPT_PATTERN = /^\s*Analyze GitHub issue\(s\):\s*(\S+)/im;
