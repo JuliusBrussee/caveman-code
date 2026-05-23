@@ -29,6 +29,7 @@ import { parseStreamingJson } from "../utils/json-parse.js";
 import { sanitizeSurrogates } from "../utils/sanitize-unicode.js";
 
 import { getAnthropicCapabilities, supportsAdaptiveThinking } from "./anthropic-capabilities.js";
+import { discoverAnthropicCapabilities } from "./anthropic-discovery.js";
 import { buildCopilotDynamicHeaders, hasCopilotVisionInput } from "./github-copilot-headers.js";
 import { adjustMaxTokensForThinking, buildBaseOptions } from "./simple-options.js";
 import { transformMessages } from "./transform-messages.js";
@@ -232,6 +233,15 @@ export const streamAnthropic: StreamFunction<"anthropic-messages", AnthropicOpti
 				isOAuth = false;
 			} else {
 				const apiKey = options?.apiKey ?? getEnvApiKey(model.provider) ?? "";
+
+				// Discover real per-account capabilities before building the
+				// request so the first call uses the right thinking schema,
+				// reasoning_effort ceiling, and context window. Memoized per
+				// (provider, baseUrl) for the rest of the process; subsequent
+				// calls resolve from cache immediately.
+				if (apiKey) {
+					await discoverAnthropicCapabilities(model.provider, model.baseUrl, apiKey);
+				}
 
 				let copilotDynamicHeaders: Record<string, string> | undefined;
 				if (model.provider === "github-copilot") {
@@ -520,7 +530,7 @@ function createClient(
 ): { client: Anthropic; isOAuthToken: boolean } {
 	// Adaptive thinking models (Opus 4.6, Sonnet 4.6) have interleaved thinking built-in.
 	// The beta header is deprecated on Opus 4.6 and redundant on Sonnet 4.6, so skip it.
-	const needsInterleavedBeta = interleavedThinking && !supportsAdaptiveThinking(model.id);
+	const needsInterleavedBeta = interleavedThinking && !supportsAdaptiveThinking(model.id, model.provider);
 
 	// Opt into per-model capability betas (e.g. 1M context window).
 	const caps = getAnthropicCapabilities(model.id, model.provider);
