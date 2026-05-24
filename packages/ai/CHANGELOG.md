@@ -4,6 +4,8 @@
 
 ### Fixed
 
+- Fixed Anthropic adaptive-thinking rejection on `claude-opus-4-7` (and the `opus-4-6` family more generally): the request builder now consults a per-(provider, model) capability table and emits the adaptive `thinking.type=adaptive` + `output_config.effort` shape for any model that requires it, instead of the legacy `thinking.type=enabled` + `budget_tokens` shape ([#11](https://github.com/JuliusBrussee/caveman-code/issues/11))
+- Fixed Anthropic 1M context tier not being opted into for `claude-opus-4-5` on the direct Anthropic API and Bedrock: the provider now sends `anthropic-beta: context-1m-2025-08-07` for that family and the model registry overrides its `contextWindow` to 1_000_000 so the modeline / picker / compaction logic see the real ceiling. The opt-in is provider-scoped: the GitHub Copilot Anthropic relay rejects this beta header and exposes 1M-context Claude models as separate model ids instead, so the beta is not sent on Copilot. Discovery of those Copilot-only model ids is out of scope for this PR; a follow-up runtime-discovery layer will surface them ([#12](https://github.com/JuliusBrussee/caveman-code/issues/12))
 - Fixed bare `readline` import to use `node:readline` prefix for Deno compatibility ([#2885](https://github.com/badlogic/pi-mono/issues/2885) by [@milosv-vtool](https://github.com/milosv-vtool))
 
 ## [0.65.2] - 2026-04-06

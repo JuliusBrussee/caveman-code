@@ -1,13 +1,34 @@
 import { MODELS } from "./models.generated.js";
+import { getAnthropicCapabilities } from "./providers/anthropic-capabilities.js";
 import type { Api, KnownProvider, Model, Usage } from "./types.js";
 
 const modelRegistry: Map<string, Map<string, Model<Api>>> = new Map();
+
+/**
+ * Apply per-model capability overrides at registry-load time.
+ *
+ * The generated `models.generated.ts` mirrors what the provider reports for
+ * the default tier (e.g. Anthropic's 200k window for Opus 4.5). When the
+ * capability table declares a beta opt-in that unlocks a larger window, the
+ * registry should advertise that window so the UI (modeline, picker) and
+ * compaction logic operate against the real ceiling we will request.
+ */
+function applyCapabilityOverrides(model: Model<Api>): Model<Api> {
+	if (model.api !== "anthropic-messages" && model.api !== "bedrock-converse-stream") {
+		return model;
+	}
+	const caps = getAnthropicCapabilities(model.id, model.provider);
+	if (caps.contextWindow && caps.contextWindow !== model.contextWindow) {
+		return { ...model, contextWindow: caps.contextWindow };
+	}
+	return model;
+}
 
 // Initialize registry from MODELS on module load
 for (const [provider, models] of Object.entries(MODELS)) {
 	const providerModels = new Map<string, Model<Api>>();
 	for (const [id, model] of Object.entries(models)) {
-		providerModels.set(id, model as Model<Api>);
+		providerModels.set(id, applyCapabilityOverrides(model as Model<Api>));
 	}
 	modelRegistry.set(provider, providerModels);
 }
@@ -62,7 +83,7 @@ export function supportsXhigh<TApi extends Api>(model: Model<TApi>): boolean {
 		return true;
 	}
 
-	if (model.id.includes("opus-4-6") || model.id.includes("opus-4.6")) {
+	if (getAnthropicCapabilities(model.id, model.provider).xhighEffort) {
 		return true;
 	}
 

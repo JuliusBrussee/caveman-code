@@ -28,6 +28,7 @@ import { AssistantMessageEventStream } from "../utils/event-stream.js";
 import { parseStreamingJson } from "../utils/json-parse.js";
 import { sanitizeSurrogates } from "../utils/sanitize-unicode.js";
 
+import { getAnthropicCapabilities, supportsAdaptiveThinking } from "./anthropic-capabilities.js";
 import { buildCopilotDynamicHeaders, hasCopilotVisionInput } from "./github-copilot-headers.js";
 import { adjustMaxTokensForThinking, buildBaseOptions } from "./simple-options.js";
 import { transformMessages } from "./transform-messages.js";
@@ -441,23 +442,14 @@ export const streamAnthropic: StreamFunction<"anthropic-messages", AnthropicOpti
 };
 
 /**
- * Check if a model supports adaptive thinking (Opus 4.6 and Sonnet 4.6)
- */
-function supportsAdaptiveThinking(modelId: string): boolean {
-	// Opus 4.6 and Sonnet 4.6 model IDs (with or without date suffix)
-	return (
-		modelId.includes("opus-4-6") ||
-		modelId.includes("opus-4.6") ||
-		modelId.includes("sonnet-4-6") ||
-		modelId.includes("sonnet-4.6")
-	);
-}
-
-/**
  * Map ThinkingLevel to Anthropic effort levels for adaptive thinking.
- * Note: effort "max" is only valid on Opus 4.6.
+ * Note: effort "max" is only valid on models whose capability table
+ * entry sets `xhighEffort: true` (today: Opus 4.6 / 4.7).
  */
-function mapThinkingLevelToEffort(level: SimpleStreamOptions["reasoning"], modelId: string): AnthropicEffort {
+function mapThinkingLevelToEffort(
+	level: SimpleStreamOptions["reasoning"],
+	model: Model<"anthropic-messages">,
+): AnthropicEffort {
 	switch (level) {
 		case "minimal":
 			return "low";
@@ -468,7 +460,7 @@ function mapThinkingLevelToEffort(level: SimpleStreamOptions["reasoning"], model
 		case "high":
 			return "high";
 		case "xhigh":
-			return modelId.includes("opus-4-6") || modelId.includes("opus-4.6") ? "max" : "high";
+			return getAnthropicCapabilities(model.id, model.provider).xhighEffort ? "max" : "high";
 		default:
 			return "high";
 	}
@@ -491,8 +483,8 @@ export const streamSimpleAnthropic: StreamFunction<"anthropic-messages", SimpleS
 
 	// For Opus 4.6 and Sonnet 4.6: use adaptive thinking with effort level
 	// For older models: use budget-based thinking
-	if (supportsAdaptiveThinking(model.id)) {
-		const effort = mapThinkingLevelToEffort(options.reasoning, model.id);
+	if (supportsAdaptiveThinking(model.id, model.provider)) {
+		const effort = mapThinkingLevelToEffort(options.reasoning, model);
 		return streamAnthropic(model, context, {
 			...base,
 			thinkingEnabled: true,
@@ -530,12 +522,20 @@ function createClient(
 	// The beta header is deprecated on Opus 4.6 and redundant on Sonnet 4.6, so skip it.
 	const needsInterleavedBeta = interleavedThinking && !supportsAdaptiveThinking(model.id);
 
+	// Opt into per-model capability betas (e.g. 1M context window).
+	const caps = getAnthropicCapabilities(model.id, model.provider);
+	const extraBetas: string[] = [];
+	if (caps.contextBeta) {
+		extraBetas.push(caps.contextBeta);
+	}
+
 	// Copilot: Bearer auth, selective betas (no fine-grained-tool-streaming)
 	if (model.provider === "github-copilot") {
 		const betaFeatures: string[] = [];
 		if (needsInterleavedBeta) {
 			betaFeatures.push("interleaved-thinking-2025-05-14");
 		}
+		betaFeatures.push(...extraBetas);
 
 		const client = new Anthropic({
 			apiKey: null,
@@ -561,6 +561,7 @@ function createClient(
 	if (needsInterleavedBeta) {
 		betaFeatures.push("interleaved-thinking-2025-05-14");
 	}
+	betaFeatures.push(...extraBetas);
 
 	// OAuth: Bearer auth, Claude Code identity headers
 	if (isOAuthToken(apiKey)) {
@@ -658,7 +659,7 @@ function buildParams(
 	// budget-based (older models), or explicitly disabled.
 	if (model.reasoning) {
 		if (options?.thinkingEnabled) {
-			if (supportsAdaptiveThinking(model.id)) {
+			if (supportsAdaptiveThinking(model.id, model.provider)) {
 				// Adaptive thinking: Claude decides when and how much to think
 				params.thinking = { type: "adaptive" };
 				if (options.effort) {
