@@ -57,7 +57,7 @@
 		"@sinclair/typebox": "^0.34.49",
 		"@silvia-odwyer/photon-node": "^0.3.4",
 		"ajv": "^8.17.1",
-		"better-sqlite3": "^11.7.0",
+		"better-sqlite3": "^12.10.0",
 		"chalk": "^5.5.0",
 		"cli-highlight": "^2.1.11",
 		"diff": "^8.0.2",
@@ -84,7 +84,7 @@
 		"@mariozechner/clipboard": "^0.3.2"
 	},
 	"devDependencies": {
-		"@types/better-sqlite3": "^7.6.12",
+		"@types/better-sqlite3": "^7.6.13",
 		"@types/diff": "^7.0.2",
 		"@types/hosted-git-info": "^3.0.5",
 		"@types/ms": "^2.1.0",
@@ -111,7 +111,7 @@
 		"directory": "packages/coding-agent"
 	},
 	"engines": {
-		"node": ">=20.6.0"
+		"node": "^20.6.0 || ^22.0.0 || ^24.0.0 || ^26.0.0"
 	},
 	"homepage": "https://github.com/JuliusBrussee/caveman-code#readme",
 	"bugs": {
