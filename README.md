@@ -300,7 +300,7 @@ TypeScript monorepo, 9 packages — full layout in [CLAUDE.md](CLAUDE.md).
 
 ## Acknowledgements
 
-**Caveman Code is a heavy fork of [pi-code](https://github.com/badlogic/pi-code) by [Mario Zechner](https://github.com/badlogic).** We track upstream and contribute fixes back where generally useful.
+**Caveman Code is a heavy fork of [pi-code](https://github.com/earendil-works/pi) by [Mario Zechner](https://github.com/badlogic).** We track upstream and contribute fixes back where generally useful.
 
 | From `pi-code` (upstream) | Caveman Code's own work |
 |---|---|
