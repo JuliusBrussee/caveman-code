@@ -129,19 +129,43 @@ interface CopilotModelEntry {
 	};
 }
 
+// Copilot's /models endpoint is served by a different proxy than chat. Some
+// accounts (individual/business/enterprise) get HTTP 421 "Misdirected
+// Request" on the host that serves chat. Try the configured host first,
+// then fall back to canonical hosts so discovery succeeds regardless of
+// which Copilot tier the user is on.
+const COPILOT_DISCOVERY_FALLBACK_HOSTS = [
+	"https://api.githubcopilot.com",
+	"https://api.individual.githubcopilot.com",
+	"https://api.business.githubcopilot.com",
+	"https://api.enterprise.githubcopilot.com",
+];
+
 async function discoverCopilot(baseUrl: string, apiKey: string, extraHeaders?: Record<string, string>): Promise<void> {
-	const res = await fetch(`${baseUrl}/models`, {
-		method: "GET",
-		headers: {
-			Authorization: `Bearer ${apiKey}`,
-			"User-Agent": "GitHubCopilotChat/0.35.0",
-			"Editor-Version": "vscode/1.107.0",
-			"Editor-Plugin-Version": "copilot-chat/0.35.0",
-			"Copilot-Integration-Id": "vscode-chat",
-			...extraHeaders,
-		},
-	});
-	if (!res.ok) return;
+	const headers = {
+		Authorization: `Bearer ${apiKey}`,
+		"User-Agent": "GitHubCopilotChat/0.35.0",
+		"Editor-Version": "vscode/1.107.0",
+		"Editor-Plugin-Version": "copilot-chat/0.35.0",
+		"Copilot-Integration-Id": "vscode-chat",
+		...extraHeaders,
+	};
+	const hosts = [baseUrl, ...COPILOT_DISCOVERY_FALLBACK_HOSTS.filter((h) => h !== baseUrl)];
+	let res: Response | undefined;
+	let workingHost = baseUrl;
+	for (const host of hosts) {
+		try {
+			const r = await fetch(`${host}/models`, { method: "GET", headers });
+			if (r.ok) {
+				res = r;
+				workingHost = host;
+				break;
+			}
+		} catch {
+			// try next host
+		}
+	}
+	if (!res) return;
 	const body = (await res.json()) as { data?: CopilotModelEntry[] };
 	const entries = body?.data ?? [];
 
@@ -159,10 +183,16 @@ async function discoverCopilot(baseUrl: string, apiKey: string, extraHeaders?: R
 		const efforts = sup.reasoning_effort ?? [];
 		const xhighEffort = efforts.includes("max") || efforts.includes("xhigh");
 
+		// Use max_prompt_tokens (real input cap) for contextWindow, not
+		// max_context_window_tokens (input+output+cache total). Compaction
+		// compares against the input budget and the provider rejects
+		// requests over max_prompt_tokens.
+		const promptCap = lim.max_prompt_tokens ?? lim.max_context_window_tokens;
+
 		setDiscoveredCapabilities("github-copilot", entry.id, {
 			thinkingSchema: adaptive ? "adaptive" : "legacy",
 			xhighEffort: xhighEffort || undefined,
-			contextWindow: lim.max_context_window_tokens,
+			contextWindow: promptCap,
 		});
 
 		// Build a registry entry so previously-unknown ids (e.g.
@@ -172,7 +202,7 @@ async function discoverCopilot(baseUrl: string, apiKey: string, extraHeaders?: R
 			name: entry.name || entry.id,
 			api: "anthropic-messages",
 			provider: "github-copilot",
-			baseUrl,
+			baseUrl: workingHost,
 			headers: {
 				"User-Agent": "GitHubCopilotChat/0.35.0",
 				"Editor-Version": "vscode/1.107.0",
@@ -182,7 +212,7 @@ async function discoverCopilot(baseUrl: string, apiKey: string, extraHeaders?: R
 			reasoning: adaptive,
 			input: sup.vision ? ["text", "image"] : ["text"],
 			cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
-			contextWindow: lim.max_context_window_tokens ?? 128000,
+			contextWindow: promptCap ?? 128000,
 			maxTokens: lim.max_output_tokens ?? 8192,
 		});
 	}
