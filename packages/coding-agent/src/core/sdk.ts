@@ -134,6 +134,16 @@ function getDefaultAgentDir(): string {
 }
 
 /**
+ * Parse the CAVE_STREAM_IDLE_TIMEOUT_MS override. Returns a non-negative integer
+ * (0 disables the watchdog) or undefined to fall back to the loop default (120s).
+ */
+function parseStreamIdleTimeoutEnv(raw: string | undefined): number | undefined {
+	if (raw === undefined || raw.trim() === "") return undefined;
+	const n = Number(raw);
+	return Number.isFinite(n) && n >= 0 ? Math.floor(n) : undefined;
+}
+
+/**
  * Create an AgentSession with the specified options.
  *
  * @example
@@ -338,6 +348,9 @@ export async function createAgentSession(options: CreateAgentSessionOptions = {}
 		thinkingBudgets: settingsManager.getThinkingBudgets(),
 		maxRetryDelayMs: settingsManager.getRetrySettings().maxDelayMs,
 		maxTurns: options.maxTurns,
+		// Optional override for the stream inactivity watchdog (ms). Lets you set a
+		// short window to exercise the hang-recovery path. Falsy/invalid → loop default.
+		streamIdleTimeoutMs: parseStreamIdleTimeoutEnv(process.env.CAVE_STREAM_IDLE_TIMEOUT_MS),
 	});
 
 	// Restore messages if session has existing data

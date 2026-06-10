@@ -113,6 +113,8 @@ export interface AgentOptions {
 	toolExecution?: ToolExecutionMode;
 	/** Hard cap on assistant turns within a single run. */
 	maxTurns?: number;
+	/** Inactivity watchdog for streaming responses, in ms (default 120000; 0 disables). */
+	streamIdleTimeoutMs?: number;
 	/** Optional model router for resolving models per outbound LLM call. */
 	router?: ModelRouter;
 	/** Current role for routing decisions. Required when router is set. */
@@ -202,6 +204,8 @@ export class Agent {
 	public role?: Role;
 	/** Optional cap on assistant turns within a single run. */
 	public maxTurns?: number;
+	/** Inactivity watchdog for streaming responses, in ms (default 120000; 0 disables). */
+	public streamIdleTimeoutMs?: number;
 
 	constructor(options: AgentOptions = {}) {
 		this._state = createMutableAgentState(options.initialState);
@@ -224,6 +228,7 @@ export class Agent {
 		this.router = options.router;
 		this.role = options.role;
 		this.maxTurns = options.maxTurns;
+		this.streamIdleTimeoutMs = options.streamIdleTimeoutMs;
 	}
 
 	/**
@@ -441,6 +446,7 @@ export class Agent {
 			maxRetryDelayMs: this.maxRetryDelayMs,
 			toolExecution: this.toolExecution,
 			maxTurns: this.maxTurns,
+			streamIdleTimeoutMs: this.streamIdleTimeoutMs,
 			beforeToolCall: this.beforeToolCall,
 			afterToolCall: this.afterToolCall,
 			getSystemPrompt: this.getSystemPrompt,
