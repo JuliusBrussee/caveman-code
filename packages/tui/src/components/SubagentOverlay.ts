@@ -7,8 +7,11 @@
  * WS6 lands, `setRegistry()` will receive a real registry and the overlay
  * begins rendering rows.
  */
+import { formatElapsed } from "../format-elapsed.js";
 import type { Component } from "../tui.js";
 import { visibleWidth } from "../utils.js";
+
+export { formatElapsed };
 
 export interface SubagentSnapshot {
 	id: string;
@@ -167,11 +170,3 @@ export class SubagentOverlay implements Component {
 	}
 }
 
-export function formatElapsed(ms: number): string {
-	if (ms < 1000) return `${ms}ms`;
-	const s = Math.floor(ms / 1000);
-	if (s < 60) return `${s}s`;
-	const m = Math.floor(s / 60);
-	const rs = s % 60;
-	return `${m}m${rs.toString().padStart(2, "0")}s`;
-}
