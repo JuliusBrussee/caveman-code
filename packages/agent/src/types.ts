@@ -232,6 +232,15 @@ export interface AgentLoopConfig extends SimpleStreamOptions {
 	maxTurns?: number;
 
 	/**
+	 * Inactivity watchdog for a streaming model response, in milliseconds. If
+	 * the provider sends no data for this long mid-stream, the request is aborted
+	 * and surfaced as a retryable `error` message instead of hanging forever
+	 * (no socket/idle timeout exists otherwise). Defaults to 120000; set to 0 to
+	 * disable.
+	 */
+	streamIdleTimeoutMs?: number;
+
+	/**
 	 * Called before a tool is executed, after arguments have been validated.
 	 *
 	 * Return `{ block: true }` to prevent execution. The loop emits an error tool result instead.

@@ -9,6 +9,7 @@ import {
 	EventStream,
 	streamSimple,
 	type ToolResultMessage,
+	type Usage,
 	validateToolArguments,
 } from "@juliusbrussee/caveman-ai";
 import type {
@@ -21,8 +22,26 @@ import type {
 	AgentToolResult,
 	StreamFn,
 } from "./types.js";
+import { StreamIdleTimeoutError, withIdleTimeout } from "./utils/idle-timeout.js";
 
 export type AgentEventSink = (event: AgentEvent) => Promise<void> | void;
+
+/**
+ * Default inactivity window for a streaming model response. If the provider
+ * sends no data for this long mid-stream, the request is aborted and surfaced
+ * as a retryable error rather than hanging forever. Override per-run via
+ * `AgentLoopConfig.streamIdleTimeoutMs`; set to 0 to disable.
+ */
+const DEFAULT_STREAM_IDLE_TIMEOUT_MS = 120_000;
+
+const EMPTY_USAGE: Usage = {
+	input: 0,
+	output: 0,
+	cacheRead: 0,
+	cacheWrite: 0,
+	totalTokens: 0,
+	cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 },
+};
 
 /**
  * Start an agent loop with a new prompt message.
@@ -300,59 +319,95 @@ async function streamAssistantResponse(
 	const resolvedApiKey =
 		(config.getApiKey ? await config.getApiKey(config.model.provider) : undefined) || config.apiKey;
 
+	// Inactivity watchdog: if the provider stops sending data mid-stream the
+	// consumer would otherwise park forever (no socket/idle timeout anywhere in
+	// the stack). Link a watchdog AbortController with the run signal so a trip
+	// tears down the underlying request, then surface a retryable error.
+	const idleMs = config.streamIdleTimeoutMs ?? DEFAULT_STREAM_IDLE_TIMEOUT_MS;
+	const watchdog = idleMs > 0 ? new AbortController() : undefined;
+	const streamSignal = watchdog ? (signal ? AbortSignal.any([signal, watchdog.signal]) : watchdog.signal) : signal;
+
 	const response = await streamFunction(resolvedModel, llmContext, {
 		...config,
 		apiKey: resolvedApiKey,
-		signal,
+		signal: streamSignal,
 	});
 
 	let partialMessage: AssistantMessage | null = null;
 	let addedPartial = false;
 
-	for await (const event of response) {
-		switch (event.type) {
-			case "start":
-				partialMessage = event.partial;
-				context.messages.push(partialMessage);
-				addedPartial = true;
-				await emit({ type: "message_start", message: { ...partialMessage } });
-				break;
-
-			case "text_start":
-			case "text_delta":
-			case "text_end":
-			case "thinking_start":
-			case "thinking_delta":
-			case "thinking_end":
-			case "toolcall_start":
-			case "toolcall_delta":
-			case "toolcall_end":
-				if (partialMessage) {
+	try {
+		for await (const event of withIdleTimeout(response, idleMs, () => watchdog?.abort())) {
+			switch (event.type) {
+				case "start":
 					partialMessage = event.partial;
-					context.messages[context.messages.length - 1] = partialMessage;
-					await emit({
-						type: "message_update",
-						assistantMessageEvent: event,
-						message: { ...partialMessage },
-					});
-				}
-				break;
+					context.messages.push(partialMessage);
+					addedPartial = true;
+					await emit({ type: "message_start", message: { ...partialMessage } });
+					break;
 
-			case "done":
-			case "error": {
-				const finalMessage = await response.result();
-				if (addedPartial) {
-					context.messages[context.messages.length - 1] = finalMessage;
-				} else {
-					context.messages.push(finalMessage);
+				case "text_start":
+				case "text_delta":
+				case "text_end":
+				case "thinking_start":
+				case "thinking_delta":
+				case "thinking_end":
+				case "toolcall_start":
+				case "toolcall_delta":
+				case "toolcall_end":
+					if (partialMessage) {
+						partialMessage = event.partial;
+						context.messages[context.messages.length - 1] = partialMessage;
+						await emit({
+							type: "message_update",
+							assistantMessageEvent: event,
+							message: { ...partialMessage },
+						});
+					}
+					break;
+
+				case "done":
+				case "error": {
+					const finalMessage = await response.result();
+					if (addedPartial) {
+						context.messages[context.messages.length - 1] = finalMessage;
+					} else {
+						context.messages.push(finalMessage);
+					}
+					if (!addedPartial) {
+						await emit({ type: "message_start", message: { ...finalMessage } });
+					}
+					await emit({ type: "message_end", message: finalMessage });
+					return finalMessage;
 				}
-				if (!addedPartial) {
-					await emit({ type: "message_start", message: { ...finalMessage } });
-				}
-				await emit({ type: "message_end", message: finalMessage });
-				return finalMessage;
 			}
 		}
+	} catch (err) {
+		if (err instanceof StreamIdleTimeoutError) {
+			// Provider went silent mid-stream. The watchdog already aborted the
+			// request; surface a retryable error message so the session's
+			// auto-retry can re-issue the turn instead of hanging.
+			const errorMessage: AssistantMessage = {
+				role: "assistant",
+				content: partialMessage?.content ?? [],
+				api: resolvedModel.api,
+				provider: resolvedModel.provider,
+				model: resolvedModel.id,
+				usage: partialMessage?.usage ?? EMPTY_USAGE,
+				stopReason: "error",
+				errorMessage: `Model stream idle for ${idleMs}ms (no data from provider); aborted for retry`,
+				timestamp: Date.now(),
+			};
+			if (addedPartial) {
+				context.messages[context.messages.length - 1] = errorMessage;
+			} else {
+				context.messages.push(errorMessage);
+				await emit({ type: "message_start", message: { ...errorMessage } });
+			}
+			await emit({ type: "message_end", message: errorMessage });
+			return errorMessage;
+		}
+		throw err;
 	}
 
 	const finalMessage = await response.result();

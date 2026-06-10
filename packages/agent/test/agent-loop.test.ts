@@ -755,4 +755,41 @@ describe("agentLoopContinue with AgentMessage", () => {
 		expect(messages.length).toBe(1);
 		expect(messages[0].role).toBe("assistant");
 	});
+
+	it("aborts a stalled model stream and returns a retryable error", async () => {
+		const context: AgentContext = { systemPrompt: "You are helpful.", messages: [], tools: [] };
+		const userPrompt = createUserMessage("Hello");
+		const config: AgentLoopConfig = {
+			model: createModel(),
+			convertToLlm: identityConverter,
+			streamIdleTimeoutMs: 100, // trip quickly for the test
+		};
+
+		let aborted = false;
+		const streamFn = ((_model: unknown, _ctx: unknown, opts?: { signal?: AbortSignal }) => {
+			const stream = new MockAssistantStream();
+			opts?.signal?.addEventListener("abort", () => {
+				aborted = true;
+			});
+			queueMicrotask(() => {
+				// Open the stream, then go silent forever (never push done/error).
+				stream.push({ type: "start", partial: createAssistantMessage([{ type: "text", text: "" }]) });
+			});
+			return stream;
+		}) as unknown as Parameters<typeof agentLoop>[4];
+
+		const events: AgentEvent[] = [];
+		const stream = agentLoop([userPrompt], context, config, undefined, streamFn);
+		for await (const event of stream) {
+			events.push(event);
+		}
+		const messages = await stream.result();
+
+		const assistant = messages.find((m) => m.role === "assistant") as AssistantMessage | undefined;
+		expect(assistant).toBeDefined();
+		expect(assistant?.stopReason).toBe("error");
+		expect(assistant?.errorMessage).toMatch(/idle/i);
+		expect(events.map((e) => e.type)).toContain("agent_end");
+		expect(aborted).toBe(true); // watchdog tore down the underlying request
+	});
 });
