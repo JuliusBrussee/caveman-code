@@ -1,3 +1,4 @@
+import { formatElapsed } from "../format-elapsed.js";
 import { getSpinner, SPINNERS, type SpinnerName, type SpinnerVariant } from "../spinners.js";
 import type { TUI } from "../tui.js";
 import { Text } from "./text.js";
@@ -13,6 +14,8 @@ export class Loader extends Text {
 	private currentFrame = 0;
 	private intervalId: NodeJS.Timeout | null = null;
 	private ui: TUI | null = null;
+	// Set once at construction so setVariant()'s stop/start never resets elapsed.
+	private readonly startTime = Date.now();
 
 	constructor(
 		ui: TUI,
@@ -20,6 +23,7 @@ export class Loader extends Text {
 		private messageColorFn: (str: string) => string,
 		private message: string = "Loading...",
 		variant?: SpinnerName | SpinnerVariant,
+		private showElapsed = false,
 	) {
 		super("", 1, 0);
 		this.ui = ui;
@@ -60,7 +64,12 @@ export class Loader extends Text {
 
 	private updateDisplay() {
 		const frame = this.spinner.frames[this.currentFrame];
-		this.setText(`${this.spinnerColorFn(frame)} ${this.messageColorFn(this.message)}`);
+		let line = `${this.spinnerColorFn(frame)} ${this.messageColorFn(this.message)}`;
+		if (this.showElapsed) {
+			const elapsed = formatElapsed(Date.now() - this.startTime);
+			line += ` ${this.messageColorFn(`(${elapsed})`)}`;
+		}
+		this.setText(line);
 		if (this.ui) {
 			this.ui.requestRender();
 		}
