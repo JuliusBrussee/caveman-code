@@ -169,4 +169,3 @@ export class SubagentOverlay implements Component {
 		return s + " ".repeat(width - w);
 	}
 }
-
