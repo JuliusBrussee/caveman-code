@@ -29,8 +29,8 @@ interface CacheEntry {
 
 const _cache = new Map<string, CacheEntry>();
 
-function cacheKey(cwd: string, allowCavemem: boolean): string {
-	return `${allowCavemem ? "cm" : "fs"}::${cwd}`;
+function cacheKey(cwd: string, allowCavemem: boolean, hasHub: boolean): string {
+	return `${allowCavemem ? "cm" : "fs"}:${hasHub ? "hub" : "nohub"}::${cwd}`;
 }
 
 /**
@@ -40,7 +40,8 @@ function cacheKey(cwd: string, allowCavemem: boolean): string {
  */
 export async function resolveMemoryProvider(opts: MemoryFactoryOptions): Promise<MemoryProvider> {
 	const allowCavemem = opts.allowCavemem !== false;
-	const key = cacheKey(opts.cwd, allowCavemem);
+	const hasHub = Boolean(opts.cavememOptions?.hub);
+	const key = cacheKey(opts.cwd, allowCavemem, hasHub);
 	const cached = _cache.get(key);
 	if (cached) return cached.provider;
 

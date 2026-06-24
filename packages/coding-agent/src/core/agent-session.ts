@@ -24,7 +24,7 @@ import type {
 	AgentTool,
 	ThinkingLevel,
 } from "@juliusbrussee/caveman-agent";
-import { checkpoints, LLMLinguaMiddleware, memory as memoryNs } from "@juliusbrussee/caveman-agent";
+import { mcp as agentMcp, checkpoints, LLMLinguaMiddleware, memory as memoryNs } from "@juliusbrussee/caveman-agent";
 
 const { CheckpointManager } = checkpoints;
 type CheckpointManagerInstance = InstanceType<typeof CheckpointManager>;
@@ -289,6 +289,21 @@ const THINKING_LEVELS_WITH_XHIGH: ThinkingLevel[] = ["off", "minimal", "low", "m
 // ============================================================================
 
 export class AgentSession {
+	private _mcpHub?: agentMcp.McpHub;
+	private async mcpHub(): Promise<agentMcp.McpHub> {
+		if (this._mcpHub) return this._mcpHub;
+
+		const loaded = agentMcp.loadMcpConfig(this._cwd);
+		const hub = new agentMcp.McpHub({ settings: loaded.settings });
+
+		for (const server of loaded.servers) {
+			hub.addServer(server);
+		}
+
+		this._mcpHub = hub;
+		return hub;
+	}
+
 	readonly agent: Agent;
 	readonly sessionManager: SessionManager;
 	readonly settingsManager: SettingsManager;
@@ -870,7 +885,12 @@ export class AgentSession {
 	async memoryProvider(): Promise<MemoryProviderInstance | undefined> {
 		if (this._memoryProvider) return this._memoryProvider;
 		if (!this._memoryProviderInit) {
-			this._memoryProviderInit = resolveMemoryProvider({ cwd: this._cwd })
+			this._memoryProviderInit = resolveMemoryProvider({
+				cwd: this._cwd,
+				cavememOptions: {
+					hub: await this.mcpHub(),
+				},
+			})
 				.then((p) => {
 					this._memoryProvider = p;
 					return p;
@@ -3286,7 +3306,12 @@ export class AgentSession {
 		// Cached factory means cavemem (or FilesProvider fallback) is built once
 		// and shared with the `/memory` slash command + the recall transform.
 		try {
-			const memoryProvider = await resolveMemoryProvider({ cwd: this._cwd });
+			const memoryProvider = await resolveMemoryProvider({
+				cwd: this._cwd,
+				cavememOptions: {
+					hub: await this.mcpHub(),
+				},
+			});
 			this._memoryProvider = memoryProvider;
 			const available = await memoryProvider.isAvailable().catch(() => false);
 			// Always register; the tools themselves short-circuit when unavailable.
