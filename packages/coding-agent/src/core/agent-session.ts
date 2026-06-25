@@ -270,6 +270,14 @@ export function promptTimingMark(label: string): void {
 	}
 }
 
+function mergeHooksConfig(base: HooksConfig | undefined, extra: HooksConfig): HooksConfig {
+	const merged: HooksConfig = { ...(base ?? {}) };
+	for (const [event, groups] of Object.entries(extra)) {
+		merged[event] = [...(merged[event] ?? []), ...(groups ?? [])];
+	}
+	return merged;
+}
+
 /** Standard thinking levels */
 const THINKING_LEVELS: ThinkingLevel[] = ["off", "minimal", "low", "medium", "high"];
 
@@ -3177,19 +3185,16 @@ export class AgentSession {
 			sessionId: () => this.sessionId,
 			registry: { disableAllHooks: sm.getDisableAllHooks?.() ?? false },
 		});
-		const global = sm.getGlobalHooks?.() as HooksConfig | undefined;
+		let global = sm.getGlobalHooks?.() as HooksConfig | undefined;
 		const project = sm.getProjectHooks?.() as HooksConfig | undefined;
+		// Auto-record cavemem hooks when CAVE_MEMORY_AUTO_RECORD=1 (opt-in, no
+		// settings-manager dependency yet). Append cavemem recipes to the global
+		// layer instead of replacing user hooks for the same event.
+		if (process.env.CAVE_MEMORY_AUTO_RECORD === "1") {
+			global = mergeHooksConfig(global, buildDefaultCavememHooks() as HooksConfig);
+		}
 		if (global) manager.registry.setLayer("global", global);
 		if (project) manager.registry.setLayer("project", project);
-		// Auto-record cavemem hooks when CAVE_MEMORY_AUTO_RECORD=1 (opt-in, no
-		// settings-manager dependency yet). When set, merge cavemem hook
-		// recipes on top of the global layer.
-		if (process.env.CAVE_MEMORY_AUTO_RECORD === "1") {
-			manager.registry.setLayer("global", {
-				...((global ?? {}) as HooksConfig),
-				...buildDefaultCavememHooks(),
-			} as HooksConfig);
-		}
 		return manager;
 	}
 
