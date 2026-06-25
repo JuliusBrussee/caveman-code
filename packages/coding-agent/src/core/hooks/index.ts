@@ -135,11 +135,10 @@ export function subscribeHooksToExtensionEvents(api: ExtensionEventBusLike, mana
 			reason: "prompt_input_exit",
 		} as any);
 	});
-	api.on("agent_end", async () => {
-		// "Stop" fires when the agent loop ends naturally. Claude Code
-		// uses Stop without a matcher.
-		await manager.dispatch("Stop", undefined, { stop_hook_active: true } as any);
-	});
+	// Stop/SubagentStop are dispatched directly by AgentSession when it
+	// observes agent_end. Keeping them out of this synthetic extension avoids
+	// losing hooks if the extension event bus is rebound or torn down near the
+	// end of a turn.
 	api.on("session_compact", async () => {
 		await manager.dispatch("PostCompact", "auto", { trigger: "auto" } as any);
 	});
