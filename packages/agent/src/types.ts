@@ -255,7 +255,7 @@ export interface AgentLoopConfig extends SimpleStreamOptions {
 
 /**
  * Thinking/reasoning level for models that support it.
- * Note: "xhigh" is only supported by OpenAI gpt-5.1-codex-max, gpt-5.2, gpt-5.2-codex, gpt-5.3, and gpt-5.3-codex models.
+ * Note: "xhigh" support varies by model — see `supportsXhigh()` in `@juliusbrussee/caveman-ai`.
  */
 export type ThinkingLevel = "off" | "minimal" | "low" | "medium" | "high" | "xhigh";
 
