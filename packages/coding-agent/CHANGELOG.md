@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- Fixed stdout/stderr write-stream failures from embedded terminal hosts, including Node's `errno -122` case, crashing Caveman Code with an unhandled `WriteStream` error.
 - Added missing `@sinclair/typebox` runtime dependency. Fixes `ERR_MODULE_NOT_FOUND` on `caveman-code` startup when installed globally ([#6](https://github.com/JuliusBrussee/caveman-code/issues/6)).
 - Fixed broken extensions-migration links in the hooks-folder warning — now point to `JuliusBrussee/caveman-code` instead of the renamed-away `caveman-cli` repo ([#8](https://github.com/JuliusBrussee/caveman-code/issues/8)).
 - Self-update check now queries the correct GitHub repo (`caveman-code`) for releases.
