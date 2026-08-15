@@ -134,8 +134,15 @@ export async function createAgentSessionServices(
 	const authStorage = options.authStorage ?? AuthStorage.create(join(agentDir, "auth.json"));
 	const settingsManager = options.settingsManager ?? SettingsManager.create(cwd, agentDir);
 	const modelRegistry = options.modelRegistry ?? ModelRegistry.create(authStorage, join(agentDir, "models.json"));
-	// See sdk.ts for rationale; fire-and-forget Anthropic capability discovery.
-	void modelRegistry.discoverAnthropicCapabilities().catch(() => {});
+	// Anthropic capability discovery. If the user's saved default model isn't
+	// in the static registry, await discovery so resolution sees the freshly
+	// merged ids (e.g. github-copilot's claude-opus-4.7-1m-internal).
+	const discoveryPromise = modelRegistry.discoverAnthropicCapabilities().catch(() => {});
+	const savedDefaultProvider = settingsManager.getDefaultProvider();
+	const savedDefaultModelId = settingsManager.getDefaultModel();
+	if (savedDefaultProvider && savedDefaultModelId && !modelRegistry.find(savedDefaultProvider, savedDefaultModelId)) {
+		await discoveryPromise;
+	}
 	const resourceLoader = new DefaultResourceLoader({
 		...(options.resourceLoaderOptions ?? {}),
 		cwd,

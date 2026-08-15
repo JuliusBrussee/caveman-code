@@ -179,13 +179,21 @@ export async function createAgentSession(options: CreateAgentSessionOptions = {}
 	const authStorage = options.authStorage ?? AuthStorage.create(authPath);
 	const modelRegistry = options.modelRegistry ?? ModelRegistry.create(authStorage, modelsPath);
 
+	const settingsManager = options.settingsManager ?? SettingsManager.create(cwd, agentDir);
+
 	// Kick off per-account capability discovery for Anthropic-API providers
 	// (e.g. GitHub Copilot's /models endpoint surfaces 1M variants like
-	// claude-opus-4.6-1m that aren't in the static registry). Fire-and-forget;
-	// onModelRegistryChange refreshes the local snapshot as results arrive.
-	void modelRegistry.discoverAnthropicCapabilities().catch(() => {});
+	// claude-opus-4.6-1m that aren't in the static registry).
+	// If the user's saved default model isn't in the static registry, we MUST
+	// await discovery before resolving — otherwise resolution falls back to a
+	// different model with a smaller context window. Otherwise fire-and-forget.
+	const discoveryPromise = modelRegistry.discoverAnthropicCapabilities().catch(() => {});
+	const savedDefaultProvider = settingsManager.getDefaultProvider();
+	const savedDefaultModelId = settingsManager.getDefaultModel();
+	if (savedDefaultProvider && savedDefaultModelId && !modelRegistry.find(savedDefaultProvider, savedDefaultModelId)) {
+		await discoveryPromise;
+	}
 
-	const settingsManager = options.settingsManager ?? SettingsManager.create(cwd, agentDir);
 	const sessionManager = options.sessionManager ?? SessionManager.create(cwd, getDefaultSessionDir(cwd, agentDir));
 
 	if (!resourceLoader) {
