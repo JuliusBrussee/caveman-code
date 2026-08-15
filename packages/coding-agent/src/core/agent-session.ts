@@ -88,7 +88,7 @@ import {
 	wrapRegisteredTools,
 } from "./extensions/index.js";
 import { buildDefaultCavememHooks } from "./hooks/cavemem-hooks.js";
-import type { HooksConfig } from "./hooks/events.js";
+import type { HookStdin, HooksConfig } from "./hooks/events.js";
 import { createHooksExtension, HooksManager } from "./hooks/index.js";
 import { composeStartupPrelude } from "./memory-bridge.js";
 import { resolveMemoryProvider } from "./memory-factory.js";
@@ -1411,8 +1411,31 @@ export class AgentSession {
 		return undefined;
 	}
 
+	private async _dispatchStopHooks(): Promise<void> {
+		if (!this._hooksManager) return;
+
+		const depth = Number.parseInt(process.env.CAVE_SUBAGENT_DEPTH ?? "", 10);
+		const isSubagent = Number.isFinite(depth) && depth > 0;
+		const agentType = process.env.CAVE_SUBAGENT_NAME;
+		const agentId = process.env.CAVE_SUBAGENT_ID;
+
+		if (!isSubagent) {
+			await this._hooksManager.dispatch("Stop", undefined, { stop_hook_active: true });
+			return;
+		}
+
+		const subagentExtras: Partial<HookStdin> = { stop_hook_active: true };
+		if (agentType) subagentExtras.agent_type = agentType;
+		if (agentId) subagentExtras.agent_id = agentId;
+		await this._hooksManager.dispatch("SubagentStop", agentType ?? "*", subagentExtras);
+	}
+
 	/** Emit extension events based on agent events */
 	private async _emitExtensionEvent(event: AgentEvent): Promise<void> {
+		if (event.type === "agent_end") {
+			await this._dispatchStopHooks();
+		}
+
 		if (!this._extensionRunner) return;
 
 		if (event.type === "agent_start") {
@@ -1520,6 +1543,25 @@ export class AgentSession {
 	private _reconnectToAgent(): void {
 		if (this._unsubscribeAgent) return; // Already connected
 		this._unsubscribeAgent = this.agent.subscribe(this._handleAgentEvent);
+	}
+
+	private async _drainAgentEventQueue(): Promise<void> {
+		let current = this._agentEventQueue;
+		while (true) {
+			try {
+				await current;
+			} catch {
+				// Event handlers already report through extension error paths; don't
+				// turn late lifecycle cleanup into a prompt failure.
+			}
+			if (this._agentEventQueue === current) return;
+			current = this._agentEventQueue;
+		}
+	}
+
+	/** Wait until queued session event handlers have settled. */
+	async waitForPendingEvents(): Promise<void> {
+		await this._drainAgentEventQueue();
 	}
 
 	/**
@@ -1906,7 +1948,10 @@ export class AgentSession {
 		promptTimingMark("session.prompt:agent.prompt:begin");
 		await this.agent.prompt(messages);
 		promptTimingMark("session.prompt:agent.prompt:end");
+		await this._drainAgentEventQueue();
+		promptTimingMark("session.prompt:agent.events:end");
 		await this.waitForRetry();
+		await this._drainAgentEventQueue();
 	}
 
 	/**

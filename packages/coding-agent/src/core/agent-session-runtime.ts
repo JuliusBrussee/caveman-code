@@ -111,6 +111,7 @@ export class AgentSessionRuntime {
 	}
 
 	private async teardownCurrent(): Promise<void> {
+		await this.session.waitForPendingEvents();
 		await emitSessionShutdownEvent(this.session.extensionRunner);
 		this.session.dispose();
 	}
@@ -285,6 +286,7 @@ export class AgentSessionRuntime {
 	}
 
 	async dispose(): Promise<void> {
+		await this.session.waitForPendingEvents();
 		await emitSessionShutdownEvent(this.session.extensionRunner);
 		this.session.dispose();
 	}
