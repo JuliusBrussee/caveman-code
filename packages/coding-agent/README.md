@@ -81,7 +81,7 @@ Caveman Code keeps upstream extensibility goals, then adds fork-specific workflo
 Claude Pro/Max · ChatGPT Plus/Pro · GitHub Copilot · Google Gemini · Google Antigravity
 
 ### API keys
-Anthropic · OpenAI · Azure OpenAI · Google Gemini · Google Vertex · Amazon Bedrock · Mistral · Groq · Cerebras · xAI · OpenRouter · Vercel AI Gateway · Hugging Face · Kimi · MiniMax · ZAI · OpenCode
+Anthropic · OpenAI · Azure OpenAI · Google Gemini · Google Vertex · Amazon Bedrock · Mistral · Groq · Cerebras · DeepSeek · xAI · OpenRouter · Vercel AI Gateway · Hugging Face · Kimi · MiniMax · ZAI · OpenCode
 
 ### Custom providers
 Add any OpenAI-, Anthropic-, or Google-compatible endpoint via `~/.cave/agent/models.json`, or build a custom provider with [Extensions](docs/extensions.md) and [Custom Provider docs](docs/custom-provider.md).
