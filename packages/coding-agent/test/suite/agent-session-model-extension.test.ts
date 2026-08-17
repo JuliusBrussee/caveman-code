@@ -44,6 +44,34 @@ describe("AgentSession model and extension characterization", () => {
 		).toEqual([`${nextModel.provider}/${nextModel.id}`]);
 	});
 
+	it("setModel refreshes the system prompt so the provider sees the new model", async () => {
+		const harness = await createHarness({
+			models: [
+				{ id: "faux-1", name: "One", reasoning: true },
+				{ id: "faux-2", name: "Two", reasoning: true },
+			],
+		});
+		harnesses.push(harness);
+
+		const seenSystemPrompts: string[] = [];
+		const capture = (context: { systemPrompt?: string }) => {
+			seenSystemPrompts.push(context.systemPrompt ?? "");
+			return fauxAssistantMessage("ok");
+		};
+
+		harness.setResponses([capture]);
+		await harness.session.prompt("first");
+
+		await harness.session.setModel(harness.getModel("faux-2")!);
+
+		harness.appendResponses([capture]);
+		await harness.session.prompt("second");
+
+		expect(seenSystemPrompts[0]).toContain("Active model: faux-1");
+		expect(seenSystemPrompts[1]).toContain("Active model: faux-2");
+		expect(seenSystemPrompts[1]).not.toContain("Active model: faux-1");
+	});
+
 	it("cycles through scoped models and preserves the scoped thinking preference", async () => {
 		const harness = await createHarness({
 			models: [

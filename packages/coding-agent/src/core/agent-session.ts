@@ -2232,6 +2232,16 @@ export class AgentSession {
 	}
 
 	/**
+	 * Rebuild the cached base system prompt so the # Environment block reflects the
+	 * current model. Model switches update agent.state.model but the prompt is
+	 * otherwise only rebuilt at init, so without this the model reports a stale id.
+	 */
+	private _refreshSystemPromptForModel(): void {
+		this._baseSystemPrompt = this._rebuildSystemPrompt(this.getActiveToolNames());
+		this.agent.state.systemPrompt = this._baseSystemPrompt;
+	}
+
+	/**
 	 * Set model directly.
 	 * Validates that auth is configured, saves to session and settings.
 	 * @throws Error if no auth is configured for the model
@@ -2249,6 +2259,8 @@ export class AgentSession {
 
 		// Re-clamp thinking level for new model's capabilities
 		this.setThinkingLevel(thinkingLevel);
+
+		this._refreshSystemPromptForModel();
 
 		await this._emitModelSelect(model, previousModel, "set");
 	}
@@ -2290,6 +2302,8 @@ export class AgentSession {
 		// setThinkingLevel clamps to model capabilities.
 		this.setThinkingLevel(thinkingLevel);
 
+		this._refreshSystemPromptForModel();
+
 		await this._emitModelSelect(next.model, currentModel, "cycle");
 
 		return { model: next.model, thinkingLevel: this.thinkingLevel, isScoped: true };
@@ -2314,6 +2328,8 @@ export class AgentSession {
 
 		// Re-clamp thinking level for new model's capabilities
 		this.setThinkingLevel(thinkingLevel);
+
+		this._refreshSystemPromptForModel();
 
 		await this._emitModelSelect(nextModel, currentModel, "cycle");
 
