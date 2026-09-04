@@ -262,8 +262,9 @@ function detectOnboarding(cwd: string): DoctorCheck[] {
 /** Cross-platform `which` that returns the absolute path or undefined. */
 function which(cmd: string): string | undefined {
 	const isWin = process.platform === "win32";
-	const probe = isWin ? "where" : "command";
-	const args = isWin ? [cmd] : ["-v", cmd];
+	const probe = isWin ? "where" : "which";
+	const args = [cmd];
+
 	try {
 		const r = spawnSync(probe, args, { encoding: "utf8" });
 		if (r.status === 0 && r.stdout) {
