@@ -5,7 +5,7 @@ import { homedir, tmpdir } from "node:os";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import ignore from "ignore";
 import { minimatch } from "minimatch";
-import { CONFIG_DIR_NAME } from "../config.js";
+import { CONFIG_DIR_NAME, getPackageDir } from "../config.js";
 import { type GitSource, parseGitUrl } from "../utils/git.js";
 import { isLocalPath } from "../utils/paths.js";
 import { isStdoutTakenOver } from "./output-guard.js";
@@ -132,6 +132,7 @@ interface ResourceAccumulator {
  *   4  package resource (origin: "package")
  */
 function resourcePrecedenceRank(m: PathMetadata): number {
+	if (m.source === "builtin") return 5;
 	if (m.origin === "package") return 4;
 	const scopeBase = m.scope === "project" ? 0 : 2;
 	return scopeBase + (m.source === "local" ? 0 : 1);
@@ -2095,6 +2096,19 @@ export class DefaultPackageManager implements PackageManager {
 			userOverrides.themes,
 			globalBaseDir,
 		);
+
+		// Bundled defaults — package/skills/
+		const packageDir = getPackageDir();
+		const bundledSkillsDir = join(packageDir, "skills");
+		if (existsSync(bundledSkillsDir)) {
+			const bundledMetadata: PathMetadata = {
+				source: "builtin",
+				scope: "user",
+				origin: "top-level",
+				baseDir: bundledSkillsDir,
+			};
+			addResources("skills", collectAutoSkillEntries(bundledSkillsDir, "pi"), bundledMetadata, [], bundledSkillsDir);
+		}
 	}
 
 	private collectFilesFromPaths(paths: string[], resourceType: ResourceType): string[] {

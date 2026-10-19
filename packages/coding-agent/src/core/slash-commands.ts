@@ -196,7 +196,7 @@ function asStringArray(value: unknown): string[] | undefined {
 	return undefined;
 }
 
-function determineSource(filePath: string, cwd: string, agentDir: string): SourceInfo {
+function determineSource(filePath: string, cwd: string, agentDir: string, defaultsDir?: string): SourceInfo {
 	const normalized = resolve(filePath);
 	const projectDir = resolve(cwd, CONFIG_DIR_NAME, "commands");
 	const userDir = resolve(agentDir, "commands");
@@ -207,6 +207,12 @@ function determineSource(filePath: string, cwd: string, agentDir: string): Sourc
 	if (normalized.startsWith(`${userDir}${"/"}`) || normalized === userDir) {
 		return createSyntheticSourceInfo(filePath, { source: "local", scope: "user", baseDir: userDir });
 	}
+	if (defaultsDir) {
+		const normDefaults = resolve(defaultsDir);
+		if (normalized.startsWith(`${normDefaults}${"/"}`) || normalized === normDefaults) {
+			return createSyntheticSourceInfo(filePath, { source: "builtin", scope: "user", baseDir: normDefaults });
+		}
+	}
 	return createSyntheticSourceInfo(filePath, { source: "local" });
 }
 
@@ -214,6 +220,7 @@ function loadCommandFromFile(
 	filePath: string,
 	cwd: string,
 	agentDir: string,
+	defaultsDir?: string,
 ): { command: MarkdownCommand | null; diagnostics: ResourceDiagnostic[] } {
 	const diagnostics: ResourceDiagnostic[] = [];
 	let raw: string;
@@ -275,7 +282,7 @@ function loadCommandFromFile(
 		userInvocable: frontmatter["user-invocable"] !== false,
 		frontmatter,
 		filePath,
-		sourceInfo: determineSource(filePath, cwd, agentDir),
+		sourceInfo: determineSource(filePath, cwd, agentDir, defaultsDir),
 	};
 
 	return { command, diagnostics };
@@ -285,6 +292,7 @@ function loadCommandsFromDir(
 	dir: string,
 	cwd: string,
 	agentDir: string,
+	defaultsDir?: string,
 ): { commands: MarkdownCommand[]; diagnostics: ResourceDiagnostic[] } {
 	const commands: MarkdownCommand[] = [];
 	const diagnostics: ResourceDiagnostic[] = [];
@@ -313,7 +321,7 @@ function loadCommandsFromDir(
 		}
 		if (!isFile || !entry.name.endsWith(".md")) continue;
 
-		const result = loadCommandFromFile(fullPath, cwd, agentDir);
+		const result = loadCommandFromFile(fullPath, cwd, agentDir, defaultsDir);
 		if (result.command) commands.push(result.command);
 		diagnostics.push(...result.diagnostics);
 	}
@@ -353,7 +361,7 @@ export function loadMarkdownCommands(options: LoadMarkdownCommandsOptions = {}):
 	const allDiagnostics: ResourceDiagnostic[] = [];
 
 	for (const dir of dirs) {
-		const result = loadCommandsFromDir(dir, cwd, agentDir);
+		const result = loadCommandsFromDir(dir, cwd, agentDir, options.defaultsDir);
 		allDiagnostics.push(...result.diagnostics);
 		for (const command of result.commands) {
 			const existing = seen.get(command.name);

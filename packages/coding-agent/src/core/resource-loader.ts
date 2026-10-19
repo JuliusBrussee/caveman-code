@@ -367,7 +367,11 @@ export class DefaultResourceLoader implements ResourceLoader {
 		const enabledThemes = getEnabledPaths(resolvedPaths.themes);
 
 		const mapSkillPath = (resource: { path: string; metadata: PathMetadata }): string => {
-			if (resource.metadata.source !== "auto" && resource.metadata.origin !== "package") {
+			if (
+				resource.metadata.source !== "auto" &&
+				resource.metadata.source !== "builtin" &&
+				resource.metadata.origin !== "package"
+			) {
 				return resource.path;
 			}
 			try {

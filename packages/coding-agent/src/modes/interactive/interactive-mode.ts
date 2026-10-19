@@ -505,6 +505,12 @@ export class InteractiveMode {
 			};
 		}
 
+		// Convert markdown commands to SlashCommand format for autocomplete
+		const markdownCommands: SlashCommand[] = this.session.markdownCommands.map((cmd) => ({
+			name: cmd.name,
+			description: this.prefixAutocompleteDescription(cmd.description || cmd.argumentHint, cmd.sourceInfo),
+		}));
+
 		// Convert prompt templates to SlashCommand format for autocomplete
 		const templateCommands: SlashCommand[] = this.session.promptTemplates.map((cmd) => ({
 			name: cmd.name,
@@ -537,7 +543,7 @@ export class InteractiveMode {
 
 		// Setup autocomplete
 		this.autocompleteProvider = new CombinedAutocompleteProvider(
-			[...slashCommands, ...templateCommands, ...extensionCommands, ...skillCommandList],
+			[...slashCommands, ...markdownCommands, ...templateCommands, ...extensionCommands, ...skillCommandList],
 			this.sessionManager.getCwd(),
 			fdPath,
 		);
@@ -918,6 +924,9 @@ export class InteractiveMode {
 	} {
 		const source = sourceInfo?.source ?? "local";
 		const scope = sourceInfo?.scope ?? "project";
+		if (source === "builtin") {
+			return { label: "bundled", color: "muted" };
+		}
 		if (source === "local") {
 			if (scope === "user") {
 				return { label: "user", color: "muted" };
@@ -943,6 +952,7 @@ export class InteractiveMode {
 	private getScopeGroup(sourceInfo?: SourceInfo): "user" | "project" | "path" {
 		const source = sourceInfo?.source ?? "local";
 		const scope = sourceInfo?.scope ?? "project";
+		if (source === "builtin") return "user";
 		if (source === "cli" || scope === "temporary") return "path";
 		if (scope === "user") return "user";
 		if (scope === "project") return "project";
@@ -1170,6 +1180,26 @@ export class InteractiveMode {
 					formatPackagePath: (item) => this.getShortPath(item.path, item.sourceInfo),
 				});
 				this.chatContainer.addChild(new Text(`${sectionHeader("Skills")}\n${skillList}`, 0, 0));
+				this.chatContainer.addChild(new Spacer(1));
+			}
+
+			const markdownCommands = this.session.markdownCommands;
+			if (markdownCommands.length > 0) {
+				const groups = this.buildScopeGroups(
+					markdownCommands.map((command) => ({ path: command.filePath, sourceInfo: command.sourceInfo })),
+				);
+				const commandByPath = new Map(markdownCommands.map((c) => [c.filePath, c]));
+				const commandList = this.formatScopeGroups(groups, {
+					formatPath: (item) => {
+						const command = commandByPath.get(item.path);
+						return command ? `/${command.name}` : this.formatDisplayPath(item.path);
+					},
+					formatPackagePath: (item) => {
+						const command = commandByPath.get(item.path);
+						return command ? `/${command.name}` : this.formatDisplayPath(item.path);
+					},
+				});
+				this.chatContainer.addChild(new Text(`${sectionHeader("Commands")}\n${commandList}`, 0, 0));
 				this.chatContainer.addChild(new Spacer(1));
 			}
 

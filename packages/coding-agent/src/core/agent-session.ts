@@ -38,7 +38,7 @@ import {
 	resetApiProviders,
 	supportsXhigh,
 } from "@juliusbrussee/caveman-ai";
-import { getDocsPath } from "../config.js";
+import { getAgentDir, getDocsPath, getPackageDir } from "../config.js";
 import { theme } from "../modes/interactive/theme/theme.js";
 import { stripFrontmatter } from "../utils/frontmatter.js";
 import { sleep } from "../utils/sleep.js";
@@ -94,13 +94,21 @@ import { composeStartupPrelude } from "./memory-bridge.js";
 import { resolveMemoryProvider } from "./memory-factory.js";
 import type { BashExecutionMessage, CustomMessage } from "./messages.js";
 import type { ModelRegistry } from "./model-registry.js";
-import { expandPromptTemplate, type PromptTemplate } from "./prompt-templates.js";
+import { expandPromptTemplate, type PromptTemplate, parseCommandArgs } from "./prompt-templates.js";
 import type { ResourceExtensionPaths, ResourceLoader } from "./resource-loader.js";
 import { createRtkSpawnHook, getRtkStatus } from "./rtk.js";
 import type { BranchSummaryEntry, CompactionEntry, SessionManager } from "./session-manager.js";
 import { CURRENT_SESSION_VERSION, getLatestCompactionEntry, type SessionHeader } from "./session-manager.js";
 import type { SettingsManager } from "./settings-manager.js";
-import type { SlashCommandInfo } from "./slash-commands.js";
+import type { SkillExpandContext } from "./skills.js";
+import {
+	expandMarkdownCommand,
+	findBundledCommandsDir,
+	loadMarkdownCommands,
+	type MarkdownCommand,
+	type SlashCommandInfo,
+	toSlashCommandInfo,
+} from "./slash-commands.js";
 import { createSyntheticSourceInfo, type SourceInfo } from "./source-info.js";
 import { buildSystemPrompt } from "./system-prompt.js";
 import { type BashOperations, createLocalBashOperations } from "./tools/bash.js";
@@ -326,6 +334,7 @@ export class AgentSession {
 
 	private _resourceLoader: ResourceLoader;
 	private _customTools: ToolDefinition[];
+	private _markdownCommands: MarkdownCommand[] = [];
 	private _baseToolDefinitions: Map<string, ToolDefinition> = new Map();
 	private _cwd: string;
 	private _extensionRunnerRef?: { current?: ExtensionRunner };
@@ -407,6 +416,7 @@ export class AgentSession {
 		this._resourceLoader = config.resourceLoader;
 		this._customTools = config.customTools ?? [];
 		this._cwd = config.cwd;
+		this._loadMarkdownCommands();
 		this._modelRegistry = config.modelRegistry;
 		this._extensionRunnerRef = config.extensionRunnerRef;
 		this._initialActiveToolNames = config.initialActiveToolNames;
@@ -1666,6 +1676,11 @@ export class AgentSession {
 		return this._resourceLoader.getPrompts().prompts;
 	}
 
+	/** File-based markdown slash commands (project, user, bundled) */
+	get markdownCommands(): ReadonlyArray<MarkdownCommand> {
+		return this._markdownCommands;
+	}
+
 	private _normalizePromptSnippet(text: string | undefined): string | undefined {
 		if (!text) return undefined;
 		const oneLine = text
@@ -1796,10 +1811,11 @@ export class AgentSession {
 		}
 		promptTimingMark("session.prompt:emitInput");
 
-		// Expand skill commands (/skill:name args) and prompt templates (/template args)
+		// Expand skill commands (/skill:name args), markdown commands (/cmd args), and prompt templates (/template args)
 		let expandedText = currentText;
 		if (expandPromptTemplates) {
 			expandedText = this._expandSkillCommand(expandedText);
+			expandedText = await this._expandMarkdownCommand(expandedText);
 			expandedText = expandPromptTemplate(expandedText, [...this.promptTemplates]);
 		}
 
@@ -1971,11 +1987,55 @@ export class AgentSession {
 		}
 	}
 
+	private _loadMarkdownCommands(): void {
+		const packageDir = getPackageDir();
+		const defaultsDir = findBundledCommandsDir(packageDir);
+		const result = loadMarkdownCommands({
+			cwd: this._cwd,
+			agentDir: getAgentDir(),
+			defaultsDir,
+		});
+		this._markdownCommands = result.commands;
+	}
+
+	private async _expandMarkdownCommand(text: string): Promise<string> {
+		if (!text.startsWith("/")) return text;
+
+		const spaceIndex = text.indexOf(" ");
+		const commandName = spaceIndex === -1 ? text.slice(1) : text.slice(1, spaceIndex);
+		const rawArguments = spaceIndex === -1 ? "" : text.slice(spaceIndex + 1).trim();
+
+		const command = this._markdownCommands.find((c) => c.name === commandName);
+		if (!command) return text;
+
+		const args = [commandName, ...parseCommandArgs(rawArguments)];
+		const ctx: SkillExpandContext = {
+			cwd: this._cwd,
+			rawArguments,
+			args,
+			sessionId: this.sessionId,
+			effort: this.thinkingLevel,
+			skillDir: dirname(command.filePath),
+		};
+
+		try {
+			const { content } = await expandMarkdownCommand(command, ctx);
+			return content;
+		} catch (err) {
+			this._extensionRunner?.emitError({
+				extensionPath: command.filePath,
+				event: "command_expansion",
+				error: err instanceof Error ? err.message : String(err),
+			});
+			return text;
+		}
+	}
+
 	/**
 	 * Queue a steering message while the agent is running.
 	 * Delivered after the current assistant turn finishes executing its tool calls,
 	 * before the next LLM call.
-	 * Expands skill commands and prompt templates. Errors on extension commands.
+	 * Expands skill commands, markdown commands, and prompt templates. Errors on extension commands.
 	 * @param images Optional image attachments to include with the message
 	 * @throws Error if text is an extension command
 	 */
@@ -1985,8 +2045,9 @@ export class AgentSession {
 			this._throwIfExtensionCommand(text);
 		}
 
-		// Expand skill commands and prompt templates
+		// Expand skill commands, markdown commands, and prompt templates
 		let expandedText = this._expandSkillCommand(text);
+		expandedText = await this._expandMarkdownCommand(expandedText);
 		expandedText = expandPromptTemplate(expandedText, [...this.promptTemplates]);
 
 		await this._queueSteer(expandedText, images);
@@ -1995,7 +2056,7 @@ export class AgentSession {
 	/**
 	 * Queue a follow-up message to be processed after the agent finishes.
 	 * Delivered only when agent has no more tool calls or steering messages.
-	 * Expands skill commands and prompt templates. Errors on extension commands.
+	 * Expands skill commands, markdown commands, and prompt templates. Errors on extension commands.
 	 * @param images Optional image attachments to include with the message
 	 * @throws Error if text is an extension command
 	 */
@@ -2005,8 +2066,9 @@ export class AgentSession {
 			this._throwIfExtensionCommand(text);
 		}
 
-		// Expand skill commands and prompt templates
+		// Expand skill commands, markdown commands, and prompt templates
 		let expandedText = this._expandSkillCommand(text);
+		expandedText = await this._expandMarkdownCommand(expandedText);
 		expandedText = expandPromptTemplate(expandedText, [...this.promptTemplates]);
 
 		await this._queueFollowUp(expandedText, images);
@@ -2989,6 +3051,8 @@ export class AgentSession {
 				sourceInfo: command.sourceInfo,
 			}));
 
+			const markdownCmds: SlashCommandInfo[] = this.markdownCommands.map(toSlashCommandInfo);
+
 			const templates: SlashCommandInfo[] = this.promptTemplates.map((template) => ({
 				name: template.name,
 				description: template.description,
@@ -3003,7 +3067,7 @@ export class AgentSession {
 				sourceInfo: skill.sourceInfo,
 			}));
 
-			return [...extensionCommands, ...templates, ...skills];
+			return [...extensionCommands, ...markdownCmds, ...templates, ...skills];
 		};
 
 		runner.bindCore(
@@ -3359,6 +3423,7 @@ export class AgentSession {
 		await this._extensionRunner?.emit({ type: "session_shutdown" });
 		await this.settingsManager.reload();
 		resetApiProviders();
+		this._loadMarkdownCommands();
 		await this._resourceLoader.reload();
 		await this._buildRuntime({
 			activeToolNames: this.getActiveToolNames(),
