@@ -89,6 +89,16 @@ Store credentials in `~/.pi/agent/auth.json`:
 
 The file is created with `0600` permissions (user read/write only). Auth file credentials take priority over environment variables.
 
+### MiniMax models
+
+`minimax` and `minimax-cn` default to `MiniMax-M3.1-Flash`, with `MiniMax-M3` as the other ordinary choice. Both use the Anthropic-compatible API, support text and images in this client, and have a 1,000,000-token context window and a 524,288-token output ceiling. The client does not currently expose video input.
+
+Flash always thinks. An off preference uses its default `max` effort; `minimal` maps to `low`, and `low`, `medium`, `high`, and `xhigh` are passed through. M3 starts with thinking off and uses adaptive thinking when enabled; it has no effort-depth control.
+
+Older built-in MiniMax text models remain available by explicit ID, saved defaults, session restore, and user-authored model scopes. Custom models and overrides are preserved. OpenRouter uses its verified `minimax/minimax-m3.1-flash:free` route and gateway pricing. OpenCode Zen and Go independently list `minimax-m3.1-flash-free`; their distinct routes and limits come from OpenCode's own [Zen catalog](https://github.com/anomalyco/models.dev/tree/dev/providers/opencode/models) and [Go catalog](https://github.com/anomalyco/models.dev/tree/dev/providers/opencode-go/models). Direct API availability does not imply Coding Plan availability.
+
+Direct cost estimates use USD per million tokens: Flash input/output/cache-read **0.15/0.60/0.015**; M3 standard pricing through 512k input **0.30/1.20/0.06**. M3 above 512k costs **0.60/2.40/0.12**, and priority pricing is 1.5× standard. The fixed-price registry cannot represent these tiers; cache-write pricing is unknown and recorded as zero. See the [MiniMax API contract](https://platform.minimax.io/docs/api-reference/text-anthropic-api) and [pricing](https://platform.minimax.io/docs/pricing/overview).
+
 ### Key Resolution
 
 The `key` field supports three formats:

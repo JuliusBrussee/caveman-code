@@ -1,9 +1,31 @@
-import { MODELS } from "./models.generated.js";
+import { MODELS as GENERATED_MODELS } from "./models.generated.js";
+import { isDirectMiniMaxM3, isLegacyMiniMaxModel, isOpenCodeFlash, MINIMAX_MODELS } from "./models.minimax.js";
 import { getAnthropicCapabilities } from "./providers/anthropic-capabilities.js";
 import { _setRegistryHook } from "./providers/anthropic-discovery.js";
 import type { Api, KnownProvider, Model, Usage } from "./types.js";
 
+const MODELS = {
+	...GENERATED_MODELS,
+	minimax: { ...GENERATED_MODELS.minimax, ...MINIMAX_MODELS.minimax },
+	"minimax-cn": { ...GENERATED_MODELS["minimax-cn"], ...MINIMAX_MODELS["minimax-cn"] },
+	openrouter: { ...GENERATED_MODELS.openrouter, ...MINIMAX_MODELS.openrouter },
+	opencode: { ...GENERATED_MODELS.opencode, ...MINIMAX_MODELS.opencode },
+	"opencode-go": { ...GENERATED_MODELS["opencode-go"], ...MINIMAX_MODELS["opencode-go"] },
+};
+
 const modelRegistry: Map<string, Map<string, Model<Api>>> = new Map();
+
+/** Hide legacy built-ins from ordinary choices, while keeping custom objects. */
+export function isSelectableModel(model: Model<Api>): boolean {
+	return !isLegacyMiniMaxModel(model) || modelRegistry.get(model.provider)?.get(model.id) !== model;
+}
+
+/** Prefer Flash within a provider without reordering unrelated models. */
+export function compareMiniMaxModels(a: Model<Api>, b: Model<Api>): number {
+	if (a.provider !== b.provider) return 0;
+	const rank = (model: Model<Api>) => (/minimax-m3\.1-flash/i.test(model.id) ? -1 : 0);
+	return rank(a) - rank(b);
+}
 
 /**
  * Apply per-model capability overrides at registry-load time.
@@ -117,9 +139,12 @@ export function getProviders(): KnownProvider[] {
 
 export function getModels<TProvider extends KnownProvider>(
 	provider: TProvider,
+	options: { includeLegacy?: boolean } = {},
 ): Model<ModelApi<TProvider, keyof (typeof MODELS)[TProvider]>>[] {
-	const models = modelRegistry.get(provider);
-	return models ? (Array.from(models.values()) as Model<ModelApi<TProvider, keyof (typeof MODELS)[TProvider]>>[]) : [];
+	const models = Array.from(modelRegistry.get(provider)?.values() ?? []);
+	return (options.includeLegacy ? models : models.filter(isSelectableModel).sort(compareMiniMaxModels)) as Model<
+		ModelApi<TProvider, keyof (typeof MODELS)[TProvider]>
+	>[];
 }
 
 export function calculateCost<TApi extends Api>(model: Model<TApi>, usage: Usage): Usage["cost"] {
@@ -139,6 +164,9 @@ export function calculateCost<TApi extends Api>(model: Model<TApi>, usage: Usage
  * - Opus 4.6 models (xhigh maps to adaptive effort "max" on Anthropic-compatible providers)
  */
 export function supportsXhigh<TApi extends Api>(model: Model<TApi>): boolean {
+	if (isDirectMiniMaxM3(model)) return model.id === "MiniMax-M3.1-Flash";
+	if (isOpenCodeFlash(model)) return true;
+	if (model.provider === "openrouter" && model.id === "minimax/minimax-m3.1-flash:free") return true;
 	if (
 		model.id.includes("gpt-5.2") ||
 		model.id.includes("gpt-5.3") ||

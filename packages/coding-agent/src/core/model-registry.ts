@@ -6,9 +6,11 @@ import {
 	type Api,
 	type AssistantMessageEventStream,
 	type Context,
+	compareMiniMaxModels,
 	discoverAnthropicCapabilities,
 	getModels,
 	getProviders,
+	isSelectableModel,
 	type KnownProvider,
 	type Model,
 	type OAuthProviderInterface,
@@ -343,7 +345,7 @@ export class ModelRegistry {
 		modelOverrides: Map<string, Map<string, ModelOverride>>,
 	): Model<Api>[] {
 		return getProviders().flatMap((provider) => {
-			const models = getModels(provider as KnownProvider) as Model<Api>[];
+			const models = getModels(provider as KnownProvider, { includeLegacy: true }) as Model<Api>[];
 			const providerOverride = overrides.get(provider);
 			const perModelOverrides = modelOverrides.get(provider);
 
@@ -525,6 +527,11 @@ export class ModelRegistry {
 		return this.models;
 	}
 
+	/** Ordinary choices; explicit references and saved sessions still use getAll/find. */
+	getSelectable(): Model<Api>[] {
+		return this.models.filter(isSelectableModel).sort(compareMiniMaxModels);
+	}
+
 	/**
 	 * Kick off per-provider capability discovery for every Anthropic-API
 	 * model the user has auth for. Fire-and-forget; new model ids appear
@@ -551,7 +558,7 @@ export class ModelRegistry {
 	 * This is a fast check that doesn't refresh OAuth tokens.
 	 */
 	getAvailable(): Model<Api>[] {
-		return this.models.filter((m) => this.hasConfiguredAuth(m));
+		return this.getSelectable().filter((m) => this.hasConfiguredAuth(m));
 	}
 
 	/**

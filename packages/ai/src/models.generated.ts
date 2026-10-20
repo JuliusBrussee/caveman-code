@@ -4584,6 +4584,23 @@ export const MODELS = {
 		} satisfies Model<"anthropic-messages">,
 	},
 	"minimax": {
+		"MiniMax-M3": {
+			id: "MiniMax-M3",
+			name: "MiniMax-M3",
+			api: "anthropic-messages",
+			provider: "minimax",
+			baseUrl: "https://api.minimax.io/anthropic",
+			reasoning: true,
+			input: ["text", "image"],
+			cost: {
+				input: 0.6,
+				output: 2.4,
+				cacheRead: 0.12,
+				cacheWrite: 0,
+			},
+			contextWindow: 1000000,
+			maxTokens: 128000,
+		} satisfies Model<"anthropic-messages">,
 		"MiniMax-M2.7": {
 			id: "MiniMax-M2.7",
 			name: "MiniMax-M2.7",
@@ -4620,6 +4637,23 @@ export const MODELS = {
 		} satisfies Model<"anthropic-messages">,
 	},
 	"minimax-cn": {
+		"MiniMax-M3": {
+			id: "MiniMax-M3",
+			name: "MiniMax-M3",
+			api: "anthropic-messages",
+			provider: "minimax-cn",
+			baseUrl: "https://api.minimaxi.com/anthropic",
+			reasoning: true,
+			input: ["text", "image"],
+			cost: {
+				input: 0.6,
+				output: 2.4,
+				cacheRead: 0.12,
+				cacheWrite: 0,
+			},
+			contextWindow: 1000000,
+			maxTokens: 128000,
+		} satisfies Model<"anthropic-messages">,
 		"MiniMax-M2.7": {
 			id: "MiniMax-M2.7",
 			name: "MiniMax-M2.7",

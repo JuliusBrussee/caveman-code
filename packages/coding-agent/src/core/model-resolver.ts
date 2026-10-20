@@ -29,8 +29,8 @@ export const defaultModelPerProvider: Record<KnownProvider, string> = {
 	cerebras: "zai-glm-4.7",
 	zai: "glm-5",
 	mistral: "devstral-medium-latest",
-	minimax: "MiniMax-M2.7",
-	"minimax-cn": "MiniMax-M2.7",
+	minimax: "MiniMax-M3.1-Flash",
+	"minimax-cn": "MiniMax-M3.1-Flash",
 	huggingface: "moonshotai/Kimi-K2.5",
 	opencode: "claude-opus-4-6",
 	"opencode-go": "kimi-k2.5",
@@ -244,7 +244,8 @@ export function parseModelPattern(
  * strips colon-suffixes to find a match.
  */
 export async function resolveModelScope(patterns: string[], modelRegistry: ModelRegistry): Promise<ScopedModel[]> {
-	const availableModels = await modelRegistry.getAvailable();
+	// User-authored --models/settings scopes may deliberately name legacy IDs.
+	const availableModels = modelRegistry.getAll().filter((m) => modelRegistry.hasConfiguredAuth(m));
 	const scopedModels: ScopedModel[] = [];
 
 	for (const pattern of patterns) {

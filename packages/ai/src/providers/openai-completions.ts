@@ -10,6 +10,7 @@ import type {
 } from "openai/resources/chat/completions.js";
 import { getEnvApiKey } from "../env-api-keys.js";
 import { calculateCost, supportsXhigh } from "../models.js";
+import { isOpenCodeFlash } from "../models.minimax.js";
 import type {
 	AssistantMessage,
 	Context,
@@ -407,7 +408,13 @@ function buildParams(model: Model<"openai-completions">, context: Context, optio
 		params.tool_choice = options.toolChoice;
 	}
 
-	if (compat.thinkingFormat === "zai" && model.reasoning) {
+	if (isOpenCodeFlash(model)) {
+		Object.assign(params, {
+			reasoning_effort: options?.reasoningEffort
+				? mapReasoningEffort(options.reasoningEffort, compat.reasoningEffortMap)
+				: "max",
+		});
+	} else if (compat.thinkingFormat === "zai" && model.reasoning) {
 		(params as any).enable_thinking = !!options?.reasoningEffort;
 	} else if (compat.thinkingFormat === "qwen" && model.reasoning) {
 		(params as any).enable_thinking = !!options?.reasoningEffort;
@@ -420,6 +427,8 @@ function buildParams(model: Model<"openai-completions">, context: Context, optio
 			openRouterParams.reasoning = {
 				effort: mapReasoningEffort(options.reasoningEffort, compat.reasoningEffortMap),
 			};
+		} else if (model.provider === "openrouter" && model.id === "minimax/minimax-m3.1-flash:free") {
+			openRouterParams.reasoning = { effort: "max" };
 		} else {
 			openRouterParams.reasoning = { effort: "none" };
 		}

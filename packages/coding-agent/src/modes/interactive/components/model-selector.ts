@@ -175,7 +175,18 @@ export class ModelSelectorComponent extends Container implements Focusable {
 		this.errorMessage = this.modelRegistry.getError();
 
 		try {
-			this.allModels = this.modelRegistry.getAll();
+			this.allModels = this.modelRegistry.getSelectable();
+			// Keep deliberate choices visible, including favorites and session history.
+			const savedRefs = [
+				...this.settingsManager.getFavoriteModels(),
+				...this.settingsManager.getRecentModels(),
+				...this.scopedModels.map((sc) => sc.model),
+				...(this.currentModel ? [this.currentModel] : []),
+			];
+			for (const ref of savedRefs) {
+				const model = this.modelRegistry.find(ref.provider, ref.id);
+				if (model && !this.allModels.includes(model)) this.allModels.push(model);
+			}
 		} catch (error) {
 			this.allModels = [];
 			this.errorMessage = error instanceof Error ? error.message : String(error);

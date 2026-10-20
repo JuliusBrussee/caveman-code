@@ -6,6 +6,7 @@ import type {
 } from "@anthropic-ai/sdk/resources/messages.js";
 import { getEnvApiKey } from "../env-api-keys.js";
 import { calculateCost } from "../models.js";
+import { isDirectMiniMaxM3, usesMiniMaxAdaptiveThinking } from "../models.minimax.js";
 import type {
 	Api,
 	AssistantMessage,
@@ -154,7 +155,7 @@ function convertContentBlocks(content: (TextContent | ImageContent)[]):
 	return blocks;
 }
 
-export type AnthropicEffort = "low" | "medium" | "high" | "max";
+export type AnthropicEffort = "low" | "medium" | "high" | "xhigh" | "max";
 
 export interface AnthropicOptions extends StreamOptions {
 	/**
@@ -487,6 +488,13 @@ export const streamSimpleAnthropic: StreamFunction<"anthropic-messages", SimpleS
 	}
 
 	const base = buildBaseOptions(model, options, apiKey);
+	if (usesMiniMaxAdaptiveThinking(model)) {
+		return streamAnthropic(model, context, {
+			...base,
+			thinkingEnabled: model.id === "MiniMax-M3.1-Flash" || !!options?.reasoning,
+			effort: options?.reasoning === "minimal" ? "low" : options?.reasoning,
+		} satisfies AnthropicOptions);
+	}
 	if (!options?.reasoning) {
 		return streamAnthropic(model, context, { ...base, thinkingEnabled: false } satisfies AnthropicOptions);
 	}
@@ -530,7 +538,8 @@ function createClient(
 ): { client: Anthropic; isOAuthToken: boolean } {
 	// Adaptive thinking models (Opus 4.6, Sonnet 4.6) have interleaved thinking built-in.
 	// The beta header is deprecated on Opus 4.6 and redundant on Sonnet 4.6, so skip it.
-	const needsInterleavedBeta = interleavedThinking && !supportsAdaptiveThinking(model.id, model.provider);
+	const needsInterleavedBeta =
+		interleavedThinking && !usesMiniMaxAdaptiveThinking(model) && !supportsAdaptiveThinking(model.id, model.provider);
 
 	// Opt into per-model capability betas (e.g. 1M context window).
 	const caps = getAnthropicCapabilities(model.id, model.provider);
@@ -621,7 +630,9 @@ function buildParams(
 	isOAuthToken: boolean,
 	options?: AnthropicOptions,
 ): MessageCreateParamsStreaming {
-	const { cacheControl } = getCacheControl(model.baseUrl, options?.cacheRetention);
+	// Current direct MiniMax models cache prefixes automatically; explicit
+	// Anthropic cache_control blocks are not supported by that API.
+	const { cacheControl } = getCacheControl(model.baseUrl, isDirectMiniMaxM3(model) ? "none" : options?.cacheRetention);
 	const params: MessageCreateParamsStreaming = {
 		model: model.id,
 		messages: convertMessages(context.messages, model, isOAuthToken, cacheControl),
@@ -667,13 +678,23 @@ function buildParams(
 
 	// Configure thinking mode: adaptive (Opus 4.6 and Sonnet 4.6),
 	// budget-based (older models), or explicitly disabled.
-	if (model.reasoning) {
+	if (usesMiniMaxAdaptiveThinking(model)) {
+		if (model.id === "MiniMax-M3.1-Flash") {
+			// Flash always thinks. Even a saved "off" preference must not send
+			// disabled/none, which this API rejects.
+			params.thinking = { type: "adaptive" };
+			Object.assign(params, { output_config: { effort: options?.effort ?? "max" } });
+		} else if (options?.thinkingEnabled) {
+			// M3 supports adaptive thinking, but no effort control.
+			params.thinking = { type: "adaptive" };
+		}
+	} else if (model.reasoning) {
 		if (options?.thinkingEnabled) {
 			if (supportsAdaptiveThinking(model.id, model.provider)) {
 				// Adaptive thinking: Claude decides when and how much to think
 				params.thinking = { type: "adaptive" };
 				if (options.effort) {
-					params.output_config = { effort: options.effort };
+					params.output_config = { effort: options.effort === "xhigh" ? "max" : options.effort };
 				}
 			} else {
 				// Budget-based thinking for older models
@@ -786,7 +807,15 @@ function convertMessages(
 					// If thinking signature is missing/empty (e.g., from aborted stream),
 					// convert to plain text block without <thinking> tags to avoid API rejection
 					// and prevent Claude from mimicking the tags in responses
-					if (!block.thinkingSignature || block.thinkingSignature.trim().length === 0) {
+					if (usesMiniMaxAdaptiveThinking(model)) {
+						// MiniMax returns valid unsigned thinking blocks. Preserve them
+						// through tool-result turns instead of changing them into text.
+						blocks.push({
+							type: "thinking",
+							thinking: block.thinking,
+							...(block.thinkingSignature ? { signature: block.thinkingSignature } : {}),
+						} as Anthropic.Messages.ThinkingBlockParam);
+					} else if (!block.thinkingSignature || block.thinkingSignature.trim().length === 0) {
 						blocks.push({
 							type: "text",
 							text: sanitizeSurrogates(block.thinking),

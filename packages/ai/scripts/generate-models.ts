@@ -3,6 +3,7 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
+import { MINIMAX_MODELS } from "../src/models.minimax.js";
 import type { Api, KnownProvider, Model } from "../src/types.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -915,25 +916,13 @@ async function generateModels() {
 		});
 	}
 
-	const minimaxDirectSupportedIds = new Set(["MiniMax-M2.7", "MiniMax-M2.7-highspeed"]);
-
-	for (const candidate of allModels) {
-		if (
-			(candidate.provider === "minimax" || candidate.provider === "minimax-cn") &&
-			minimaxDirectSupportedIds.has(candidate.id)
-		) {
-			candidate.contextWindow = 204800;
-			candidate.maxTokens = 131072;
-		}
-	}
-
-	for (let i = allModels.length - 1; i >= 0; i--) {
-		const candidate = allModels[i];
-		if (
-			(candidate.provider === "minimax" || candidate.provider === "minimax-cn") &&
-			!minimaxDirectSupportedIds.has(candidate.id)
-		) {
-			allModels.splice(i, 1);
+	// Current MiniMax metadata wins over stale catalogs. Retain older entries for
+	// explicit selections and session restore; ordinary choices filter them.
+	for (const models of Object.values(MINIMAX_MODELS)) {
+		for (const model of Object.values(models)) {
+			const existing = allModels.findIndex((m) => m.provider === model.provider && m.id === model.id);
+			if (existing >= 0) allModels[existing] = model;
+			else allModels.push(model);
 		}
 	}
 
