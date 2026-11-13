@@ -8,6 +8,11 @@ describe("supportsXhigh", () => {
 		expect(supportsXhigh(model!)).toBe(true);
 	});
 
+	it("returns true for Anthropic Opus 5.x", () => {
+		const model = { ...getModel("anthropic", "claude-opus-4-6")!, id: "claude-opus-5-5" };
+		expect(supportsXhigh(model)).toBe(true);
+	});
+
 	it("returns false for non-Opus Anthropic models", () => {
 		const model = getModel("anthropic", "claude-sonnet-4-5");
 		expect(model).toBeDefined();

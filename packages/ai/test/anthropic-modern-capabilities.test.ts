@@ -96,6 +96,15 @@ describe("static capability fallback table", () => {
 		expect(caps.contextBeta).toBeUndefined();
 	});
 
+	it("classifies opus-5.x as adaptive; xhighEffort only on providers known to accept effort=max", () => {
+		for (const id of ["claude-opus-5-5", "claude-opus-5.5", "claude-opus-5-0"]) {
+			expect(getAnthropicCapabilities(id).thinkingSchema).toBe("adaptive");
+			expect(getAnthropicCapabilities(id).xhighEffort).toBeFalsy();
+			expect(getAnthropicCapabilities(id, "anthropic").xhighEffort).toBe(true);
+			expect(getAnthropicCapabilities(id, "github-copilot").xhighEffort).toBeFalsy();
+		}
+	});
+
 	it("classifies opus-4-5 as legacy without contextBeta (only discovery may enable it)", () => {
 		const caps = getAnthropicCapabilities("claude-opus-4-5");
 		expect(caps.thinkingSchema).toBe("legacy");
@@ -113,6 +122,7 @@ describe("static capability fallback table", () => {
 	});
 
 	it("supportsAdaptiveThinking aligns with the static table", () => {
+		expect(supportsAdaptiveThinking("claude-opus-5-5")).toBe(true);
 		expect(supportsAdaptiveThinking("claude-opus-4-7")).toBe(true);
 		expect(supportsAdaptiveThinking("claude-opus-4-6")).toBe(true);
 		expect(supportsAdaptiveThinking("claude-sonnet-4-6")).toBe(true);
@@ -177,6 +187,16 @@ describe("Anthropic thinking request shape", () => {
 		_clearDiscoveredCapabilitiesForTests();
 		const { params } = await runWith(getModel("anthropic", "claude-opus-4-7"), "xhigh");
 		expect(params.output_config).toEqual({ effort: "max" });
+	});
+
+	it("opus-5.x on direct Anthropic sends adaptive thinking; xhigh maps to effort=max", async () => {
+		_clearDiscoveredCapabilitiesForTests();
+		const model = { ...getModel("anthropic", "claude-opus-4-7"), id: "claude-opus-5-5" };
+		const high = await runWith(model, "high");
+		expect(high.params.thinking).toEqual({ type: "adaptive" });
+		expect(high.params.output_config).toEqual({ effort: "high" });
+		const xhigh = await runWith(model, "xhigh");
+		expect(xhigh.params.output_config).toEqual({ effort: "max" });
 	});
 
 	it("xhigh on Copilot opus-4.6 clamps to effort=high without discovery (Copilot relay rejects max)", async () => {
