@@ -100,6 +100,16 @@ const CAPABILITY_ENTRIES: Array<{
 	providers?: ReadonlyArray<string>;
 	caps: AnthropicModelCapabilities;
 }> = [
+	// Opus 5.x — adaptive thinking, same provider-conditional xhighEffort as 4.6/4.7.
+	{
+		match: (id) => /opus-5[.-]/.test(id),
+		providers: ["anthropic", "amazon-bedrock", "openrouter"],
+		caps: { thinkingSchema: "adaptive", xhighEffort: true },
+	},
+	{
+		match: (id) => /opus-5[.-]/.test(id),
+		caps: { thinkingSchema: "adaptive" },
+	},
 	// Opus 4.7 — adaptive thinking. xhigh -> effort=max on the direct
 	// Anthropic API and Bedrock; not on Copilot (uses separate model ids).
 	{
