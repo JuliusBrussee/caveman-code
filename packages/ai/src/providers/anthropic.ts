@@ -407,6 +407,9 @@ export const streamAnthropic: StreamFunction<"anthropic-messages", AnthropicOpti
 				} else if (event.type === "message_delta") {
 					if (event.delta.stop_reason) {
 						output.stopReason = mapStopReason(event.delta.stop_reason);
+						if (output.stopReason === "error") {
+							output.errorMessage = `Response stopped by safety classifier (stop_reason: ${event.delta.stop_reason})`;
+						}
 					}
 					// Only update usage fields if present (not null).
 					// Preserves input_tokens from message_start when proxies omit it in message_delta.
@@ -434,7 +437,7 @@ export const streamAnthropic: StreamFunction<"anthropic-messages", AnthropicOpti
 			}
 
 			if (output.stopReason === "aborted" || output.stopReason === "error") {
-				throw new Error("An unknown error occurred");
+				throw new Error(output.errorMessage ?? "An unknown error occurred");
 			}
 
 			stream.push({ type: "done", reason: output.stopReason, message: output });
